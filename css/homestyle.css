@@ -1,0 +1,360 @@
+@charset "utf-8";
+
+/* 具有 .main 类名的元素的样式 */
+.main {
+    scroll-snap-type: y mandatory; /* 定义垂直方向上的滚动对齐 */
+    overflow: scroll; /* 溢出时出现滚动条（滚动模组） */
+    overflow-x: hidden; /* 不允许水平方向上的滚动 */
+    height: 100vh; /* 高度等于视窗高度 */
+}
+
+
+.sec1 {
+    height: 100vh; /* 元素的高度为 viewport 的高度 */
+    width: 100vw; /* 元素的宽度为 viewport 的宽度 */
+    scroll-snap-align: start; /* 滚动时该元素的开始位置将与滚动容器的开始位置对齐 */
+}
+
+/* 设置 .back 元素的背景图像、水平和垂直居中、占满整个屏幕并固定在窗口中 */
+.back{
+    width: 100%;
+    height: 100%;
+
+    display: flex; /* 盒类型：表示该元素应该采用 Flexbox 布局模型，使子元素能够在其中垂直或水平居中 */
+    flex-direction: column; /* 设置弹性盒 flex 容器的主轴方向为纵向，即垂直排列子元素 */
+    justify-content: center; /* 表示子元素应水平居中 */
+    align-items: center; /* 表示子元素应垂直居中 */
+
+    background-image: url("../image/loginback01.jpg"); /* 背景： */
+    background-repeat: no-repeat; /* 背景：表示不应重复背景图像 */
+    background-attachment: fixed; /* 背景：表示背景图像应固定在窗口中，即页面滚动时不会变化 */
+    transform: scale(1.05); /* 表示该元素的缩放因子为 1.05，即将其放大了 5%。这会使该元素在屏幕上显示稍微大一些，以获得更好的视觉效果 */
+}
+/* 为 .back 增加背景模糊效果 */
+.back::before{
+    content: ""; /* 伪元素不包含任何内容 */
+    width: 100%; /* 与 .back 相同宽度 */
+    height: 100%; /* 与 .back 相同高度 */
+    backdrop-filter: blur(10px); /* 背景模糊化 */
+    position: fixed; /* 在屏幕上保持固定位置 */
+}
+/* 鼠标悬停在 .back 元素上时去除背景的模糊效果 */
+.back:hover::before{
+    backdrop-filter: none; /* 去除背景模糊化 */
+}
+
+
+    .search {
+        position: sticky;
+        height: 100%; /* 设置容器 div 的高度占据整个可用空间 */
+        width: 50vw;
+        min-width: 500px;
+        padding-right: 5vw;
+        padding-left: 5vw;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .search-group {
+            width: 100%; /* 设置元素的宽度为100% */
+            height: 50px; /* 设置元素的最小高度为 300 像素 */
+
+            display: flex; /* 将元素设置为弹性盒子，使子元素可以使用弹性布局 */
+            flex-direction: row; /* 设置弹性盒 flex 容器的主轴方向为纵向，即垂直排列子元素 */
+            align-items: center; /* 设置弹性盒模型子元素在水平方向上居中 */
+
+            overflow: hidden;  /* 当子元素的高度大于父元素时，隐藏溢出的部分 */
+            background-color: rgba(50, 59, 88, 0.7); /* 设置元素的背景颜色为半透明的深蓝色 */
+            border-radius: 10px; /* 设置元素的圆角为 10 像素 */
+            box-shadow: 0 0 10px rgba(50, 59, 88, 0.8); /* 添加阴影效果，使元素产生视觉上的浮起感 */
+            backdrop-filter: blur(5px); /* 使用模糊效果 */
+            transition: 0.3s linear; /* 设置元素过渡的持续时间为 0.3 秒，过渡方式为线性（hover的时候） */
+        }
+        .search-group:hover {
+            transform: scale(1.02); /* 缩放比例增加到 1.02 */
+        }
+        .search-group .search-select {
+            z-index: 1;
+            width: 10%; /* 设置元素宽度占容器的10% */
+            padding: 2%; /* 设置元素内边距为占据元素宽度的2% */
+            position: relative; /* 设置元素相对定位 */
+
+            display: flex; /* 设置元素为弹性容器 */
+            justify-content: center; /* 设置元素内部内容水平居中 */
+            align-items: center; /* 设置元素内部内容垂直居中 */
+        }
+        .search-group .search-select span {
+            margin-right: 2px; /* 设置 span 元素右侧外边距为 2px */
+        }
+        .search-group .search-select:hover {
+            cursor: pointer; /* 鼠标悬停时变为手型 */
+        }
+        .search-group .search-select img { /* 通过CSS选择器选择class为search-group的元素下，class为search-select下的img元素 */
+            margin-right: 4px; /* 将图片离其他元素的右侧间隔为4个像素 */
+            width: 16px; /* 图片宽度为16个像素 */
+            height: 16px; /* 图片高度为16个像素 */
+            border-radius: 50%; /* 图片的圆角为50%的圆形 */
+        }
+        .search-group .search-input {
+            width: 80%;
+            padding: 2%; /* 文字内边距 */
+            margin-left: 2%;
+
+            border: none; /* 去掉边框 */
+            background: transparent; /* 背景透明 */
+            transition: 0.3s; /* 过渡时间 */
+
+            font-size: 16px; /* 字体大小 */
+        }
+        .search-group .search-input:hover{
+            transform: scaleX(1.1); /* 鼠标悬停时文字缩放 */
+        }
+        .search-group .search-input:focus{
+            outline: none; /* 去掉焦点状态的边框 */
+            color: rgba(137, 160, 245, 0.7); /* 获得焦点时文字颜色改变 */
+        }
+        .search-group .search-btn{
+            width: 10%; /* 宽度 */
+            height: 80%; /* 高度 */
+            margin: 2%; /* 上方与父元素的距离 */
+
+            border: none; /* 消除边框 */
+            background: transparent; /* 背景透明，显示父元素/页面/背景颜色 */
+            outline: transparent !important; /* 取消默认的外边框，!important优先级最高，确保样式生效 */
+        }
+        .search-btn i {
+            transform: scale(1.5);
+            transition: 0.3s linear; /* 设置元素过渡的持续时间为 0.3 秒，过渡方式为线性（hover的时候） */
+        }
+        .search-btn i:hover {
+            transform: scale(1.9);
+        }
+
+        .search-option {
+            font-size: small;
+            overflow: hidden;
+            max-width: 760px;
+            display: none;
+            box-sizing: border-box;
+            flex: none;
+            width: 100%;
+            margin: 5px 0 0;
+            overflow: hidden;
+            position: absolute;
+            top: 45px;
+            z-index: 600;
+            transition: 0.3s linear;
+            padding: 5px;
+        }
+        .search-option ul {
+            margin: 0;
+        }
+        .search-option p {
+            margin: 0;
+            padding-left: 5px;
+            font-weight: bold;
+        }
+        .search-option li {
+            box-sizing: border-box;
+            display: inline-flex;
+            width: 62px;
+            height: 25px;
+            justify-content: center;
+            align-items: center;
+            transition: 0.3s linear;
+            border-radius: 5px;
+            margin: 0 2px;
+        }
+        /* 解决点击冒泡问题 */
+        .search-option li::after {
+            position: absolute;
+            width: 62px;
+            height: 25px;
+            content: "";
+        }
+        .search-option li:hover {
+            cursor: pointer;
+        }
+        .search-option img {
+            margin-right: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        #searchList {
+            display: none; /* 隐藏该元素 */
+            box-sizing: border-box; /* 盒模型为border-box */
+            text-align: left; /* 内容左对齐 */
+            position: absolute; /* 绝对定位  */
+            z-index: 100; /* 叠加顺序为100  */
+            top: 50px; /* 距离父元素顶部的距离为50px */
+            max-width: 760px; /* 最大宽度为760px */
+            max-height: 350px; /* 最大高度为350px */
+            /*overflow: -moz-scrollbars-none; !* Firefox浏览器的滚动条不显示 *!*/
+            overflow: hidden; /* 超出此元素的内容隐藏掉 */
+            overflow-y: auto; /* 当垂直方向有溢出时，会出现滚动条 */
+            width: 100%; /* 元素宽度为100% */
+            border-radius: 8px; /* 元素圆角为8px */
+        }
+        #searchList::-webkit-scrollbar {
+            width: 0 !important /* 隐藏滚动条 */
+        }
+        #searchList li {
+            margin: 5px;
+            transition: 0.3s linear;
+            position: relative; /* li元素的定位 */
+            height: 32px;
+            padding: 0 8px;
+            display: flex; /* 应用flex布局 */
+            align-items: center;
+        }
+        /* 备选项前序号 */
+        #searchList li::before {
+            content: counter(item-count); /* content属性添加一个计数器 */
+            display: inline-flex; /* 将计数器放到文本中，使其居中 */
+            justify-content: center;
+            align-items: center;
+            width: 18px;
+            height: 18px;
+            color: #FFF;
+            background: #999999;
+            font-size: 12px;
+            border-radius: 9px;
+            margin-right: 5px;
+            counter-increment: item-count; /* 计数器自增1 */
+        }
+        #searchList li:first-child:before {
+            background: #FD8C84;
+        }
+        #searchList li:nth-child(2):before {
+            background: #FFCC99;
+        }
+        #searchList li:nth-child(3):before {
+            background: #7FD75A;
+        }
+        #searchList li:nth-child(4):before {
+            background: #CCCCFF;
+        }
+        #searchList li:nth-child(5):before {
+            background: #60C4FD;
+        }
+        #searchList li:last-child:before {
+            content: ".."; /* 计数器超出显示范围时，显示省略号 */
+        }
+        #searchList li a {
+            width: 100%;
+            font-size: 14px;
+            transition: 0.3s linear;
+        }
+
+
+
+/* 具有类名 .sec 的元素的样式 */
+    .sec2 {
+        height: 100vh; /* 元素的高度为 viewport 的高度 */
+        width: 100vw; /* 元素的宽度为 viewport 的宽度 */
+        scroll-snap-align: start; /* 滚动时该元素的开始位置将与滚动容器的开始位置对齐 */
+    }
+
+/* 具有 .imghid 类名的元素的样式 */
+.imghid {
+overflow: hidden; /* 溢出隐藏效果 */
+}
+
+/* 具有 .part1 类名的元素内部 img 元素的样式 */
+.part1 .img {
+background-image: url("../image/homepic1.png"); /* 背景图片为 ../image/homepic1.png */
+}
+/* 具有 .part2 类名的元素内部 img 元素的样式 */
+.part2 .img {
+background-image: url("../image/homepic2.png"); /* 背景图片为 ../image/homepic2.png */
+}
+/* 具有 .part3 类名的元素内部 img 元素的样式 */
+.part3 .img {
+background-image: url("../image/homepic3.png"); /* 背景图片为 ../image/homepic3.png */
+}
+/* 具有 .part4 类名的元素内部 img 元素的样式 */
+.part4 .img {
+background-image: url("../image/homepic4.png"); /* 背景图片为 ../image/homepic4.png */
+}
+
+/* 具有 .pt 类名的元素的样式 */
+.pt {
+display: flex; /* 使用 flex 布局 */
+flex-direction: column; /* 垂直方向排列 */
+height: 500px; /* 高度为 500px */
+width: 250px; /* 宽度为 250px */
+float: left; /* 左浮动——左对齐 */
+margin: 150px 0px 0px 105px; /* 外边距为 150px 0px 0px 105px */
+background: rgba(219, 235, 241,0.8); /* 背景颜色为 rgba(219, 235, 241,0.8) */
+box-shadow: 0 0 15px rgb(59, 73, 95); /* 设置阴影 */
+border-radius: 15px; /* 设置边框圆角半径 */
+overflow: hidden; /* 溢出隐藏 */
+scroll-snap-align: start; /* 元素吸附到滚动区块的左侧 */
+transition: all 0.5s ease 0s; /* 动画过渡效果 */
+}
+/* 当鼠标悬停时应用的样式 */
+.pt:hover {
+cursor: pointer; /* 鼠标样式为手型 */
+transform: scale(1.05); /* 缩放比例增加到 1.05 */
+}
+
+/* 具有 .pt 类名子元素的样式 */
+.pt .img {
+height: 190px; /* 高度为 190px */
+width: 250px; /* 宽度为 250px */
+background-size: cover; /* 背景图片大小自适应元素大小 */
+background-position: 0px -30px; /* 背景图片向上偏移 30px */
+transition: all 0.5s ease 0s; /* 动画过渡效果 */
+opacity: 0.8; /* 不透明度为 0.8 */
+}
+/* 当鼠标悬停于图片时应用的样式 */
+.pt .img:hover {
+transform: scale(1.1); /* 缩放比例增加到 1.1 */
+}
+
+/* 具有 .pt 类名子元素的样式 */
+.pt .txt {
+height: 310px; /* 高度为 310px */
+width: 200px; /* 宽度为 200px */
+overflow: hidden; /* 溢出隐藏 */
+display: flex; /* 使用 flex 布局 */
+flex-direction: column; /* 垂直方向排列 */
+margin: auto; /* 上下自动居中，左右为自动 */
+}
+
+/* 具有 .pt .txt 中 h1 标签的样式 */
+.pt .txt h1 {
+text-align: center; /* 文字居中 */
+font-size: 3em; /* 字体大小为 3em */
+color: rgb(28, 44, 68); /* 文字颜色为 rgb(28, 44, 68) */
+height: 30px; /* 高度为 30px */
+line-height: 30px; /* 行高为 30px */
+}
+
+/* 具有 .pt .txt 中 p 标签的样式 */
+.pt .txt p {
+margin-top: -2px; /* 上外边距为 -2px */
+word-wrap: break-word; /* 处理单词换行 */
+color: rgb(114, 182, 202); /* 文字颜色为 rgb(114, 182, 202) */
+}
+
+
+/* 定义一个名为 load 的 keyframes 动画 */
+@keyframes load {
+/* 动画开始状态 */
+0% {
+background-position-y: 50px; /* 背景图片在 Y 轴方向上的初始位置为 50px */
+opacity: 0; /* 初始化元素不透明度为 0 */
+}
+/* 动画结束状态 */
+100% {
+background-position-y: 0px; /* 背景图片在 Y 轴方向上的位置为 0px */
+opacity: 1; /* 最终元素不透明度为 1 */
+}
+}
+
