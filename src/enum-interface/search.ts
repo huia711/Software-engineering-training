@@ -3,6 +3,7 @@ export interface SearchEngineItem {
   name: string
   baseUrl: string
   icon: string
+  icon_select: string
   // description: string
 }
 
@@ -18,10 +19,10 @@ export enum OpenPageTarget {
 }
 
 export enum SearchSuggestion {
-  none,
-  baidu,
-  bing,
-  google
+  none =  '不使用',
+  baidu = '百度 API',
+  bing = 'Bing API',
+  google = 'Google API'
 }
 
 export interface SearchSetting {

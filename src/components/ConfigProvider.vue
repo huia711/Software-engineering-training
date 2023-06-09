@@ -1,88 +1,102 @@
 <template>
-  <div v-if="isDark" class="Dark">
-    <div class="Light">
-    </div>
-  </div>
   <slot/>
 </template>
-
-<script lang="ts" type="module">
-// 导入必要的类型和定义
-import type { InjectionKey, Ref } from "vue"
-import { LanguageType, ThemeMode } from "@/enum-interface"
-
-// 定义主题提供者键的全局数据标识符
-export const CURRENT_THEME_KEY: InjectionKey<Ref<ThemeMode>> = Symbol.for("")
-</script>
 
 <script lang="ts" setup type="module">
 /**
  * 导入（import）
  */
-import { computed, provide, watchEffect, defineProps, withDefaults } from "vue"
+import {computed, provide, watchEffect, defineProps, withDefaults, watch} from "vue"
+import {useStore} from "@/store"
+import { SettingMutations } from "@/store/setting"
+// 导入外部定义
+import {LanguageType, ThemeMode} from "@/enum-interface"
+import { usePreferredDark } from "@/utils/use"
 // 外部
 import dayjs from "@/plugins/dayjs"
-import { usePreferredDark } from "@/utils/use"
 import { useI18n } from "vue-i18n"
-
 import { useDark, useToggle } from '@vueuse/core'
 
-/**
- * 自定义类型（type）的定义
- */
-interface ThemeProviderProps {
-  theme: ThemeMode // 主题模式
-  lang: LanguageType // 语言类型
-}
 
 /**
  * 常/变量（const/let）的定义
  */
-const prop = withDefaults(defineProps<ThemeProviderProps>(), {
-  theme: ThemeMode.Auto,
-  lang: LanguageType.Auto
-})
-
 // 获取本地化工具用于国际化日期格式和语言设置
+const store = useStore()
 const { locale } = useI18n()
-// 获取用户的首选主题设置
+
+// 定义Dark（useDark）控制Theme
+const Dark = useDark ({
+  // 存储到localStorage/sessionStorage中的Key 根据自己的需求更改
+  storageKey: 'useDarkKEY',
+  // 暗黑class名字
+  valueDark: 'dark',
+  // 高亮class名字
+  valueLight: 'light',
+})
+const toggle = useToggle(Dark);
+
+// 获取系统主题
 const isDark = usePreferredDark()
+// watchEffect(() => {
+//   console.log(isDark.value ? ThemeMode.Dark : ThemeMode.Light)
+// })
 
 
 /**
  * 使用 computed 进行响应计算（自动跟踪）
- * 这里用于实现自动选择
+ * 这里用于实现自动选择（Auto）
  */
-// 当前主题，使用computed自动更新：如果props传入主题为 "auto" 并且prefer-dark为真，则返回 "dark" 主题，否则返回 "light" 主题
-const currentTheme = computed(() => {
-  const { theme } = prop
-  if ( theme === ThemeMode.Auto) {
-    return isDark.value ? ThemeMode.Dark : ThemeMode.Light
-  } else {
-    return theme
-  }
+// 设置的主体（theme）
+const theme = computed({
+  get: () => store.state.setting.themeMode,
+  set: theme => store.commit(SettingMutations.updateThemeMode, theme)
 })
+const lang = computed(() => store.state.setting.lang)
+
+// 获取实时的系统主题（theme）
+// 使用computed自动更新：如果props传入主题为 "auto" 并且prefer-dark为真，则返回 "dark" 主题，否则返回 "light" 主题
+const currentTheme = computed(() => {
+    {
+      if ( theme.value === ThemeMode.Auto) {
+        return isDark.value ? ThemeMode.Dark : ThemeMode.Light
+      } else {
+        return theme.value
+      }
+    }
+  })
 
 // 当前语言，使用computed自动更新：如果props传入语言为 "auto" 则返回浏览器的当前语言配置，否则返回props传入的语言
 const currentLang = computed(() => {
-  const { lang } = prop
-  return lang === LanguageType.Auto ? navigator.language : lang
+  return lang.value === LanguageType.Auto ? navigator.language : lang.value
 })
+
 
 /**
  * 使用 watchEffect 进行响应计算（自动跟踪）
  * 这里用于更新 DOM
  */
 // 监听并设置主题
-watchEffect(() => {
-  //
-  let isDark = currentTheme.value === ThemeMode.Dark
-  // 获取 HTML 元素节点
-  const html = document.body.parentElement
+watch(() => currentTheme.value, (newValue, oldValue) => {
+  if (newValue !== oldValue && oldValue !== undefined) {
+    console.log("success")
+    toggle()
+  }
+}, {
+  deep: true,      // 深度监听属性的变化
+  immediate: true, // 立即执行一次回调函数
+  flush: 'async'   // 在下一次事件循环时刷新
+})
 
-  // 设置 HTML 元素节点的一个自定义属性 data-theme 的属性值
-  html.setAttribute("data-theme", isDark ? "dark" : "light")
-  console.log(isDark)
+watch(() => isDark.value, (newValue, oldValue) => {
+  console.log(newValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value)
+  if (oldValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value) {
+    store.commit(SettingMutations.updateThemeMode, newValue ? ThemeMode.Dark : ThemeMode.Light)
+  }
+}, {
+  deep: true,      // 深度监听属性的变化
+  immediate: true, // 立即执行一次回调函数
+  flush: 'async'   // 在下一次事件循环时刷新
 })
 
 // 监听并设置语言
@@ -90,11 +104,8 @@ watchEffect(() => {
   const lang = currentLang.value
 
   locale.value = lang
-  dayjs.locale(lang.toLowerCase())
+  dayjs.locale(lang)
 })
-
-// 从本组件的依赖中提供当前主题
-provide(CURRENT_THEME_KEY, currentTheme)
 </script>
 
 

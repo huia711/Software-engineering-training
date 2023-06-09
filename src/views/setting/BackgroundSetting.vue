@@ -1,18 +1,18 @@
 <template>
   <div class="background-setting">
     <setting-item :lable="t('background.wallpaper.setting')">
-      <a-radio-group v-model:value="background.type" button-style="solid">
-        <a-radio :value="BackgroundType.None">{{ t("background.wallpaper.none") }}</a-radio>
-        <a-radio :value="BackgroundType.Local">{{ t("background.wallpaper.local") }}</a-radio>
-        <a-radio :value="BackgroundType.Bing">{{ t("background.wallpaper.bing") }}</a-radio>
-      </a-radio-group>
+      <el-radio-group v-model = "background.type" button-style="solid">
+        <el-radio :label = "BackgroundType.None">{{ t("background.wallpaper.none") }}</el-radio>
+        <el-radio :label = "BackgroundType.Local">{{ t("background.wallpaper.local") }}</el-radio>
+        <el-radio :label = "BackgroundType.Bing">{{ t("background.wallpaper.bing") }}</el-radio>
+      </el-radio-group>
     </setting-item>
 
-    <setting-item
-      v-if="background.type === BackgroundType.Local"
-      class="upload-layout"
-      :lable="t('background.wallpaper.upload')"
-    >
+<!--    <setting-item-->
+<!--      v-if="background.type === BackgroundType.Local"-->
+<!--      class="upload-layout"-->
+<!--      :lable="t('background.wallpaper.upload')"-->
+<!--    >-->
 <!--      <a-upload-->
 <!--        class="background-uploader"-->
 <!--        list-type="picture-card"-->
@@ -26,7 +26,7 @@
 <!--          <plus-outlined />-->
 <!--        </div>-->
 <!--      </a-upload>-->
-    </setting-item>
+<!--    </setting-item>-->
 
     <template v-if="background.type !== BackgroundType.None">
 <!--      <setting-item :lable="t('background.blur')">-->
@@ -43,65 +43,77 @@
 <!--      </setting-item>-->
 
       <setting-item :lable="t('background.wallpaperDark')" horizontal>
-        <a-switch v-model:checked="background.autoOpacity" />
+        <el-switch v-model = "background.autoOpacity" />
       </setting-item>
     </template>
   </div>
 </template>
 
 <script lang="ts" setup type="module">
-import { watch } from "vue"
-import { PlusOutlined } from "@ant-design/icons-vue"  // 引入用于渲染加号图标的 Ant Design 组件
-import { BackgroundSetting, BackgroundType } from "@/enum-interface"  // 引入壁纸设置和壁纸类型
-// import { isExtension, Permis } from "@/plugins/extension"  // 引入扩展和权限检查的辅助函数
-import { toPixel, toPercent } from "@/utils/format"
-import { useStore } from "@/store"
-import { SettingActions, SettingMutations } from "@/store/setting"
-// import { deepComputed } from "@/utils/common"  // 引入计算深层对象属性的辅助函数
-import { useI18n } from "vue-i18n"
-import SettingItem from "@/components/SettingItem.vue"
+  /**
+   * 导入（import）
+   */
+  import { watch } from "vue"
+  import { useStore } from "@/store"
+  import { SettingActions, SettingMutations } from "@/store/setting"
+  // 导入组件Component
+  import SettingItem from "@/components/SettingItem.vue"
+  // 导入外部定义
+  import { BackgroundSetting, BackgroundType } from "@/enum-interface"  // 引入壁纸设置和壁纸类型
+  // 外部导入
+  import { useI18n } from "vue-i18n"
+  // import { isExtension, Permis } from "@/plugins/extension"  // 引入扩展和权限检查的辅助函数
+  // import { toPixel, toPercent } from "@/utils/format"
+  // import { deepComputed } from "@/utils/common"  // 引入计算深层对象属性的辅助函数
 
-const { t } = useI18n()
-const store = useStore()
-// const background = deepComputed(() => store.state.setting.background, updateBackgroundSetting)
-const background = store.state.setting.background
+  /**
+   * 常/变量（const/let）的定义
+   */
+  const { t } = useI18n()
+  const store = useStore()
+  const background = store.state.setting.background
 
-// // 上传壁纸
-// function uploadBackgroundImage(e) {
-//   store.dispatch(SettingActions.uploadBackgroundImage, e.file)
-// }
+  /**
+   * 响应式对象（reactive,computed）
+   */
+  // 监听到背景类型为Bing则拉取壁纸
+  watch(
+      () => background.type,
+      type => {
+        if (type === BackgroundType.Bing) {
+          store.dispatch(SettingActions.loadBingDailyWallpaper)
+        }
+      }
+  )
 
-// 更新背景设置
-function updateBackgroundSetting(value: BackgroundSetting) {
-  store.commit(SettingMutations.updateBackgroundSetting, value)
-}
-
-// 监听到背景类型为Bing则拉取壁纸
-watch(
-  () => background.type,
-  type => {
-    if (type === BackgroundType.Bing) {
-      store.dispatch(SettingActions.loadBingDailyWallpaper)
-    }
+  /**
+   * 函数（function）定义
+   */
+  // 更新背景设置
+  function updateBackgroundSetting(value: BackgroundSetting) {
+    store.commit(SettingMutations.updateBackgroundSetting, value)
   }
-)
+  // // 上传壁纸
+  // function uploadBackgroundImage(e) {
+  //   store.dispatch(SettingActions.uploadBackgroundImage, e.file)
+  // }
 </script>
 
 <style lang="less">
-.background-setting {
-  .upload-layout {
-    margin-top: 8px;
+  .background-setting {
+    .upload-layout {
+      margin-top: 8px;
 
-    .background-uploader {
-      .ant-upload,
-      img {
-        width: 100%;
-        height: 128px;
+      .background-uploader {
+        .el-upload,
+        img {
+          width: 100%;
+          height: 128px;
 
-        object-fit: cover;
-        object-position: center;
+          object-fit: cover;
+          object-position: center;
+        }
       }
     }
   }
-}
 </style>

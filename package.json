@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
+    "@element-plus/icons-vue": "^2.1.0",
     "@intlify/vite-plugin-vue-i18n": "^7.0.0",
     "@vue/runtime-core": "^3.3.4",
     "@vueuse/core": "^10.1.2",

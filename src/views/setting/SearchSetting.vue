@@ -1,36 +1,30 @@
 <template>
   <div class="search-setting">
+    <!--管理搜索引擎-->
     <setting-item horizontal>
       <template #lable>
         <span>{{ t("search.engine") }}</span>
-        <icon-tooltip title="管理搜索引擎" @click="manageVisible = true">
-          <setting-outlined />
-        </icon-tooltip>
       </template>
 
-      <a-select v-model:value="searchSetting.currentEngine" style="width: 90px">
-        <a-select-option v-for="(value, key) in searchEngines" :value="key" :key="key">
+      <el-select v-model = "currentEngine" style="width: 90px">
+        <el-option v-for="(value, key) in searchEngines" :value="key" :key="key" :label="value.name">
           {{ value.name }}
-        </a-select-option>
-      </a-select>
+        </el-option>
+      </el-select>
     </setting-item>
 
+    <!--管理接口-->
     <setting-item horizontal>
       <template #lable>
         <span>{{ t("search.suggestApi") }}</span>
-        <icon-tooltip
-          v-if="searchSetting.suggestion === SearchSuggestion.none"
-          :title="t('search.suggestApiTip')"
-          type="warn"
-        />
       </template>
 
-      <a-select v-model:value="searchSetting.suggestion" style="width: 100px">
-        <a-select-option :value="SearchSuggestion.none"> 不使用 </a-select-option>
-        <a-select-option :value="SearchSuggestion.baidu"> 百度 API </a-select-option>
-        <a-select-option :value="SearchSuggestion.bing"> Bing API </a-select-option>
-        <a-select-option :value="SearchSuggestion.google"> Google API </a-select-option>
-      </a-select>
+      <el-select v-model = "searchSetting.suggestion" style="width: 100px" placement="bottom">
+        <el-option :value="SearchSuggestion.none" > 不使用 </el-option>
+        <el-option :value="SearchSuggestion.baidu"> 百度 API </el-option>
+        <el-option :value="SearchSuggestion.bing"> Bing API </el-option>
+        <el-option :value="SearchSuggestion.google"> Google API </el-option>
+      </el-select>
     </setting-item>
 
 <!--    <setting-item :lable="t('search.searchRound')">-->
@@ -42,15 +36,15 @@
 <!--    </setting-item>-->
 
     <setting-item :lable="t('search.newTabOpen')" horizontal>
-      <a-switch v-model:checked="isOpenPageByBlank" />
+      <el-switch v-model = "isOpenPageByBlank" />
     </setting-item>
 
     <setting-item :lable="t('search.showEngineIcon')" horizontal>
-      <a-switch v-model:checked="searchSetting.showEngineIcon" />
+      <el-switch v-model = "searchSetting.showEngineIcon" />
     </setting-item>
 
     <setting-item :lable="t('search.showEngineSelet')" horizontal>
-      <a-switch v-model:checked="searchSetting.showEngineSelect" />
+      <el-switch v-model = "searchSetting.showEngineSelect" />
     </setting-item>
   </div>
 
@@ -60,48 +54,53 @@
 </template>
 
 <script lang="ts" setup type="module">
-import { ref, computed } from "vue"
-import { SettingOutlined } from "@ant-design/icons-vue"
-import { OpenPageTarget, SearchEngineData, SearchSetting, SearchSuggestion, Option } from "@/enum-interface"
-// import SearchManage from "./SearchManage.vue"
-// import { Permis, isExtension } from "@/plugins/extension"
-import { toPixel } from "@/utils/format"
-import { useStore } from "@/store"
-import { SearchGetters } from "@/store/search"
-// import { deepComputed } from "@/utils/common"
-import { SettingMutations } from "@/store/setting"
-import { useI18n } from "vue-i18n"
-import SettingItem from "@/components/SettingItem.vue";
-import IconTooltip from "@/components/IconTooltip.vue";
+  /**
+   * 导入（import）
+   */
+  import { ref, computed } from "vue"
+  import { useStore } from "@/store"
+  import { SearchGetters } from "@/store/search"
+  import { SettingMutations } from "@/store/setting"
+  // 导入组件Component
+  import SettingItem from "@/components/SettingItem.vue"
+  // 导入外部定义
+  import { OpenPageTarget, SearchEngineData, SearchSetting, Option, SearchSuggestion } from "@/enum-interface"
+  // 外部导入
+  import { useI18n } from "vue-i18n"
 
-const { t } = useI18n()
-const store = useStore()
+  /**
+   * 常/变量（const/let）的定义
+   */
+  const { t } = useI18n()
+  const store = useStore()
+  const { state: stateX } = useStore()
 
-const searchEngines = computed<SearchEngineData>(
-  () => store.getters[SearchGetters.getUseSearchEngines]
-)
-// const searchSetting = deepComputed(
-//   () => store.state.setting.search,
-//   updateSearchSetting,
-//   "openPageTarget"
-// )
-const searchSetting = store.state.setting.search
+  /**
+   * 响应式对象（reactive,computed）
+   */
+  const searchSetting = computed(() => stateX.setting.search)
+  const searchEngines = computed<SearchEngineData>(() => store.getters[SearchGetters.getUseSearchEngines])
+  const currentEngine = computed({
+    get: () => searchSetting.value.currentEngine,
+    // 在 set 函数中，更新 store 中的搜索设置
+    set: currentEngine => updateSearchSetting({ currentEngine })
+  })
 
-// Ref
-const manageVisible = ref(false)
+  // 是否在新标签页中打开
+  const isOpenPageByBlank = computed({
+    get: () => store.state.setting.search.openPageTarget === OpenPageTarget.Blank,
+    set: isOpenPageByBlank =>
+      updateSearchSetting({
+        openPageTarget: isOpenPageByBlank ? OpenPageTarget.Blank : OpenPageTarget.Self
+      })
+  })
 
-// 是否在新标签页中打开
-const isOpenPageByBlank = computed({
-  get: () => store.state.setting.search.openPageTarget === OpenPageTarget.Blank,
-  set: isOpenPageByBlank =>
-    updateSearchSetting({
-      openPageTarget: isOpenPageByBlank ? OpenPageTarget.Blank : OpenPageTarget.Self
-    })
-})
-
-function updateSearchSetting(data: Option<SearchSetting>) {
-  store.commit(SettingMutations.updateSearchSetting, data)
-}
+  /**
+   * 函数（function）定义
+   */
+  function updateSearchSetting(data: Option<SearchSetting>) {
+    store.commit(SettingMutations.updateSearchSetting, data)
+  }
 </script>
 
 <style lang="less">

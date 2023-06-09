@@ -2,9 +2,10 @@
  * 导入（import）
  */
 import {createStoreModule} from "./index"
-import {SearchData, SearchEngineData, SearchEngineItem, SearchSuggestion,} from "@/enum-interface"
+import {SearchData, SearchEngineData, SearchEngineItem, } from "@/enum-interface"
 import {isEmpty} from "@/utils/common"
 import {getBaiduSuggestion, getBingSuggestion, getGoogleSuggestion} from "@/api/suggestion"
+import {SearchSuggestion} from "@/enum-interface";
 
 /**
  * 自定义类型（type）的定义
@@ -59,19 +60,22 @@ export const searchEnginesData: SearchEngineData = {
     id: "google",
     name: "Google",
     baseUrl: "https://www.google.com/search?q=",
-    icon: "img/google.png"
+    icon: "img/google.png",
+    icon_select: "img/google_select.jpg"
   },
   bing: {
     id: "bing",
     name: "Bing",
     baseUrl: "https://www.bing.com/search?q=",
-    icon: "img/bing.svg"
+    icon: "img/bing.svg",
+    icon_select: "img/bing_select.jpg"
   },
   baidu: {
     id: "baidu",
     name: "百度",
     baseUrl: "https://www.baidu.com/s?wd=",
-    icon: "img/baidu.png"
+    icon: "img/baidu.png",
+    icon_select: "img/baidu_select.jpg"
   }
 };
 

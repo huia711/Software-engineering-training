@@ -48,3 +48,8 @@ export interface LayoutSetting {
 export interface PopupSettting {
     current: number
 }
+
+export type Option<T> = {
+    [K in keyof T]?: T[K]
+}
+

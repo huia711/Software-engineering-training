@@ -1,3 +1,6 @@
+/**
+ * 导入（import）
+ */
 import { createStoreModule } from "./index"
 import { copy, isEmpty, uuid } from "@/utils/common"
 // import { wallpaperStore } from "@/plugins/localforage"
@@ -17,10 +20,13 @@ import {
   PopupSettting,
   SearchSetting,
   OpenPageTarget,
-  SearchSuggestion,
   LanguageType
 } from "@/enum-interface"
+import {SearchSuggestion} from "@/enum-interface";
 
+/**
+ * 自定义类型（type）的定义
+ */
 export interface SettingState {
   lang: LanguageType
   themeMode: ThemeMode
@@ -51,12 +57,22 @@ export enum SettingActions {
   importSetting = "IMPORT_SETTING"
 }
 
+/**
+ * 常/变量（const/let）的定义
+ */
 // SETTING_STORAGE 常量用于表示应用设置的本地存储键名。
 // BACKUP_FILE_MARK 常量用于在备份的文件名中区分备份文件的标记。
 const SETTING_STORAGE = "setting-data"
 const BACKUP_FILE_MARK = "_MARK_"
 
+/**
+ * 默认导出（export default）定义
+ * module的定义
+ */
 export default createStoreModule<SettingState>({
+  /**
+   * state
+   */
   state() {
     // 返回应用状态的默认值(defaultState)
     const defaultState: SettingState = {
@@ -113,7 +129,9 @@ export default createStoreModule<SettingState>({
     return defaultState
   },
 
-
+  /**
+   * mutations
+   */
   mutations: {
     /**
      * 更新语言
@@ -187,7 +205,9 @@ export default createStoreModule<SettingState>({
     }
   },
 
-
+  /**
+   * action
+   */
   actions: {
     // /**
     //  * 上传壁纸

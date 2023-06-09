@@ -14,8 +14,7 @@
 </template>
 
 <script lang="ts" setup type="module">
-import { defineProps, withDefaults } from 'vue'
-
+import {defineProps, withDefaults} from 'vue'
 // Setting Item 组件 Props 定义
 interface SettingItemProps {
   lable?: string // 标签内容
@@ -28,7 +27,7 @@ const props = withDefaults(defineProps<SettingItemProps>(), {
 })
 </script>
 
-<style>
+<style lang="less">
 .setting-item {
   min-height: 38px;
 
