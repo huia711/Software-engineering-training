@@ -49,16 +49,16 @@ func Execute() error {
 			viper.GetString("db.username"),
 			viper.GetString("db.password"),
 			viper.GetString("db.dbname"),
-		)
+		) // 用viper将对应的参数取出来
 		if err != nil {
 			return err
 		}
 
-		mysql.DB.AutoMigrate(&models.User{})
+		mysql.DB.AutoMigrate(&models.User{}) // 将数据库的表自动映射为User
 
-		defer mysql.DB.Close()
+		defer mysql.DB.Close() // 最后别忘了把连接关了
 
-		r := router.SetupRouter()
+		r := router.SetupRouter() // 初始化路由
 		err = r.Run()
 		if err != nil {
 			return err
