@@ -29,16 +29,16 @@ export function isEmpty(obj: any): boolean {
  * @param target
  * @returns boolean
  */
-export function equalsIgnoreCase(source?: string, target?: string) {
-  if (source && target) {
-    const sourceLow = source.toLowerCase(),
-      targetLow = target.toLowerCase()
-
-    return sourceLow === targetLow
-  } else {
-    return false
-  }
-}
+// export function equalsIgnoreCase(source?: string, target?: string) {
+//   if (source && target) {
+//     const sourceLow = source.toLowerCase(),
+//       targetLow = target.toLowerCase()
+//
+//     return sourceLow === targetLow
+//   } else {
+//     return false
+//   }
+// }
 
 /**
  * 存在任意字符
@@ -46,9 +46,9 @@ export function equalsIgnoreCase(source?: string, target?: string) {
  * @param tragets
  * @returns
  */
-export function containsAny(source: string, ...tragets: string[]) {
-  return tragets.some(item => source.includes(item))
-}
+// export function containsAny(source: string, ...tragets: string[]) {
+//   return tragets.some(item => source.includes(item))
+// }
 
 /**
  * 存在全部字符
@@ -56,26 +56,26 @@ export function containsAny(source: string, ...tragets: string[]) {
  * @param tragets
  * @returns
  */
- export function containsAll(source: string, ...tragets: string[]) {
-  return tragets.every(item => source.includes(item))
-}
+//  export function containsAll(source: string, ...tragets: string[]) {
+//   return tragets.every(item => source.includes(item))
+// }
 
 /**
  * 深克隆
  *
  * @param obj 对象
  */
-export function deepClone<E extends object>(obj: E, ...ignoreKeys: string[]): E {
-  const json = JSON.stringify(obj)
-  const newObj = JSON.parse(json)
-
-  for (const key of ignoreKeys) {
-    if (Reflect.has(newObj, key)) {
-      Reflect.deleteProperty(newObj, key)
-    }
-  }
-  return newObj
-}
+// export function deepClone<E extends object>(obj: E, ...ignoreKeys: string[]): E {
+//   const json = JSON.stringify(obj)
+//   const newObj = JSON.parse(json)
+//
+//   for (const key of ignoreKeys) {
+//     if (Reflect.has(newObj, key)) {
+//       Reflect.deleteProperty(newObj, key)
+//     }
+//   }
+//   return newObj
+// }
 
 /**
  * 复制参数
@@ -120,30 +120,30 @@ export function copy(
  * @param keys Key
  * @returns 除keys参数外的key
  */
-export function otherKeys<T, K extends keyof T>(source: T, ...keys: K[]): Array<K> {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return Object.keys(source).filter(key => !keys.includes(key as K)) as Array<K>
-}
+// export function otherKeys<T, K extends keyof T>(source: T, ...keys: K[]): Array<K> {
+//   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//   // @ts-ignore
+//   return Object.keys(source).filter(key => !keys.includes(key as K)) as Array<K>
+// }
 
 /**
  * 生成UUID
  *
  * @returns string uuid
  */
-export function uuid() {
-  const temp: any[] = []
-  const hexDigits = "0123456789abcdef";
-
-  for (let i = 0; i < 36; i++) {
-    temp[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)
-  }
-
-  temp[14] = "4" // bits 12-15 of the time_hi_and_version field to 0010
-  temp[19] = hexDigits.substr((temp[19] & 0x3) | 0x8, 1) // bits 6-7 of the clock_seq_hi_and_reserved to 01
-  temp[8] = temp[13] = temp[18] = temp[23] = "-"
-  return temp.join("")
-}
+// export function uuid() {
+//   const temp: any[] = []
+//   const hexDigits = "0123456789abcdef";
+//
+//   for (let i = 0; i < 36; i++) {
+//     temp[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)
+//   }
+//
+//   temp[14] = "4" // bits 12-15 of the time_hi_and_version field to 0010
+//   temp[19] = hexDigits.substr((temp[19] & 0x3) | 0x8, 1) // bits 6-7 of the clock_seq_hi_and_reserved to 01
+//   temp[8] = temp[13] = temp[18] = temp[23] = "-"
+//   return temp.join("")
+// }
 
 /**
  * 深computed实现

@@ -8,6 +8,7 @@ import { createStore, useStore as HomeUseStore, Module, Store } from 'vuex' //�
 import search, { SearchState } from './search'
 import setting, { SettingState } from './setting'
 import topSite, { TopSiteState } from './bookmark'
+import settings, { SettingsState } from './settings'
 
 /**
  * 自定义类型（type）的定义
@@ -17,6 +18,7 @@ export type RootState = {
   search: SearchState;
   setting: SettingState;
   topSite: TopSiteState;
+  settings: SettingsState
 };
 
 /**
@@ -32,6 +34,7 @@ const store = createStore<RootState>({
     search,
     setting,
     topSite,
+    settings
   },
 });
 

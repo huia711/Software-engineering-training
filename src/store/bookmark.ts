@@ -3,7 +3,7 @@ import { createStoreModule } from "./index"
 import { SortData, TopSiteItem, TopSites } from "@/enum-interface"
 import { copy } from "@/utils/common"
 import { debounce } from "@/utils/async"
-import { verifyImageUrl } from "@/utils/file"
+// import { verifyImageUrl } from "@/utils/file"
 
 export interface TopSiteState {
   topSites: TopSites

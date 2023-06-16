@@ -2,12 +2,12 @@
  * 导入（import）
  */
 import { createStoreModule } from "./index"
-import { copy, isEmpty, uuid } from "@/utils/common"
+import { copy, isEmpty } from "@/utils/common"
 // import { wallpaperStore } from "@/plugins/localforage"
-import { isImageFile } from "@/utils/file"
+// import { isImageFile } from "@/utils/file"
 import { getDailyWallpaperUrl } from "@/api/bing"
 import { debounce } from "@/utils/async"
-import { isObjectURL } from "@/utils/browser"
+// import { isObjectURL } from "@/utils/browser"
 import { saveAs } from "file-saver"
 import {
   BackgroundSetting,

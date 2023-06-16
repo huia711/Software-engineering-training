@@ -3,109 +3,109 @@
 </template>
 
 <script lang="ts" setup type="module">
-/**
- * 导入（import）
- */
-import {computed, provide, watchEffect, defineProps, withDefaults, watch} from "vue"
-import {useStore} from "@/store"
-import { SettingMutations } from "@/store/setting"
-// 导入外部定义
-import {LanguageType, ThemeMode} from "@/enum-interface"
-import { usePreferredDark } from "@/utils/use"
-// 外部
-import dayjs from "@/plugins/dayjs"
-import { useI18n } from "vue-i18n"
-import { useDark, useToggle } from '@vueuse/core'
+  /**
+   * 导入（import）
+   */
+  import {computed, provide, watchEffect, defineProps, withDefaults, watch} from "vue"
+  import {useStore} from "@/store"
+  import { SettingMutations } from "@/store/setting"
+  // 导入外部定义
+  import {LanguageType, ThemeMode} from "@/enum-interface"
+  import { usePreferredDark } from "@/utils/use"
+  // 外部
+  import dayjs from "@/plugins/dayjs"
+  import { useI18n } from "vue-i18n"
+  import { useDark, useToggle } from '@vueuse/core'
 
 
-/**
- * 常/变量（const/let）的定义
- */
-// 获取本地化工具用于国际化日期格式和语言设置
-const store = useStore()
-const { locale } = useI18n()
+  /**
+   * 常/变量（const/let）的定义
+   */
+  // 获取本地化工具用于国际化日期格式和语言设置
+  const store = useStore()
+  const { locale } = useI18n()
 
-// 定义Dark（useDark）控制Theme
-const Dark = useDark ({
-  // 存储到localStorage/sessionStorage中的Key 根据自己的需求更改
-  storageKey: 'useDarkKEY',
-  // 暗黑class名字
-  valueDark: 'dark',
-  // 高亮class名字
-  valueLight: 'light',
-})
-const toggle = useToggle(Dark);
+  // 定义Dark（useDark）控制Theme
+  const Dark = useDark ({
+    // 存储到localStorage/sessionStorage中的Key 根据自己的需求更改
+    storageKey: 'useDarkKEY',
+    // 暗黑class名字
+    valueDark: 'dark',
+    // 高亮class名字
+    valueLight: 'light',
+  })
+  const toggle = useToggle(Dark);
 
-// 获取系统主题
-const isDark = usePreferredDark()
-// watchEffect(() => {
-//   console.log(isDark.value ? ThemeMode.Dark : ThemeMode.Light)
-// })
+  // 获取系统主题
+  const isDark = usePreferredDark()
+  // watchEffect(() => {
+  //   console.log(isDark.value ? ThemeMode.Dark : ThemeMode.Light)
+  // })
 
 
-/**
- * 使用 computed 进行响应计算（自动跟踪）
- * 这里用于实现自动选择（Auto）
- */
-// 设置的主体（theme）
-const theme = computed({
-  get: () => store.state.setting.themeMode,
-  set: theme => store.commit(SettingMutations.updateThemeMode, theme)
-})
-const lang = computed(() => store.state.setting.lang)
+  /**
+   * 使用 computed 进行响应计算（自动跟踪）
+   * 这里用于实现自动选择（Auto）
+   */
+  // 设置的主体（theme）
+  const theme = computed({
+    get: () => store.state.setting.themeMode,
+    set: theme => store.commit(SettingMutations.updateThemeMode, theme)
+  })
+  const lang = computed(() => store.state.setting.lang)
 
-// 获取实时的系统主题（theme）
-// 使用computed自动更新：如果props传入主题为 "auto" 并且prefer-dark为真，则返回 "dark" 主题，否则返回 "light" 主题
-const currentTheme = computed(() => {
-    {
-      if ( theme.value === ThemeMode.Auto) {
-        return isDark.value ? ThemeMode.Dark : ThemeMode.Light
-      } else {
-        return theme.value
+  // 获取实时的系统主题（theme）
+  // 使用computed自动更新：如果props传入主题为 "auto" 并且prefer-dark为真，则返回 "dark" 主题，否则返回 "light" 主题
+  const currentTheme = computed(() => {
+      {
+        if ( theme.value === ThemeMode.Auto) {
+          return isDark.value ? ThemeMode.Dark : ThemeMode.Light
+        } else {
+          return theme.value
+        }
       }
-    }
+    })
+
+  // 当前语言，使用computed自动更新：如果props传入语言为 "auto" 则返回浏览器的当前语言配置，否则返回props传入的语言
+  const currentLang = computed(() => {
+    return lang.value === LanguageType.Auto ? navigator.language : lang.value
   })
 
-// 当前语言，使用computed自动更新：如果props传入语言为 "auto" 则返回浏览器的当前语言配置，否则返回props传入的语言
-const currentLang = computed(() => {
-  return lang.value === LanguageType.Auto ? navigator.language : lang.value
-})
 
+  /**
+   * 使用 watchEffect 进行响应计算（自动跟踪）
+   * 这里用于更新 DOM
+   */
+  // 监听并设置主题
+  watch(() => currentTheme.value, (newValue, oldValue) => {
+    if (newValue !== oldValue && oldValue !== undefined) {
+      console.log("success")
+      toggle()
+    }
+  }, {
+    deep: true,      // 深度监听属性的变化
+    immediate: true, // 立即执行一次回调函数
+    flush: 'async'   // 在下一次事件循环时刷新
+  })
 
-/**
- * 使用 watchEffect 进行响应计算（自动跟踪）
- * 这里用于更新 DOM
- */
-// 监听并设置主题
-watch(() => currentTheme.value, (newValue, oldValue) => {
-  if (newValue !== oldValue && oldValue !== undefined) {
-    console.log("success")
-    toggle()
-  }
-}, {
-  deep: true,      // 深度监听属性的变化
-  immediate: true, // 立即执行一次回调函数
-  flush: 'async'   // 在下一次事件循环时刷新
-})
+  watch(() => isDark.value, (newValue, oldValue) => {
+    console.log(newValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value)
+    if (oldValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value) {
+      store.commit(SettingMutations.updateThemeMode, newValue ? ThemeMode.Dark : ThemeMode.Light)
+    }
+  }, {
+    deep: true,      // 深度监听属性的变化
+    immediate: true, // 立即执行一次回调函数
+    flush: 'async'   // 在下一次事件循环时刷新
+  })
 
-watch(() => isDark.value, (newValue, oldValue) => {
-  console.log(newValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value)
-  if (oldValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value) {
-    store.commit(SettingMutations.updateThemeMode, newValue ? ThemeMode.Dark : ThemeMode.Light)
-  }
-}, {
-  deep: true,      // 深度监听属性的变化
-  immediate: true, // 立即执行一次回调函数
-  flush: 'async'   // 在下一次事件循环时刷新
-})
+  // 监听并设置语言
+  watchEffect(() => {
+    const lang = currentLang.value
 
-// 监听并设置语言
-watchEffect(() => {
-  const lang = currentLang.value
-
-  locale.value = lang
-  dayjs.locale(lang)
-})
+    locale.value = lang
+    dayjs.locale(lang)
+  })
 </script>
 
 

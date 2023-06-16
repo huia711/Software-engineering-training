@@ -3,25 +3,52 @@
     <!-- 搜索框 -->
     <search class="search" :value="state.searchText"/>
 
-    <section class="sec1">
-      <!--    &lt;!&ndash; 过渡效果组件 &ndash;&gt;-->
-      <!--    <transition name="fade">-->
-      <!--      <top-site v-if="state.enableTopSite" v-show="!state.fixedSearch" />-->
-      <!--    </transition>-->
-    </section>
+<!--    <section class="sec1">-->
+<!--      &lt;!&ndash;    &lt;!&ndash; 过渡效果组件 &ndash;&gt;&ndash;&gt;-->
+<!--      &lt;!&ndash;    <transition name="fade">&ndash;&gt;-->
+<!--      &lt;!&ndash;      <top-site v-if="state.enableTopSite" v-show="!state.fixedSearch" />&ndash;&gt;-->
+<!--      &lt;!&ndash;    </transition>&ndash;&gt;-->
+<!--    </section>-->
 
-    <section class="sec2">
-      <!--    &lt;!&ndash; 过渡效果组件 &ndash;&gt;-->
-      <!--    <transition name="fade">-->
-      <!--      <top-site v-if="state.enableTopSite" v-show="!state.fixedSearch" />-->
-      <!--    </transition>-->
-    </section>
+<!--    <section class="sec2">-->
+<!--      &lt;!&ndash;    &lt;!&ndash; 过渡效果组件 &ndash;&gt;&ndash;&gt;-->
+<!--      &lt;!&ndash;    <transition name="fade">&ndash;&gt;-->
+<!--      &lt;!&ndash;      <top-site v-if="state.enableTopSite" v-show="!state.fixedSearch" />&ndash;&gt;-->
+<!--      &lt;!&ndash;    </transition>&ndash;&gt;-->
+<!--    </section>-->
 
     <!-- 设置按钮 -->
     <div class="setting">
       <el-button @click="state.settingVisible = true" round>
         <setting-outlined style="font-size: 18px" />
       </el-button>
+    </div>
+
+    <div class="temp">
+      <modernButton
+          :custom-button-style="state.imgStyle"
+          srcPath="../../src/img/userHead.png"
+          @buttonClicked="userPageStateChange(true)"
+          textUnderButton="User"
+      />
+      <modernButton
+          id="setting-button"
+          :custom-button-style="state.imgStyle"
+          srcPath="../../src/img/setting.png"
+          @buttonClicked="settingPageStateChange(true)"
+          textUnderButton="settings"
+      />
+    </div>
+
+    <loginPage v-if="state.userPageClicked === true"
+               :isLogin="false"
+               @close="userPageStateChange(false)"
+    />
+    <div id="setting-page">
+      <settingPage
+          @close="settingPageStateChange(false)"
+          :pageState="state.settingPageClicked"
+      />
     </div>
 
     <!-- 设置抽屉 -->
@@ -42,7 +69,7 @@
   /**
    * 导入（import）
    */
-  import { computed, reactive } from "vue"
+  import {computed, reactive, watch} from "vue"
   import { useStore } from "@/store"
   import { useRoute } from "vue-router"
   // 导入组件Component
@@ -54,12 +81,18 @@
   import { SettingOutlined } from "@ant-design/icons-vue"
   import { BackgroundType } from "@/enum-interface"
 
+  import loginPage from '@/views/loginPage.vue';
+  import settingPage from '@/views/settingPage/settingPage.vue';
+  import modernButton from '@/components/basis/modernButton.vue';
+  import $ from 'jquery';
+
   /**
    * 常/变量（const/let）的定义
    */
   // 导入路由和Vuex（状态管理）
   const route = useRoute()
   const { state: stateX } = useStore()
+
 
   /**
    * 响应式对象（reactive,computed）
@@ -70,20 +103,37 @@
     fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
     searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
     settingVisible: false, // 设置抽屉是否打开
+    settingPageClicked: false,
+    userPageClicked: false,
+
     enableTopSite: computed(() => stateX.setting.topSite.enable), // 是否显示顶部网站
-    enableWallpaper: computed(() => stateX.setting.background.type !== BackgroundType.None) // 是否有壁纸
+    enableWallpaper: computed(() => stateX.setting.background.type !== BackgroundType.None), // 是否有壁纸
+    imgStyle: computed(()=>stateX.settings.imgStyle)
+  })
+
+  const settingPageStateChange = (stat: boolean) => {
+    console.log(state.settingPageClicked)
+    state.settingPageClicked = stat
+  }
+
+  const userPageStateChange = (stat: boolean) => {
+    console.log(state.userPageClicked)
+    state.userPageClicked = stat
+  }
+
+
+  watch(() => state.settingPageClicked, (newVal: boolean, oldVal: boolean) => {
+    if (newVal) {
+      $("#setting-page").removeClass("slide_out").addClass("slide_in");
+    } else {
+      $("#setting-page").removeClass("slide_in").addClass("slide_out");
+    }
   })
 </script>
 
 <style>
   /* .main-wrap 类表示页面的主体部分 */
   .main {
-    //scroll-snap-type: y mandatory; /* 定义垂直方向上的滚动对齐 */
-    //overflow: scroll; /* 溢出时出现滚动条（滚动模组） */
-    //overflow-x: hidden; /* 不允许水平方向上的滚动 */
-
-    //display: flex; /* 将显示方式设置为 Flex 布局 */
-    //flex-direction: column; /* 将主轴方向从默认的水平方向改为垂直方向 */
     justify-content: center; /* 将内容在水平方向上居中对齐 */
     align-items: center; /* 将内容在垂直方向上居中对齐 */
     row-gap: 42px; /* 将每个子元素之间的间距设置为 42 像素 */
@@ -125,5 +175,48 @@
 
     top: 0;
     z-index: -10;
+  }
+
+  @import '@/font/font.css';
+  body {
+    font-family: SmileySans,serif;
+  }
+  .temp{
+    display: flex;
+    flex-direction: row;
+    font-family: 'SmileySans';
+    justify-content: space-around;
+    position: fixed;
+    top: 200px;
+    z-index: 0;
+  }
+
+  #setting-page{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: 0;
+    left: -50%;
+    transform: translate(-50%, 0%) scale(0.1);
+    z-index: 1;
+    opacity: 0;
+    transition: all 0.3s ease-out;
+  }
+
+  #setting-page.slide_in{
+    animation: expand-out 0.5s forwards;
+    opacity: 1;
+  }
+
+  #setting-page.slide_out{
+    opacity: 0;
+  }
+
+  @keyframes expand-out {
+    100%{
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,0%) scale(1);
+    }
   }
 </style>

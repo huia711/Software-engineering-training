@@ -2,6 +2,7 @@ import { OpenPageTarget } from "@/enum-interface/search";
 
 export * from "./search"
 export * from "./setting"
+export * from "./settings"
 
 export enum LanguageType {
   Auto = "auto",
