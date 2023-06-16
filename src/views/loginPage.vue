@@ -153,19 +153,20 @@
               type: String,
               default: "../../src/img/userHead.png"
           },
-          pageColorStyle:{
-              // 主题颜色，对象包含两个属性：hex与alpha
-              type: Object,
-              default: Object({
-                  backgroundColor:Object({
-                      hex: "#ffffff",
-                      alpha: 1
-                  }),
-                  buttonColor:Object({
-                      hex: "#000000",
-                      alpha: 0.3
-                  })
-              })
+          pageColorStyle: {
+            type: Object,
+            default: function() {
+              return {
+                backgroundColor: {
+                  hex: '#ffffff',
+                  alpha: 1,
+                },
+                buttonColor: {
+                  hex: '#000000',
+                  alpha: 0.3,
+                },
+              };
+            },
           },
           backGroundImgPath:{
               // 背景图片
