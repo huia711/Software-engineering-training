@@ -33,7 +33,7 @@ export default{
     data(){
         return{
             mouse : GetMousePos(),
-            curPercentage: this.percentage,
+            curPercentage: (this.range.baseNum - this.range.start)*100/(this.range.end - this.range.start),
             startx: 0,
             endx: 0,
             relX: 0,
@@ -78,11 +78,6 @@ export default{
         }
     },
     props:{
-        percentage:{
-            type:Number,
-            required:true,
-            default: 50
-        },
         roundRadius:{
             type:Number,
             default: 8

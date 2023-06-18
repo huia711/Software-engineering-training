@@ -1,16 +1,15 @@
 <template>
-    <body class="basis">
+    <div class="basis">
         <div>
+            <p>主题颜色(((o(*ﾟ▽ﾟ*)o)))♡</p>
             <div>
                 <switcher texts="自定义页面颜色" :initialstate="curCustomBackgroundColorState" @stateChange="customBackgroundColorStateChange"/>
                 <colorPixer v-if="curCustomBackgroundColorState" :colorChangeCallback="backgroundColorChange" :colorStyle="backgroundColorStyle"/>
             </div>
-            <blankSeparator :blankColorStyle="blankSeparatorColorStyle" height="1px"/>
             <div>
                 <switcher texts="自定义按钮颜色" :initialstate="curCustomButtonColorState" @stateChange="customButtonColorStateChange"/>
                 <colorPixer v-if="curCustomButtonColorState" :colorChangeCallback="buttonColorChange" :colorStyle="buttonColorStyle"/>
             </div>
-            <blankSeparator :blankColorStyle="blankSeparatorColorStyle" height="1px"/>
             <div>
                 <switcher texts="使用预设主题颜色" :initialstate="curPresetColorState" @stateChange="presetColorStateChange"/>
                 <blankSeparator height="20px"/>
@@ -20,17 +19,21 @@
                 </div>
             </div>
         </div>
-    </body>
+        <div>
+            <blankSeparator :blankColorStyle="blankSeparatorColorStyle" height="20px 0px 20px 0px"/>
+            <p>语言设置♬╭(╯ε╰)╮</p>
+            <otherSetting/>
+        </div>
+    </div>
 </template>
 
 <script>
 import switcher from '@/components/basis/SwitcherComponent.vue';
-import slider from '@/components/basis/SliderComponent.vue';
 import colorPixer from '@/components/basis/colorPixer.vue';
-import modernButton from '@/components/basis/modernButton.vue';
 import blankSeparator from '@/components/basis/blankSeparator.vue';
 import presetStyleBox from '@/components/basis/presetStyleBox.vue';
-import { useStore } from '@/store'
+import otherSetting from '@/views/setting/OtherSetting.vue';
+import { useStore } from '@/store';
 import { mapMutations } from 'vuex';
 import { computed } from '@vue/reactivity';
 
@@ -184,11 +187,10 @@ export default{
     },
     components:{
         switcher,
-        // slider,
         colorPixer,
-        // modernButton,
         blankSeparator,
-        presetStyleBox
+        presetStyleBox,
+        otherSetting
     }
 }
 </script>
@@ -198,9 +200,9 @@ export default{
 .basis{
     background-color: transparent;
     margin: 0px;
-    padding: 10px 30px 0px 30px;
+    padding: 10px 30px 10px 30px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     max-height: 600px;
     min-height: 600px;
     width: 600px;

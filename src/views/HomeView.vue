@@ -17,44 +17,30 @@
 <!--      &lt;!&ndash;    </transition>&ndash;&gt;-->
 <!--    </section>-->
 
-    <!-- 设置按钮 -->
-    <div class="setting">
-      <el-button @click="state.settingVisible = true" round>
-        <setting-outlined style="font-size: 18px" />
-      </el-button>
-    </div>
-
     <div class="temp">
-      <modernButton
+      <router-link to="/register" style="text-decoration: none; color: black;">
+        <modernButton
           :custom-button-style="state.imgStyle"
-          srcPath="../../src/img/userHead.png"
-          @buttonClicked="userPageStateChange(true)"
+          srcPath="./src/img/userHead.png"
           textUnderButton="User"
-      />
+        />
+      </router-link>
+      
       <modernButton
           id="setting-button"
           :custom-button-style="state.imgStyle"
-          srcPath="../../src/img/setting.png"
+          srcPath="./src/img/setting.png"
           @buttonClicked="settingPageStateChange(true)"
           textUnderButton="settings"
       />
     </div>
 
-    <loginPage v-if="state.userPageClicked === true"
-               :isLogin="false"
-               @close="userPageStateChange(false)"
-    />
     <div id="setting-page">
       <settingPage
           @close="settingPageStateChange(false)"
           :pageState="state.settingPageClicked"
       />
     </div>
-
-    <!-- 设置抽屉 -->
-    <el-drawer v-model="state.settingVisible" :size="400" :show-close="false" close-on-press-escape destroy-on-close>
-      <setting/>
-    </el-drawer>
   </main>
 
 <!--  &lt;!&ndash; 壁纸 &ndash;&gt;-->
@@ -104,7 +90,6 @@
     searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
     settingVisible: false, // 设置抽屉是否打开
     settingPageClicked: false,
-    userPageClicked: false,
 
     enableTopSite: computed(() => stateX.setting.topSite.enable), // 是否显示顶部网站
     enableWallpaper: computed(() => stateX.setting.background.type !== BackgroundType.None), // 是否有壁纸
@@ -112,15 +97,8 @@
   })
 
   const settingPageStateChange = (stat: boolean) => {
-    console.log(state.settingPageClicked)
     state.settingPageClicked = stat
   }
-
-  const userPageStateChange = (stat: boolean) => {
-    console.log(state.userPageClicked)
-    state.userPageClicked = stat
-  }
-
 
   watch(() => state.settingPageClicked, (newVal: boolean, oldVal: boolean) => {
     if (newVal) {
@@ -137,6 +115,7 @@
     justify-content: center; /* 将内容在水平方向上居中对齐 */
     align-items: center; /* 将内容在垂直方向上居中对齐 */
     row-gap: 42px; /* 将每个子元素之间的间距设置为 42 像素 */
+    overflow: hidden;
   }
 
   .sec1 {
@@ -183,40 +162,36 @@
   }
   .temp{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     font-family: 'SmileySans';
     justify-content: space-around;
     position: fixed;
-    top: 200px;
+    top: 5%;
+    left: 90%;
     z-index: 0;
   }
 
   #setting-page{
     width: 100%;
     height: 100%;
-    position: relative;
-    top: 0;
-    left: -50%;
-    transform: translate(-50%, 0%) scale(0.1);
-    z-index: 1;
+    position: fixed;
+    top: -30%;
+    left: 40%;
+    transform: scale(0.1);
+    z-index: -100;
     opacity: 0;
-    transition: all 0.3s ease-out;
+    transition: all 0.3s ease;
   }
 
   #setting-page.slide_in{
-    animation: expand-out 0.5s forwards;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) scale(1);
+    z-index: 100;
     opacity: 1;
   }
 
   #setting-page.slide_out{
     opacity: 0;
-  }
-
-  @keyframes expand-out {
-    100%{
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%,0%) scale(1);
-    }
   }
 </style>

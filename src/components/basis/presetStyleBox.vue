@@ -100,6 +100,7 @@ export default{
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
     background-color: v-bind("'rgba(' + bkgColorStyle.r + ',' + bkgColorStyle.g + ',' + bkgColorStyle.b + ',' + presetStyle.backgroundColor.alpha + ')'");
 }
 </style>

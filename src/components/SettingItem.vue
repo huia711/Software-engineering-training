@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<SettingItemProps>(), {
     margin: 8px 0;
 
     span {
-      font-size: 14px;
+      font-size: 16px;
     }
   }
 

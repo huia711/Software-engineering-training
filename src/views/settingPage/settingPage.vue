@@ -17,9 +17,10 @@
                   </ul>
                   <!-- 右侧具体内容 -->
                   <basicSettings v-if="curSelected === 0" />
-                  <privacyPage v-if="curSelected === 1" personalPageLink="https://www.baidu.com"/>
-                  <advancePage v-if="curSelected === 2" />
-                  <aboutPage v-if="curSelected === 3"/>
+                  <backgroundPicture v-if="curSelected === 1" />
+                  <privacyPage v-if="curSelected === 2" />
+                  <advancePage v-if="curSelected === 3" />
+                  <aboutPage v-if="curSelected === 4"/>
           </div>
           <closeButton @close="closePage"/>
       </div>
@@ -33,6 +34,7 @@ import basicSettings from './basicSettings.vue'
 import aboutPage from './AboutSettings.vue'
 import advancePage from './AdvanceSettings.vue'
 import privacyPage from './PrivacySettings.vue'
+import backgroundPicture from './backgroundPicture.vue'
 
 import cal from '@/utils/calculation'
 
@@ -50,7 +52,7 @@ export default{
     data(){
         return{
             colorStyle: cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),
-            options:["通 用","隐 私","高 级","关 于"],
+            options:["通 用","壁 纸","隐 私","高 级","关 于"],
             curSelected: 0,
             searchItemNum: this.searchItemCount,
             curOn: -1,
@@ -61,7 +63,7 @@ export default{
                 outlineColor:"transparent",
                 cursor:"pointer",
                 wordSpacing:"6px",
-                width:"100px",
+                width:"150px",
                 height:"35px",
                 divHeight:"3rem",
                 fontSize:"20px",
@@ -72,7 +74,7 @@ export default{
                 outlineColor:"transparent",
                 cursor:"pointer",
                 wordSpacing:"6px",
-                width:"auto",
+                width:"150px",
                 height:"35px",
                 divHeight:"3rem",
                 fontSize:"20px",
@@ -113,7 +115,8 @@ export default{
         basicSettings,
         aboutPage,
         privacyPage,
-        advancePage
+        advancePage,
+        backgroundPicture
     }
 }
 </script>
