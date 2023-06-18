@@ -10,10 +10,10 @@
             <inputBox :visibleButton="false" :widthExpand="-203" :defaultContent="String(currentColorStyle.alpha)" @dataChanged="alphaChange"/>
         </div>
         <div>
-            <slider text="R" :range="rangeR" :percentage="percentages.R" :valueCallback="rChange"/>
-            <slider text="G" :range="rangeG" :percentage="percentages.G" :valueCallback="gChange"/>
-            <slider text="B" :borderBottomStyle="borderBottom" :range="rangeB" :percentage="percentages.B" :valueCallback="bChange"/>
-            <slider text="Alpha" :range="rangeAlpha" :percentage="percentages.Alpha" :valueCallback="alphaChange"/>
+            <slider text="R" :range="rangeR" :valueCallback="rChange"/>
+            <slider text="G" :range="rangeG" :valueCallback="gChange"/>
+            <slider text="B" :borderBottomStyle="borderBottom" :range="rangeB" :valueCallback="bChange"/>
+            <slider text="Alpha" :range="rangeAlpha" :valueCallback="alphaChange"/>
         </div>
     </div>
 </template>

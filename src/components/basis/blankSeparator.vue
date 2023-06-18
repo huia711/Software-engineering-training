@@ -46,9 +46,9 @@ export default{
 <style>
 .separator{
     width: v-bind("width");
-    height: v-bind("height");
+    height: 1px;
     outline: 0px;
-    margin: 0px;
+    margin: v-bind("height");
     padding: 0px;
     background-color: v-bind("'rgba(' + colorStyle.r + ',' + colorStyle.g + ',' + colorStyle.b + ',' + colorAlpha + ')'");
 }

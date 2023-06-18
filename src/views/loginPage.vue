@@ -1,5 +1,5 @@
 <template>
-    <body class="base">
+    <main class="base">
         <div class="pageLayout">
             <closeButton @close="closePage"/>
             <div class="global">
@@ -17,173 +17,187 @@
                 </div>
             </div>
         </div>
-    </body>
+    </main>
     
 </template>
 
-<script>
+<script lang="js">
     
-  import modernButton from '@/components/basis/modernButton.vue';
-  import inputBox from '@/components/basis/inputBox.vue'
-  import closeButton from '@/components/basis/closeButton.vue';
-  import cal from '@/utils/calculation'
+import modernButton from '@/components/basis/modernButton.vue';
+import inputBox from '@/components/basis/inputBox.vue';
+import closeButton from '@/components/basis/closeButton.vue';
+import { computed } from '@vue/reactivity';
+import cal from '@/utils/calculation';
+import { useStore } from '@/store';
+import axios from '@/plugins/axios';
 
-  export default{
-      data(){
-          return{
-              registerMode: false,
-              account: "",
-              passwd: "",
-              confPasswd: "",
-              warningMsg: "",
-              colorStyle: cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),
-              buttonColorStyle: cal.hexToRgb(this.pageColorStyle.buttonColor.hex),
-              loginButtonStyle: {
-                  backgroundColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex),this.pageColorStyle.buttonColor.alpha),
-                  width:"250px",
-                  height:"35px",
-                  borderColor:"transparent",
-                  borderRadius:"6px",
-                  cursor:"pointer",
-                  outlineColor:"transparent",
-                  wordSpacing:"50px",
-                  divHeight:"4rem"
-              },
-              registerButtonStyle: {
-                  backgroundColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex),this.pageColorStyle.buttonColor.alpha),
-                  width:"250px",
-                  height:"35px",
-                  borderColor:"transparent",
-                  borderRadius:"6px",
-                  cursor:"pointer",
-                  outlineColor:"transparent",
-                  wordSpacing:"50px",
-                  divHeight:"4rem"
-              },
-              imgStyle: {
-                  backgroundColor:"transparent",
-                  borderColor:"transparent",
-                  outlineColor:"transparent",
-                  width:"64px",
-                  height:"64px",
-              }
-          }
-      },
-      methods:{
-          userHeadImgClicked(){
-              // 头像点击
-          },
-          loginButtonClicked(){
-              if(this.registerMode === false){
-                  if(this.account === "" || this.passwd === "")
-                      this.warningMsg = "账号或密码不能为空!"
-                  else{
-                      this.warningMsg = ""
-                      this.$emit("loginAccount",this.account,this.passwd)
-                  }
-              }
-              else{
-                  // 转至登录页面
-                  this.registerMode = false
-              }
-          },
-          loginButtonMouseStateChange(state){
-              if(state === true)
-                  this.loginButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,cal.min(this.pageColorStyle.buttonColor.alpha + 0.4, 1))
-              else
-                  this.loginButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,this.pageColorStyle.buttonColor.alpha)
-          },
-          registerButtonMouseStateChange(state){
-              if(state === true)
-                  this.registerButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,cal.min(this.pageColorStyle.buttonColor.alpha + 0.4, 1))
-              else
-                  this.registerButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,this.pageColorStyle.buttonColor.alpha)
-          },
-          regButtonClicked(){
-              if(this.registerMode === false){
-                  // 转至注册页面
-                  this.registerMode = true
-              }
-              else{
-                  if(this.account === "" || this.passwd === "")
-                      this.warningMsg = "账号或密码不能为空!"
-                  else{
-                      if(this.passwd !== this.confPasswd)
-                          this.warningMsg = "两次输入的密码不一致!"
-                      else{
-                          this.warningMsg = ""
-                      this.$emit("registerAccount",this.account,this.passwd)
-                      }
-                  }
-              }
-          },
-          closePage(){
-              this.$emit("close")
-          },
-          accountGet(account){
-              this.account = account
-              this.warningMsg = ""
-          },
-          passwdGet(passwd){
-              this.passwd = passwd
-              this.confirmPasswd()
-          },
-          confPasswdGet(confPasswd){
-              this.confPasswd = confPasswd
-              this.confirmPasswd()
-          },
-          confirmPasswd(){
-              if(this.passwd !== this.confPasswd && this.registerMode === true){
-                  // 两次输入的密码不一致
-                  this.warningMsg = "两次输入的密码不一致!"
-              }
-              else{
-                  this.warningMsg = ""
-              }
-          }
-      },
-      props:{
-          userName:{
-              // 用户昵称
-              type: String,
-              default: "Guest"
-          },
-          userHeadImgPath:{
-              // 用户头像路径，注意要使用png图片，否则将会有白边
-              type: String,
-              default: "../../src/img/userHead.png"
-          },
-          pageColorStyle: {
-            type: Object,
-            default: function() {
-              return {
-                backgroundColor: {
-                  hex: '#ffffff',
-                  alpha: 1,
-                },
-                buttonColor: {
-                  hex: '#000000',
-                  alpha: 0.3,
-                },
-              };
+export default{
+    setup(){
+        const store = useStore();
+        return {
+            pageColorStyle: computed(()=>store.state.settings.pageColorStyle)
+        }
+    },
+    data(){
+        return{
+            registerMode: false,
+            account: "",
+            passwd: "",
+            confPasswd: "",
+            warningMsg: "",
+            colorStyle: cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),
+            buttonColorStyle: cal.hexToRgb(this.pageColorStyle.buttonColor.hex),
+            loginButtonStyle: {
+                backgroundColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex),this.pageColorStyle.buttonColor.alpha),
+                width:"250px",
+                height:"35px",
+                borderColor:"transparent",
+                borderRadius:"6px",
+                cursor:"pointer",
+                outlineColor:"transparent",
+                wordSpacing:"50px",
+                divHeight:"4rem"
             },
-          },
-          backGroundImgPath:{
-              // 背景图片
-              type: String,
-              default: "../../src/img/userPageBackground.jpg"
-          },
-          isLogin:{
-              type: Boolean,
-              required: true
-          }
-      },
-      components:{
-          modernButton,
-          inputBox,
-          closeButton
-      }
-  }
+            registerButtonStyle: {
+                backgroundColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex),this.pageColorStyle.buttonColor.alpha),
+                width:"250px",
+                height:"35px",
+                borderColor:"transparent",
+                borderRadius:"6px",
+                cursor:"pointer",
+                outlineColor:"transparent",
+                wordSpacing:"50px",
+                divHeight:"4rem"
+            },
+            imgStyle: {
+                backgroundColor:"transparent",
+                borderColor:"transparent",
+                outlineColor:"transparent",
+                width:"64px",
+                height:"64px",
+            }
+        }
+    },
+    methods:{
+        userHeadImgClicked(){
+            // 头像点击
+        },
+        loginButtonClicked(){
+            if(this.registerMode === false){
+                if(this.account === "" || this.passwd === "")
+                    this.warningMsg = "账号或密码不能为空!"
+                else{
+                    this.warningMsg = ""
+                    // 登录方法
+                    let data = {
+                        "account" : this.account,
+                        "password" : this.passwd
+                    }
+                    axios.post('/user/register',data).then(
+                    response=>{
+                        console.log('/user/register',response)
+                    }, error=>{
+                        console.log('ERROR',error.message)
+                    })
+                }
+            }
+            else{
+                // 转至登录页面
+                this.registerMode = false
+            }
+        },
+        loginButtonMouseStateChange(state){
+            if(state === true)
+                this.loginButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,cal.min(this.pageColorStyle.buttonColor.alpha + 0.4, 1))
+            else
+                this.loginButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,this.pageColorStyle.buttonColor.alpha)
+        },
+        registerButtonMouseStateChange(state){
+            if(state === true)
+                this.registerButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,cal.min(this.pageColorStyle.buttonColor.alpha + 0.4, 1))
+            else
+                this.registerButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,this.pageColorStyle.buttonColor.alpha)
+        },
+        regButtonClicked(){
+            if(this.registerMode === false){
+                // 转至注册页面
+                this.registerMode = true
+            }
+            else{
+                if(this.account === "" || this.passwd === "")
+                    this.warningMsg = "账号或密码不能为空!"
+                else{
+                    if(this.passwd !== this.confPasswd)
+                        this.warningMsg = "两次输入的密码不一致!"
+                    else{
+                        this.warningMsg = ""
+                        // 注册方法
+                        let data = {
+                            "account" : this.account,
+                            "password" : this.passwd
+                        }
+                        axios.post('/user/login',data).then(
+                        response=>{
+                            console.log('/user/login',response)
+                        }, error=>{
+                            console.log('ERROR',error.message)
+                        })
+                    }
+                }
+            }
+        },
+        closePage(){
+            this.$router.push('/')
+        },
+        accountGet(account){
+            this.account = account
+            this.warningMsg = ""
+        },
+        passwdGet(passwd){
+            this.passwd = passwd
+            this.confirmPasswd()
+        },
+        confPasswdGet(confPasswd){
+            this.confPasswd = confPasswd
+            this.confirmPasswd()
+        },
+        confirmPasswd(){
+            if(this.passwd !== this.confPasswd && this.registerMode === true){
+                // 两次输入的密码不一致
+                this.warningMsg = "两次输入的密码不一致!"
+            }
+            else{
+                this.warningMsg = ""
+            }
+        }
+    },
+    props:{
+        userName:{
+            // 用户昵称
+            type: String,
+            default: "Guest"
+        },
+        userHeadImgPath:{
+            // 用户头像路径，注意要使用png图片，否则将会有白边
+            type: String,
+            default: "../../src/img/userHead.png"
+        },
+        backGroundImgPath:{
+            // 背景图片
+            type: String,
+            default: "../../src/img/userPageBackground.jpg"
+        },
+        isLogin:{
+            type: Boolean,
+            required: true
+        }
+    },
+    components:{
+        modernButton,
+        inputBox,
+        closeButton
+    }
+}
 </script>
 
 <style scoped>

@@ -1,65 +1,132 @@
 <template>
     <div class="basis">
         <p>搜索设置</p>
-        <blankSeparator :blankColorStyle="blankSeparatorColorStyle" height="1px"/>
-        <slider :valueCallback="itemCountChange" :range="countRange" :textWidth="200" :maxSliderWidth="350" :percentage="itemCountPercentage" text="最大显示搜索结果数量"/>
+        <blankSeparator :blankColorStyle="blankSeparatorColorStyle" height="0px 0px 20px 0px"/>
+        <slider :valueCallback="itemCountChange" :range="countRange" :textWidth="250" :maxSliderWidth="320" :width="570" text="最大显示搜索结果数量"/>
+    
+    <!--管理搜索引擎-->
+    <setting-item horizontal>
+      <template #lable>
+        <span>{{ t("search.engine") }}</span>
+      </template>
+
+      <el-select v-model = "currentEngine" style="width: 90px">
+        <el-option v-for="(value, key) in searchEngines" :value="key" :key="key" :label="value.name">
+          {{ value.name }}
+        </el-option>
+      </el-select>
+    </setting-item>
+
+    <!--管理接口-->
+    <setting-item horizontal>
+      <template #lable>
+        <span>{{ t("search.suggestApi") }}</span>
+      </template>
+
+      <el-select v-model = "searchSetting.suggestion" style="width: 100px" placement="bottom">
+        <el-option :value="SearchSuggestion.none" > 不使用 </el-option>
+        <el-option :value="SearchSuggestion.baidu"> 百度 API </el-option>
+        <el-option :value="SearchSuggestion.bing"> Bing API </el-option>
+        <el-option :value="SearchSuggestion.google"> Google API </el-option>
+      </el-select>
+    </setting-item>
+
+<!--    <setting-item :lable="t('search.searchRound')">-->
+<!--      <a-slider-->
+<!--        v-model:value="searchSetting.searchInputRadius"-->
+<!--        :max="22"-->
+<!--        :tip-formatter="toPixel"-->
+<!--      />-->
+<!--    </setting-item>-->
+
+    <setting-item :lable="t('search.newTabOpen')" horizontal>
+      <el-switch v-model = "isOpenPageByBlank" />
+    </setting-item>
+
+    <setting-item :lable="t('search.showEngineIcon')" horizontal>
+      <el-switch v-model = "searchSetting.showEngineIcon" />
+    </setting-item>
+
+    <setting-item :lable="t('search.showEngineSelet')" horizontal>
+      <el-switch v-model = "searchSetting.showEngineSelect" />
+    </setting-item>
     </div>
 </template>
 
-<script>
+<script lang="ts" setup>
 import { useStore } from '@/store'
-import { mapMutations } from 'vuex';
 import blankSeparator from '@/components/basis/blankSeparator.vue'
 import slider from '@/components/basis/SliderComponent.vue';
+import settingItem from '@/components/SettingItem.vue'
 import { computed } from '@vue/reactivity';
-export default{
-    setup(){
-        const store = useStore();
-        return{
-            pageState: computed(()=> store.state.isSettingPageShown),
-            searchItemNumber: computed(()=> store.state.settings.searchItemCount)
-        }
-    },
-    data(){
-        return{
-            blankSeparatorColorStyle:{
+import { OpenPageTarget, SearchEngineData, SearchSetting, Option, SearchSuggestion } from "@/enum-interface"
+import { SearchGetters } from "@/store/search"
+import { SettingMutations } from "@/store/setting"
+import { SettingsMutationTypes } from '@/store/settings'
+import { useI18n } from "vue-i18n"
+
+  const store = useStore();
+  const { state: stateX } = useStore();
+  const { t } = useI18n();
+
+  function updateSearchSetting(data: Option<SearchSetting>) {
+    store.commit(SettingMutations.updateSearchSetting, data)
+  }
+
+  /**
+   * 响应式对象（reactive,computed）
+   */
+  const searchSetting = computed(() => stateX.setting.search)
+  const searchEngines = computed<SearchEngineData>(() => store.getters[SearchGetters.getUseSearchEngines])
+  const currentEngine = computed({
+    get: () => searchSetting.value.currentEngine,
+    // 在 set 函数中，更新 store 中的搜索设置
+    set: currentEngine => updateSearchSetting({ currentEngine })
+  })
+
+  // 是否在新标签页中打开
+  const isOpenPageByBlank = computed({
+    get: () => store.state.setting.search.openPageTarget === OpenPageTarget.Blank,
+    set: isOpenPageByBlank =>
+      updateSearchSetting({
+        openPageTarget: isOpenPageByBlank ? OpenPageTarget.Blank : OpenPageTarget.Self
+      })
+  })
+
+  const searchItemNumber = computed({
+    get: ()=>store.state.settings.searchItemCount,
+    set: searchItemNumber => itemCountChange(searchItemNumber)
+  });
+
+  const blankSeparatorColorStyle = {
                 backgroundColor:{
                     hex:"#000000",
                     alpha:1
                 }
-            },
-            itemCountPercentage: this.searchItemNumber*100/8,
-            countRange:{
-                start: 1,
-                end: 8,
-                baseNum:this.searchItemNumber
             }
-        }
-    },
-    methods:{
-        ...mapMutations(['setSearchItemCount']),
-        itemCountChange(newVal){
-            this.setSearchItemCount(newVal)
-            this.itemCountPercentage = newVal/8
-        }
-    },
-    components:{
-        blankSeparator,
-        slider
-    }
-}
+
+  const countRange = {
+                start: 0,
+                end: 8,
+                baseNum:store.state.settings.searchItemCount
+            }
+  
+  function itemCountChange(newVal:number){
+    store.commit(SettingsMutationTypes.setSearchItemCount,newVal)
+  }
+
 </script>
 
 <style scoped>
 .basis{
     background-color: transparent;
     margin: 0px;
-    padding: 10px 30px 0px 30px;
+    padding: 10px 30px 10px 30px;
     display: flex;
     flex-direction: column;
     max-height: 600px;
     min-height: 600px;
     width: 600px;
-    overflow: hidden scroll;
+    overflow: hidden;
 }
 </style>

@@ -13,6 +13,10 @@ export interface SettingsState {
     tempSelectedPresetColorStyle: number
 }
 
+export enum SettingsMutationTypes {
+    setSearchItemCount = "SET_SEARCH_ITEM_COUNT",
+}
+
 export default createStoreModule<SettingsState>({
     state() {
         const defaultState: SettingsState = {
@@ -60,12 +64,17 @@ export default createStoreModule<SettingsState>({
         setPageColorStyle(state, payload:PageColorStyle) {
             state.pageColorStyle = payload;
         },
-        setSearchItemCount(state, payload:number) {
+
+        /** 
+        *@param state
+        *@param searchItemCount
+        */
+        [SettingsMutationTypes.setSearchItemCount]: (state, payload:number) => {
             state.searchItemCount = payload;
         },
+        
         setTempSelectedPresetColorStyle(state, payload:number) {
             state.tempSelectedPresetColorStyle = payload;
-            console.log(state.tempSelectedPresetColorStyle);
         },
         setTempPageColorStyle(state, payload:TempPageColorStyle) {
             state.tempPageColorStyle = payload;

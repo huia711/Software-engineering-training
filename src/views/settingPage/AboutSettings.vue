@@ -18,7 +18,7 @@
     width: 600px;
     display: flex;
     margin: 0;
-    padding: 10px 30px 0px 30px;
+    padding: 10px 30px 10px 30px;
     justify-content: center;
     align-items: center;
     background-color: transparent;
