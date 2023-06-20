@@ -6,8 +6,13 @@
   </config-provider>
 </template>
 
-<script lang="ts" setup>
-  import ConfigProvider from "@/components/ConfigProvider.vue"
+<script>
+  import ConfigProvider from "@/components/ConfigProvider.vue";
+  export default{
+    beforeCreate(){
+      document.querySelector('body').setAttribute('style','margin:auto')
+    }
+  }
 </script>
 
 <style>

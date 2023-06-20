@@ -1,18 +1,31 @@
 <template>
-    <div class="imgBasis">
-      <img class="imgStyle" :src="imageUrl" :alt="imageAlt" />
+    <div class="imgBasis" @click="setBackgroundImage">
+      <img class="imgStyle" :src="imageUrl" :alt="imageAlt"/>
       <div class="imgDescription">
-        <p style="font-size: large; word-spacing: 15px;">{{ imageDescription }}</p>
+        <p style="font-size: 30px; word-spacing: 15px;">{{ imageDescription }}</p>
       </div>
     </div>
-  </template>
+</template>
   
 <script>
+import { useStore } from '@/store';
+import { SettingsMutationTypes } from '@/store/settings';
 export default {
+data(){
+  return{
+    store: useStore()
+  }
+},
+methods: {
+  setBackgroundImage(){
+    this.store.commit(SettingsMutationTypes.setBackgroundImg, this.imageUrl)
+    console.log(this.store.state.settings.backgroundImg)
+  }
+},
 props: {
-    imageUrl: String,
-    imageAlt: String,
-    imageDescription: String
+  imageUrl: String,
+  imageAlt: String,
+  imageDescription: String
 }
 };
 </script>
@@ -23,29 +36,33 @@ props: {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 50px;
+    width: 250px;
+    height: 150px;
     border-radius: 15px;
     overflow: hidden;
     cursor: pointer;
+    margin: 20px;
 }
 
 .imgDescription{
-    margin: 0px;
-    padding: 0px;
-    z-index: 1;
+  display: flex;
+  position: absolute;
+  margin: 0px;
+  padding: 0px;
+  z-index: 100;
 }
 
 .imgStyle{
-    width: 80px;
-    height: 50px;
-    margin: 0px;
-    padding: 0px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 250px;
+  height: auto;
+  margin: 0px;
+  padding: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 
-    transition: 0.3s linear;
+  transition: 0.3s linear;
 }
 
 .imgStyle:hover{

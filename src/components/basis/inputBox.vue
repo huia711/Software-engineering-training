@@ -5,6 +5,7 @@
         class="inputBox" :style="{width:finalWidth+'px'}" 
         @focusin="isInputEnable(true)" 
         @focusout="isInputEnable(false)" 
+        :placeholder="placeHolder" 
         v-model="inputData" />
 
         <!-- Toggle button sticks to the right -->
@@ -41,6 +42,10 @@
             },
             defaultContent(newValue,oldValue){
                 this.inputData = newValue
+            },
+            inputState(newVal,oldVal){
+                if(newVal === false)
+                    this.$emit("inputFinished")
             }
         },
         props:{
@@ -53,6 +58,10 @@
                 default: 0
             },
             defaultContent:{
+                type: String,
+                default: ""
+            },
+            placeHolder:{
                 type: String,
                 default: ""
             }

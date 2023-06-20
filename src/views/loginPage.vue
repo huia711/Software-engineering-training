@@ -1,5 +1,7 @@
 <template>
     <main class="base">
+        <div id="wallpaper">
+        </div>
         <div class="pageLayout">
             <closeButton @close="closePage"/>
             <div class="global">
@@ -8,9 +10,10 @@
                 :customButtonStyle="imgStyle" />
                 <div class="loginPage">
                     <!-- 显示登录/注册界面 -->
+                    <p v-show="registerMode" class="inputBoxs">昵称：<inputBox :visibleButton = "false" :widthExpand="32" @dataChanged="registerNameGet" /></p>
                     <p class="inputBoxs">账号：<inputBox :visibleButton = "false" :widthExpand="32" @dataChanged="accountGet" /></p>
                     <p class="inputBoxs">密码：<inputBox :visibleButton = "true" :widthExpand="32" @dataChanged="passwdGet" /></p>
-                    <p v-if="registerMode" class="inputBoxs">确认密码：<inputBox :visibleButton = "true" @dataChanged="confPasswdGet" /></p>
+                    <p v-show="registerMode" class="inputBoxs">确认密码：<inputBox :visibleButton = "true" @dataChanged="confPasswdGet" /></p>
                     <modernButton buttonText="登 录" :customButtonStyle="loginButtonStyle" @buttonClicked="loginButtonClicked" @mouseOn="loginButtonMouseStateChange(true)" @mouseLeave="loginButtonMouseStateChange(false)" />
                     <modernButton buttonText="注 册" :customButtonStyle="registerButtonStyle" @buttonClicked="regButtonClicked" @mouseOn="registerButtonMouseStateChange(true)" @mouseLeave="registerButtonMouseStateChange(false)" />
                     <p style="color: red;height: 20px;">{{ warningMsg }}</p>
@@ -28,19 +31,33 @@ import inputBox from '@/components/basis/inputBox.vue';
 import closeButton from '@/components/basis/closeButton.vue';
 import { computed } from '@vue/reactivity';
 import cal from '@/utils/calculation';
-import { useStore } from '@/store';
 import axios from '@/plugins/axios';
+import { useStore } from '@/store';
+import $ from 'jquery'
+import { mapMutations } from 'vuex';
 
 export default{
     setup(){
         const store = useStore();
         return {
-            pageColorStyle: computed(()=>store.state.settings.pageColorStyle)
+            pageColorStyle: computed(()=>store.state.settings.pageColorStyle),
+            backgroundImg: computed(()=>store.state.settings.backgroundImg),
+            imgStyle: computed(()=>store.state.settings.imgStyle),
+            userName: computed(()=>store.state.settings.userName),
+            store
+        }
+    },
+    mounted(){
+        if(this.store.state.settings.backgroundImg !== ""){
+            $("#wallpaper").addClass("backgroundImg");
+        } else {
+            $("#wallpaper").removeClass("backgroundImg");
         }
     },
     data(){
         return{
             registerMode: false,
+            registerName: "",
             account: "",
             passwd: "",
             confPasswd: "",
@@ -68,20 +85,11 @@ export default{
                 outlineColor:"transparent",
                 wordSpacing:"50px",
                 divHeight:"4rem"
-            },
-            imgStyle: {
-                backgroundColor:"transparent",
-                borderColor:"transparent",
-                outlineColor:"transparent",
-                width:"64px",
-                height:"64px",
             }
         }
     },
     methods:{
-        userHeadImgClicked(){
-            // 头像点击
-        },
+        ...mapMutations(['setUserName']),
         loginButtonClicked(){
             if(this.registerMode === false){
                 if(this.account === "" || this.passwd === "")
@@ -90,12 +98,18 @@ export default{
                     this.warningMsg = ""
                     // 登录方法
                     let data = {
-                        "account" : this.account,
-                        "password" : this.passwd
+                        "id" : this.account,
+                        "username" : this.registerName,
+                        "password" : this.passwd,
+                        "confirmPassword": this.confPasswd
                     }
-                    axios.post('/user/register',data).then(
+                    axios.post('http://localhost:8080/user/login',data).then(
                     response=>{
-                        console.log('/user/register',response)
+                        if(response.message==="登陆成功！"){
+                            this.setUserName(response.data.userName)
+                        } else {
+                            this.warningMsg = "账号或密码错误!"
+                        }
                     }, error=>{
                         console.log('ERROR',error.message)
                     })
@@ -124,8 +138,8 @@ export default{
                 this.registerMode = true
             }
             else{
-                if(this.account === "" || this.passwd === "")
-                    this.warningMsg = "账号或密码不能为空!"
+                if(this.registerName === "" || this.account === "" || this.passwd === "")
+                    this.warningMsg = "用户昵称、账号和密码不能为空!"
                 else{
                     if(this.passwd !== this.confPasswd)
                         this.warningMsg = "两次输入的密码不一致!"
@@ -136,9 +150,9 @@ export default{
                             "account" : this.account,
                             "password" : this.passwd
                         }
-                        axios.post('/user/login',data).then(
+                        axios.post('http://localhost:8080/user/register',data).then(
                         response=>{
-                            console.log('/user/login',response)
+                            console.log('http://localhost:8080/user/register',response)
                         }, error=>{
                             console.log('ERROR',error.message)
                         })
@@ -148,6 +162,10 @@ export default{
         },
         closePage(){
             this.$router.push('/')
+        },
+        registerNameGet(name){
+            this.registerName = name
+            this.warningMsg = ""
         },
         accountGet(account){
             this.account = account
@@ -172,20 +190,10 @@ export default{
         }
     },
     props:{
-        userName:{
-            // 用户昵称
-            type: String,
-            default: "Guest"
-        },
         userHeadImgPath:{
             // 用户头像路径，注意要使用png图片，否则将会有白边
             type: String,
             default: "../../src/img/userHead.png"
-        },
-        backGroundImgPath:{
-            // 背景图片
-            type: String,
-            default: "../../src/img/userPageBackground.jpg"
         },
         isLogin:{
             type: Boolean,
@@ -208,9 +216,6 @@ export default{
     margin: auto;
     justify-content: center;
     align-items: center;
-    background: v-bind("'url('+backGroundImgPath+') no-repeat'");
-    background-size: cover;
-    background-attachment: scroll;
 }
 
 .pageLayout{
@@ -218,6 +223,26 @@ export default{
     justify-content: center;
     flex-direction: row-reverse;
     position: fixed;
+    z-index: 100;
+}
+
+#wallpaper{
+    display: flex;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+  }
+
+#wallpaper.backgroundImg {
+    background-image: v-bind("'url(\"' + backgroundImg + '\")'");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .loginPage{
