@@ -34,7 +34,7 @@
       <router-link to="/register" style="text-decoration: none; color: black;">
         <modernButton
           :custom-button-style="imgStyle"
-          srcPath="@/img/userHead.png"
+          srcPath="img/userHead.png"
           textUnderButton="User"
         />
       </router-link>
@@ -42,7 +42,7 @@
       <modernButton
           id="setting-button"
           :custom-button-style="imgStyle"
-          srcPath="@/img/setting.png"
+          srcPath="img/setting.png"
           @buttonClicked="settingVisibleState(true)"
           textUnderButton="settings"
       />
@@ -126,12 +126,13 @@ export default {
     let page = 1
 
     const handleScroll = () => {
+      console.log(document.getElementById('main').scrollTop)
       if (document.getElementById('main').scrollTop === 0) {
         page = 1
         document.getElementById('menu1').click()
         console.log("page"+page)
       }
-      if (document.getElementById('main').scrollTop > document.getElementById('sec1').clientHeight) {
+      if (document.getElementById('main').scrollTop > document.getElementById('main').clientHeight) {
         page = 2
         document.getElementById('menu2').click()
         console.log("page"+page)
