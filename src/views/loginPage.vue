@@ -147,7 +147,7 @@ export default{
                         this.warningMsg = ""
                         // 注册方法
                         let data = {
-                            "account" : this.account,
+                            "id" : this.account,
                             "password" : this.passwd
                         }
                         axios.post('http://localhost:8080/user/register',data).then(
