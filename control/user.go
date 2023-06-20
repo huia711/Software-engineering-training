@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	//"github.com/go-sql-driver/mysql"
 )
 
 // 注册
@@ -55,14 +54,15 @@ func LoginHandler(c *gin.Context) {
 					fmt.Printf("token generate error:%v", err)
 					return
 				}
-				response.Success(c, gin.H{"token": token, "username": findUser.UserName, "url": findUser.Url}, "登录成功!")
+				response.Success(c, gin.H{"token": token, "username": findUser.UserName}, "登录成功!")
 			}
 		}
 	}
 }
 
 func OnlineHandler(c *gin.Context) {
-
+	id := c.Param("id")
+	c.String(200, "Hello, %s!", id) // 乱搞的，以后不要这句
 }
 
 /*if user.ID == 0 {

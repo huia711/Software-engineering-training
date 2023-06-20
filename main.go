@@ -1,25 +1,20 @@
 package main
 
 import (
+	"backend/config"
+	"backend/models"
 	"backend/mysql"
+	_ "backend/mysql"
+	"backend/router"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-
-	//"github.com/sirupsen/logrus"
-
-	"backend/config"
-	"backend/models"
-	_ "backend/mysql"
-	"backend/router"
 )
 
 var (
 	cfgFile string
-	//logger  = &logrus.Logger{}
 	rootCmd = &cobra.Command{}
 )
 
@@ -59,7 +54,7 @@ func Execute() error {
 		defer mysql.DB.Close() // 最后别忘了把连接关了
 
 		r := router.SetupRouter() // 初始化路由
-		err = r.Run()
+		err = r.Run(":2000")
 		if err != nil {
 			return err
 		}

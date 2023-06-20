@@ -10,7 +10,7 @@ type User struct {
 	Id       string `json:"id,string" db:"id"`
 	Password string `json:"password" db:"password"`
 	UserName string `json:"username" db:"user_name"`
-	Url      string `json:"url" db:"url"`
+	//Url      map[string]interface{} `json:"url" db:"url"`
 }
 
 // 数据表名字
@@ -29,10 +29,10 @@ func NewUser(name, password string) *User {
 
 // RegisterForm 注册请求参数
 type RegisterForm struct {
-	Id              string `form:"id"`
-	UserName        string `form:"username"`
-	Password        string `form:"password"`
-	ConfirmPassword string `form:"confirmPassword"`
+	Id              string `json:"id"`
+	UserName        string `json:"username"`
+	Password        string `json:"password"`
+	ConfirmPassword string `json:"confirmPassword"`
 }
 
 // 注册构造函数
@@ -45,7 +45,7 @@ func NewRegisterForm(name, password string) *RegisterForm {
 
 // LoginForm 登录请求参数
 type LoginForm struct {
-	Id       string `form:"id"`
-	UserName string `form:"username"`
-	Password string `form:"password"`
+	Id       string `json:"id"`
+	UserName string `json:"username"`
+	Password string `json:"password"`
 }

@@ -13,7 +13,7 @@ func UserRouterInit(r *gin.RouterGroup) {
 	{
 		userManager.POST("/register", control.RegisterHandler)
 		userManager.POST("/login", control.LoginHandler)
-		userManager.POST("/online", control.OnlineHandler)
+		userManager.POST("/:id", control.OnlineHandler)
 		//userManager.GET("/refresh_token", control.RefreshTokenHandler)
 		userManager.Use(logic.AuthMiddleware())
 		//{
@@ -21,40 +21,6 @@ func UserRouterInit(r *gin.RouterGroup) {
 		//}
 	}
 }
-
-// 新闻路由组
-/*func NewsRouterInit(r *gin.RouterGroup) {
-	newsManager := r.Group("/article")
-	{
-		newsManager.POST("/store_news",control.StoreHandler)
-		newsManager.GET("/get_news",control.GetNewsHandler)
-	}
-}*/
-
-// 评论路由组
-//func CommentRouterInit(r *gin.RouterGroup) {
-//	commentManager := r.Group("/comment")
-//	{
-//		commentManager.GET("/comment_list", control.CommentListHandler)
-//		userManager.Use(logic.AuthMiddleware())
-//		{
-//			commentManager.POST("/comment", control.UserCommentHandler)
-//			commentManager.GET("/get_comment", control.GetCommentHandler)
-//		}
-//	}
-//}
-
-//点赞路由组
-/*func LikeRouterInit(r *gin.RouterGroup) {
-	likeManager := r.Group("/like")
-	{
-		likeManager.Use(control.JWTAuthMiddleware){
-			likeManager.POST("/like", control.LikeHandler)
-			likeManager.GET("/get_like", control.GetLikeHandler)
-			likeManager.GET("/like_count", control.LikeCountHandler)
-	 	}
-	}
-}*/
 
 func SetupRouter() *gin.Engine {
 	router := gin.Default()

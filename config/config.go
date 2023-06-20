@@ -2,11 +2,10 @@ package config
 
 import (
 	"fmt"
-	"io"
-	"io/ioutil"
-
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
+	"io"
+	"io/ioutil"
 )
 
 const (
