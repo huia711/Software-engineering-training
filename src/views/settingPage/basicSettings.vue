@@ -57,20 +57,20 @@ export default{
                 Object({
                 backgroundColor:{
                     hex:"#ffffff",
-                    alpha:1
+                    alpha:0.7
                 },
                 buttonColor:{
                     hex:"#000000",
-                    alpha:0.2
+                    alpha:0.3
                 }}),
                 Object({
                 backgroundColor:{
                     hex:"#000000",
-                    alpha:0.3
+                    alpha:0.6
                 },
                 buttonColor:{
                     hex:"#ffffff",
-                    alpha:0.2
+                    alpha:0.3
                 }})],
             blankSeparatorColorStyle:{
                 backgroundColor:{
@@ -207,6 +207,10 @@ export default{
     min-height: 600px;
     width: 600px;
     overflow: hidden scroll;
+}
+
+.basis::-webkit-scrollbar{
+    display: none;
 }
 
 .boxs{

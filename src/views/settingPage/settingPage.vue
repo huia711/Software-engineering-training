@@ -16,20 +16,18 @@
                       </li>
                   </ul>
                   <!-- 右侧具体内容 -->
-                  <basicSettings v-if="curSelected === 0" />
-                  <backgroundPicture v-if="curSelected === 1" />
-                  <privacyPage v-if="curSelected === 2" />
-                  <advancePage v-if="curSelected === 3" />
-                  <aboutPage v-if="curSelected === 4"/>
+                  <basicSettings v-show="curSelected === 0" />
+                  <backgroundPicture v-show="curSelected === 1" />
+                  <privacyPage v-show="curSelected === 2" />
+                  <advancePage v-show="curSelected === 3" />
+                  <aboutPage v-show="curSelected === 4"/>
           </div>
-          <closeButton @close="closePage"/>
       </div>
   </div>
 </template>
 
 <script>
 import modernButton from '@/components/basis/modernButton.vue'
-import closeButton from '@/components/basis/closeButton.vue'
 import basicSettings from './basicSettings.vue'
 import aboutPage from './AboutSettings.vue'
 import advancePage from './AdvanceSettings.vue'
@@ -37,7 +35,6 @@ import privacyPage from './PrivacySettings.vue'
 import backgroundPicture from './backgroundPicture.vue'
 
 import cal from '@/utils/calculation'
-
 import { useStore } from '@/store'
 import { mapMutations } from 'vuex'
 import { computed } from '@vue/reactivity'
@@ -46,7 +43,7 @@ export default{
     setup(){
       const store = useStore()
       return{
-          pageColorStyle: computed(()=> store.state.settings.pageColorStyle)
+          pageColorStyle: computed(() => store.state.settings.pageColorStyle)
       }
     },
     data(){
@@ -54,12 +51,11 @@ export default{
             colorStyle: cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),
             options:["通 用","壁 纸","隐 私","高 级","关 于"],
             curSelected: 0,
-            searchItemNum: this.searchItemCount,
             curOn: -1,
             buttonSelectedStyle:{
                 borderColor:"transparent",
-                borderRadius:"0 9999px 9999px 0",
-                backgroundColor:"lightblue",
+                borderRadius:"5px",
+                backgroundColor: computed(()=>cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex), this.pageColorStyle.buttonColor.alpha)),
                 outlineColor:"transparent",
                 cursor:"pointer",
                 wordSpacing:"6px",
@@ -70,6 +66,7 @@ export default{
             },
             buttonNotSelectedStyle:{
                 borderColor:"transparent",
+                borderRadius:"5px",
                 backgroundColor:"transparent",
                 outlineColor:"transparent",
                 cursor:"pointer",
@@ -82,36 +79,21 @@ export default{
         }
     },
     methods:{
-        ...mapMutations(['setSettingPageShown','confirmSettings']),
+        ...mapMutations(['setSettingPageShown']),
         buttonClick(index){
             this.curSelected = index
         },
         buttonOn(index){
             this.curOn = index
         },
-        closePage(){
-            this.confirmSettings()
-            this.$emit("close")
-        }
     },
     watch:{
         pageColorStyle(newVal,oldVal){
             this.colorStyle = cal.hexToRgb(newVal.backgroundColor.hex)
         }
     },
-    props:{
-        backGroundImgPath:{
-            type: String,
-            default: "../../src/img/userPageBackground.jpg"
-        },
-        searchItemCount:{
-            type:Number,
-            default:5
-        }
-    },
     components:{
         modernButton,
-        closeButton,
         basicSettings,
         aboutPage,
         privacyPage,
@@ -150,9 +132,10 @@ export default{
 }
 
 .listStyle{
-  padding: 0px;
+  margin: 5px;
+  padding: 5px;
   list-style: none;
-  border-right: 1px solid #ffffff;
+  border-right: v-bind("'1px solid ' + pageColorStyle.buttonColor.hex");
 }
 
 .listItem{

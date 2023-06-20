@@ -1,7 +1,10 @@
 <template>
   <main class="main">
+    <!-- 背景 -->
+    <div id="wallpaper">
+    </div>
     <!-- 搜索框 -->
-    <search class="search" :value="state.searchText"/>
+    <search class="search" :value="searchText"/>
 
 <!--    <section class="sec1">-->
 <!--      &lt;!&ndash;    &lt;!&ndash; 过渡效果组件 &ndash;&gt;&ndash;&gt;-->
@@ -20,7 +23,7 @@
     <div class="temp">
       <router-link to="/register" style="text-decoration: none; color: black;">
         <modernButton
-          :custom-button-style="state.imgStyle"
+          :custom-button-style="imgStyle"
           srcPath="./src/img/userHead.png"
           textUnderButton="User"
         />
@@ -28,85 +31,101 @@
       
       <modernButton
           id="setting-button"
-          :custom-button-style="state.imgStyle"
+          :custom-button-style="imgStyle"
           srcPath="./src/img/setting.png"
-          @buttonClicked="settingPageStateChange(true)"
+          @buttonClicked="settingVisibleState(true)"
           textUnderButton="settings"
       />
     </div>
 
     <div id="setting-page">
       <settingPage
-          @close="settingPageStateChange(false)"
-          :pageState="state.settingPageClicked"
+          id="settingMainPage"
+          v-click-outside="handleClickOutside"
       />
     </div>
   </main>
-
-<!--  &lt;!&ndash; 壁纸 &ndash;&gt;-->
-<!--  <div class="wallpaper-wrap">-->
-<!--    <suspense>-->
-<!--      <wallpaper v-if="state.enableWallpaper" />-->
-<!--    </suspense>-->
-<!--  </div>-->
 </template>
 
-<script lang="ts" setup>
+<script lang="js">
   /**
    * 导入（import）
    */
-  import {computed, reactive, watch} from "vue"
+  import {computed, onMounted} from "vue"
   import { useStore } from "@/store"
   import { useRoute } from "vue-router"
   // 导入组件Component
   import Search from "@/views/home/IndexSearch.vue"
-  import Setting from "@/views/setting/IndexSetting.vue"
-  import TopSite from "@/home/TopSite.vue"
-  import Wallpaper from "@/views/home/WallPaper.vue"
-  // 外部导入
-  import { SettingOutlined } from "@ant-design/icons-vue"
-  import { BackgroundType } from "@/enum-interface"
-
-  import loginPage from '@/views/loginPage.vue';
   import settingPage from '@/views/settingPage/settingPage.vue';
   import modernButton from '@/components/basis/modernButton.vue';
+  // 外部导入
   import $ from 'jquery';
+  import { mapMutations } from "vuex";
 
-  /**
-   * 常/变量（const/let）的定义
-   */
-  // 导入路由和Vuex（状态管理）
-  const route = useRoute()
-  const { state: stateX } = useStore()
-
-
-  /**
-   * 响应式对象（reactive,computed）
-   */
-  // 组件本地状态 // 使用 reactive 函数
-  // 创建一个名为 state 的响应式对象（与vuex无关）
-  const state = reactive({
-    fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
-    searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
-    settingVisible: false, // 设置抽屉是否打开
-    settingPageClicked: false,
-
-    enableTopSite: computed(() => stateX.setting.topSite.enable), // 是否显示顶部网站
-    enableWallpaper: computed(() => stateX.setting.background.type !== BackgroundType.None), // 是否有壁纸
-    imgStyle: computed(()=>stateX.settings.imgStyle)
-  })
-
-  const settingPageStateChange = (stat: boolean) => {
-    state.settingPageClicked = stat
-  }
-
-  watch(() => state.settingPageClicked, (newVal: boolean, oldVal: boolean) => {
-    if (newVal) {
-      $("#setting-page").removeClass("slide_out").addClass("slide_in");
-    } else {
-      $("#setting-page").removeClass("slide_in").addClass("slide_out");
+export default {
+  data(){
+    const store = useStore();
+    return{
+      settingVisible: false, // 设置页面是否打开
+      enableTopSite: computed(() => store.state.setting.topSite.enable), // 是否显示顶部网站
+      imgStyle: computed(() => store.state.settings.imgStyle),
+      backgroungImage: computed(() => store.state.settings.backgroundImg)
     }
-  })
+  },
+  methods:{
+      ...mapMutations(['confirmSettings']),
+      settingVisibleState (stat) {
+        this.settingVisible = stat
+      },
+      handleClickOutside(){
+        this.settingVisible = false
+        this.confirmSettings()
+      }
+  },
+  watch:{
+    settingVisible(newVal, oldVal){
+      if (newVal) {
+        $("#setting-page").removeClass("slide_out").addClass("slide_in");
+      } else {
+        $("#setting-page").removeClass("slide_in").addClass("slide_out");
+      }
+    },
+    backgroungImage(newVal, oldVal){
+      if(newVal !== ""){
+        $("#wallpaper").addClass("backgroundImg");
+      } else {
+        $("#wallpaper").removeClass("backgroundImg");
+      }
+    }
+  },
+  setup(){
+    /**
+     * 常/变量（const/let）的定义
+     */
+    // 导入路由和Vuex（状态管理）
+    const route = useRoute();
+    const store = useStore();
+
+    onMounted(()=>{
+      if(store.state.settings.backgroundImg !== ""){
+        $("#wallpaper").addClass("backgroundImg");
+      } else {
+        $("#wallpaper").removeClass("backgroundImg");
+      }
+    });
+    return{
+      fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
+      searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
+      fontColor: computed(() => store.state.settings.buttonColor.hex)
+    }
+  },
+  components:{
+    Search,
+    modernButton,
+    settingPage
+  }
+}
+
 </script>
 
 <style>
@@ -116,6 +135,25 @@
     align-items: center; /* 将内容在垂直方向上居中对齐 */
     row-gap: 42px; /* 将每个子元素之间的间距设置为 42 像素 */
     overflow: hidden;
+  }
+
+  #wallpaper{
+    display: flex;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+  }
+
+  #wallpaper.backgroundImg {
+    background-image: v-bind("'url(\"' + backgroungImage + '\")'");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
   }
 
   .sec1 {
@@ -145,15 +183,6 @@
   }
   .setting:hover {
     transform: scale(1.15); /* 缩放比例增加到 1.02 */
-  }
-
-  .wallpaper {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-
-    top: 0;
-    z-index: -10;
   }
 
   @import '@/font/font.css';
