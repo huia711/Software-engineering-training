@@ -8,53 +8,35 @@
     </div>
 
     <!-- 输入框容器 -->
-    <el-affix offset="100" position="top">
+    <el-affix :offset="offset" position="top">
       <div class="search-input" ref="searchInput">
-          <!--自动完成搜索建议-->
-  <!--          <el-autocomplete v-model:value="searchText"-->
-  <!--                           :open="showComplete"-->
-  <!--                           :options="searchSuggestion"-->
-  <!--                           :defaultActiveFirstOption="false"-->
-  <!--                           :get-popup-container= "() => searchWarp"-->
-  <!--                           size="large"-->
-  <!--                           autofocus-->
-  <!--                           backfill-->
-  <!--                           style="width: 100%"-->
-  <!--                           @search="debounceSearchSuggestion"-->
-  <!--                           @select="showComplete = false"-->
+        <!--自动完成搜索建议-->
+        <!-- 搜索输入框，按下回车键或点击搜索按钮时触发搜索事件 -->
+        <el-autocomplete :placeholder="t('home.search')"
+                         v-model="inputSearch"
+                         type="text"
+                         class="input-with-select"
+                         clearable
+                         autofocus
+                         @keyup.enter="onSearch(inputSearch)"
+                         @keydown="onSwitchEngines"
 
-            <!-- 搜索输入框，按下回车键或点击搜索按钮时触发搜索事件 -->
-            <el-input :placeholder="t('home.search')"
-                      v-model="inputSearch"
-                      type="text"
-                      class="input-with-select"
-                      size="large"
-                      clearable
-                      autofocus
-                      @keyup.enter = "onSearch(inputSearch)"
-                      @keydown="onSwitchEngines"
-                      @focus="showComplete = true"
-                      @blur="showComplete = false"
-            >
-              <!-- 搜索引擎选项卡 -->
-              <template #prepend v-if="searchSetting.showEngineSelect">
-                <el-select v-model = "currentEngine" >
-  <!--                <template #prefix>-->
-  <!--                  <span style="padding-left: 5px;">-->
-  <!--                    <img :src="searchEngines[currentEngine].icon_select" class="select-logo" alt="select-logo" draggable="false" />-->
-  <!--                  </span>-->
-  <!--                </template>-->
-                  <el-option v-for = "(value, key) in searchEngines" :value="key" :key="key" :label="value.name">
-                    {{ value.name }}
-                  </el-option>
-                </el-select>
-              </template>
-              <!-- 搜索按钮 -->
-              <template #append>
-                <el-button :icon="Search" @click = "onSearch(inputSearch)"></el-button>
-              </template>
-            </el-input>
-  <!--          </el-autocomplete>-->
+                         :fetch-suggestions="querySearch"
+                         popper-class="my-autocomplete"
+        >
+          <!-- 搜索引擎选项卡 -->
+          <template #prepend v-if="searchSetting.showEngineSelect">
+            <el-select v-model = "currentEngine">
+              <el-option v-for = "(value, key) in searchEngines" :value="key" :key="key" :label="value.name" class="option">
+                {{ value.name }}
+              </el-option>
+            </el-select>
+          </template>
+          <!-- 搜索按钮 -->
+          <template #append>
+            <el-button :icon="Search" @click = "onSearch(inputSearch)"></el-button>
+          </template>
+        </el-autocomplete>
       </div>
     </el-affix>
   </div>
@@ -65,78 +47,60 @@
    * 导入（import）
    */
   import { useStore } from "@/store"
-  import { SearchActions, SearchGetters } from "@/store/search" // 引入搜索业务模块中的 Actions 和 Getters
+  import {SearchActions, SearchGetters, SearchMutations} from "@/store/search" // 引入搜索业务模块中的 Actions 和 Getters
   import { SettingMutations } from "@/store/setting" // 引入设置业务模块中的 Mutations
-  import { ref, computed, watch, nextTick } from "vue"
+  import { ref, computed } from "vue"
   // 导入外部定义
-  import { Option, SearchEngineData, SearchSetting } from "@/enum-interface" // 引入一些用于标记类型的枚举或接口类型
-  import { debounce } from "@/utils/async" // 引入一个工具函数用于实现防抖操作
-  import { isEmpty } from "@/utils/common" // 引入一个工具函数用于判断一个值是否为空
+  import {HistoryItem, Option, SearchSetting} from "@/enum-interface" // 引入一些用于标记类型的枚举或接口类型
+  import {isEmpty, matchPrefix} from "@/utils/common" // 引入一个工具函数用于判断一个值是否为空
   // 外部导入
   import { useI18n } from "vue-i18n"
-  import { ElNotification } from "element-plus"
+  import { ElMessage } from "element-plus"
   import { Search } from '@element-plus/icons-vue'
 
-  // interface SuggestionItem {
-  //   // 联想项的标题
-  //   title?: string
-  //   // 联想项的值
-  //   value: string
-  // }
+  // 联想项
+  interface SuggestionItem {
+    // 联想项的标题
+    title?: string
+    // 联想项的值
+    value: string
+  }
 
   /**
    * 常/变量（const/let）的定义
    */
-  // 使用 useI18n 函数，获取当前的国际化信息
   const { t } = useI18n()
   // 使用 useStore 函数，获取 store 对象，并解构出需要用到的 state，getters，commit，dispatch 函数
   const { state: stateX, getters, commit, dispatch } = useStore()
   // 搜索框输入值的变量
   let inputSearch = ref("")
+  const offset = ref(100)
 
   /**
    * 响应式对象（reactive,computed）
    */
-  // 定义 reactive 变量，并使用 computed 进行响应计算 // 自动追踪 stateX.setting.search 的变化，当 stateX.setting.search 发生改变时，会自动重新计算 searchSetting 的值，并将新的值缓存起来，以便后续的使用。
-  const showComplete = ref(false),
-    searchWarp = ref<HTMLElement>(),
-    searchEngines = computed(() => getters[SearchGetters.getUseSearchEngines]),
-    searchSetting = computed(() => stateX.setting.search)
-    // searchInputRadius = computed(() => `${searchSetting.value.searchInputRadius}px`)
-    // searchSuggestion = ref<SuggestionItem[]>()
+  // 定义 reactive 变量，并使用 computed 进行响应计算
+  const searchWarp = ref<HTMLElement>()
+  const searchEngines = computed(() => getters[SearchGetters.getUseSearchEngines])
+  const searchSetting = computed(() => stateX.setting.search)
 
-  // 当前搜索引擎  // 可读可写（set）
+  // 当前搜索引擎
   const currentEngine = computed({
     get: () => searchSetting.value.currentEngine,
     // 在 set 函数中，更新 store 中的搜索设置
     set: currentEngine => updateSearchSetting({ currentEngine })
   })
 
-  // // 当fixed变化时添加动画
-  // const searchInput = ref<Element>()
-  // // 监听 fixed 值的变化，添加动画效果
-  // watch(
-  //   () => props.fixed,
-  //   () => {
-  //     const $el = searchInput.value
-  //     const first = $el.getBoundingClientRect()
-  //
-  //     // 获取新位置并添加动画  // NOTICE：使用 nextTick() 可以避免在 mounted 阶段 DOM 未完全渲染的问题
-  //     nextTick(() => {
-  //       const last = $el.getBoundingClientRect(),
-  //         invertY = first.y - last.y,
-  //         invertX = first.x - last.x
-  //
-  //       $el.animate(
-  //         [{ transform: `translate(${invertX}px ,${invertY}px)` }, { transform: "translate(0, 0)" }],
-  //         {
-  //           duration: 300,
-  //           easing: "cubic-bezier(0,0,0.32,1)"
-  //         }
-  //       )
-  //     })
-  //   }
-  // )
+  // 加载搜索记录
+  const searchSuggestion = computed<SuggestionItem[]>(() => {
+    const suggestionItems: SuggestionItem[] = stateX.search.history.map((item) => {
+      return {
+        title: '',
+        value: item.searchText
+      };
+    });
+    return suggestionItems
+  })
 
   /**
    * 函数（function）定义
@@ -148,28 +112,61 @@
    */
   function onSearch(search: string) {
     if (isEmpty(search))
-      ElNotification({
+      ElMessage({
         title: 'Warning',
         message: t('home.warning'),
         type: 'warning',
       })
-    else
+    else {
       dispatch (SearchActions.submitSearch, search)
+
+      const newHistory: HistoryItem = {
+        engineId: searchEngines.value,
+        searchText: search,
+        timestamp: Date.now()
+      }
+      putHistory(newHistory)
+    }
+  }
+
+  /**
+   * 保存搜索记录
+   */
+  function putHistory(newHistory: HistoryItem) {
+    commit(SearchMutations.putHistory, newHistory)
+    console.log(newHistory)
   }
 
   /**
    * 搜索建议自动完成处理
    * 获取搜索建议数据
    */
-  // const debounceSearchSuggestion = debounce(handleSearchSuggestion)
-  // async function handleSearchSuggestion(value: string) {
-  //   if (isEmpty(value)) {
-  //     searchSuggestion.value = []
-  //   } else {
-  //     const suggestion: string[] = await dispatch(SearchActions.getSuggestion, value)
-  //     searchSuggestion.value = suggestion.map(item => ({ value: item }))
-  //   }
-  // }
+  const querySearch = (queryString: string, cb: any) => {
+    let results
+    if (isEmpty(queryString)) {
+      results = searchSuggestion.value
+    } else {
+      // // 获得api搜索建议
+      // const suggestion: string[] = dispatch(SearchActions.getSuggestion, queryString)
+      // searchSuggestion.value = suggestion.map((item) => {
+      //   return {
+      //     title: '',
+      //     value: item
+      //   };
+      // })
+      results = searchSuggestion.value.filter(createFilter(queryString))
+    }
+
+    cb(results)
+  }
+  // filter 方法过滤 restaurants 列表，找到和查询字符串前缀匹配的项，将结果存储到 results 中
+  const createFilter = (queryString: string) => {
+    return (searchSuggestion: SuggestionItem) => {
+      return (
+        matchPrefix(searchSuggestion.value, queryString)
+      )
+    }
+  }
 
   /**
    * 搜索框按 Tab / Shift+Tab
@@ -203,6 +200,7 @@
     // commit 是 Vuex 中的一个核心方法，用于提交 mutation
     commit(SettingMutations.updateSearchSetting, data)
   }
+
 </script>
 
 
@@ -234,14 +232,20 @@
     transition: 0.3s linear; /* 设置元素过渡的持续时间为 0.3 秒，过渡方式为线性（hover的时候） */
 
     // el的输入框
-    .el-input {
-      height: 44px;
+    .input-with-select {
+      width: 100%;
+    }
+
+    .my-autocomplete li {
+      line-height: normal;
+      padding: 7px;
     }
 
     //el的按钮
     .el-button {
       height: 44px;
       width: 72px;
+      border-radius: 20px;
 
       transition: 0.3s linear;
     }
@@ -251,16 +255,17 @@
 
     // el的选择框
     .el-select {
+      height: 44px;
       width: 100px;
+      border-radius: 10px;
 
-      transition: 0.3s linear;
+      // 内框
+      .el-input {
+        height: 44px;
+        transition: 0.3s linear;
+      }
     }
-    .el-select:hover {
-      transform: scale(1.05);
-    }
-    //.select-logo {
-    //  height: 15px;
-    //}
+
   }
 
   .search-input:hover {

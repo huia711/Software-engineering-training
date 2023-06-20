@@ -1,309 +1,410 @@
 <template>
-  <div class="top-site-warp">
-    <transition-group class="top-site-grid" name="flip-list" tag="ul">
+  <!-- 顶部网站导航组件 -->
+  <div class="bookmark-warp">
+    <!-- 过渡动画组件，实现顶部网站拖拽排序的动画效果 -->
+    <!--tag="ul":将<transition-group>组件中的所有子元素渲染为HTML中的无序列表元素（ul)-->
+    <transition-group class="bookmark-grid" name="flip-list" tag="ul">
+      <!-- 循环渲染顶部网站列表中的每一项 -->
+      <!--{hide: data.currentDrag === index}: 当data.currentDrag与当前index相等时，元素会绑定“hide”这个CSS类，从而实现“隐藏”这个效果。-->
       <li
-        v-for="(item, index) of topSites"
-        :key="item.url"
-        :class="['top-site-item', { hide: data.currentDrag === index }]"
-        :title="item.title"
-      >
-        <icon
-          :class="['top-site-icon', { 'shake-active': data.shake }]"
-          :text-icon="item.textIcon"
-          :src="item.icon"
+          v-for="(item, index) of bookMarks"
+          :key="item.url"
+          :class="['bookmark-item', { hide: data.currentDrag === index }]"
           :title="item.title"
-          :size="topSiteSetting.iconSize"
-          draggable="true"
-          @click="openPage(item.url)"
-          @contextmenu.prevent.stop="openEditStatus"
-          @dragstart="onDragIcon(DragType.start, index)"
-          @dragenter="onDragIcon(DragType.enter, index)"
-          @dragover.prevent
-          @dragend="onDragIcon(DragType.end, index)"
+      >
+        <!-- 自定义图标组件，包括提示文本、图标、点击事件、拖拽事件，以及编辑状态下的删除按钮 -->
+        <!--@contextmenu:监听右键-->
+        <!--drag:监听拖拽事件 dragover:监听拖拽事件的过程中鼠标在目标元素上移动的事件-->
+        <el-card
+            :class="['bookmark-icon', { 'shake-active': data.shake }]"
+            :text-icon="item.textIcon"
+            :src="item.icon"
+            :title="item.title"
+            draggable="true"
+            @click="openPage(item.url)"
+            @contextmenu.prevent.stop="openEditStatus"
+            @dragstart="onDragIcon(DragType.start, index)"
+            @dragenter="onDragIcon(DragType.enter, index)"
+            @dragover.prevent
+            @dragend="onDragIcon(DragType.end, index)"
         >
-          <div class="icon-board"></div>
-
+          <!-- 组件过渡动画，当编辑状态打开时，出现删除按钮 -->
           <transition name="scale">
+            <!--上标-->
             <sup
-              v-show="data.editStatus"
-              class="bubble-delete"
-              @click.stop="deleteTopSite(index)"
+                v-show="data.editStatus"
+                class="bubble-delete"
+                @click.stop="deleteBookMark(index)"
             ></sup>
           </transition>
-        </icon>
+        </el-card>
 
         <div class="icon-title">
           <span>{{ item.title }}</span>
         </div>
       </li>
 
+      <!-- 添加顶部网站图标的空白位置，如果还有空位就显示该项 -->
       <li
-        v-if="topSites.length < topSiteSetting.col * topSiteSetting.row"
-        v-show="!data.shake"
-        class="top-site-item"
-        :title="t('topsite.add')"
+          v-if="bookMarks.length < bookMarkSetting.col * bookMarkSetting.row"
+          v-show="!data.editStatus"
+          class="bookmark-item"
+          :title="t('bookmark.add')"
       >
-        <icon
-          class="top-site-icon"
-          title="＋"
-          :size="48"
-          textIcon
-          @click="data.showAddModal = true"
+        <el-card
+            class="bookmark-icon"
+            @click="data.showAddModal = true"
+            textIcon
         >
-          <div class="icon-board"></div>
-        </icon>
+          <el-icon size="24"><Plus/></el-icon>
+        </el-card>
 
         <div class="icon-title">
-          <span>{{ t('topsite.add') }}</span>
+          <span>{{ t('bookmark.add') }}</span>
         </div>
       </li>
     </transition-group>
 
-    <a-modal
-      v-model:visible="data.showAddModal"
-      :title="t('topsite.add')"
-      :width="500"
-      centered
-      destroy-on-close
-      ok-text="保存"
-      cancel-text="取消"
-      @ok="onSaveCustomTopSite"
+    <!-- 添加自定义顶部网站弹出框 -->
+    <el-dialog
+        v-model="data.showAddModal"
+        :title="t('bookmark.add')"
+        :width="500"
+        centered
+        destroy-on-close
+        draggable
     >
-      <a-form :model="topSite" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }" ref="formRef">
-        <a-form-item label="网站标题" v-bind="validateInfos.title">
-          <a-input v-model:value="topSite.title" placeholder="标题" />
-        </a-form-item>
-        <a-form-item label="网站URL" v-bind="validateInfos.url">
-          <a-input v-model:value="topSite.url" placeholder="URL" />
-        </a-form-item>
-        <a-form-item label="自动获取图标">
-          <a-switch v-model:checked="topSite.autoIcon" />
-        </a-form-item>
-        <a-form-item v-if="!topSite.autoIcon" label="文字图标">
-          <a-switch v-model:checked="topSite.textIcon" />
-        </a-form-item>
-        <a-form-item
-          v-if="!(topSite.autoIcon || topSite.textIcon)"
-          label="图标URL"
-          v-bind="validateInfos.icon"
+      <!-- 表单组件，包含网站标题、网站 URL、自动获取图标开关、自定义图标 URL 等项 -->
+      <el-form
+          ref="ruleFormRef"
+          :rules="rules"
+          :model="bookMark"
+          :label-col="{ span: 6 }"
+          :wrapper-col="{ span: 16 }"
+          status-icon
+      >
+        <el-form-item :label="t('bookmark.siteTitle')" prop="title">
+          <el-input v-model="bookMark.title" :placeholder="t('bookmark.siteTitle')" />
+        </el-form-item>
+        <el-form-item :label="t('bookmark.siteURL')" prop="url" type="url">
+          <el-input v-model="bookMark.url" :placeholder="t('bookmark.siteURL')" />
+        </el-form-item>
+        <el-form-item :label="t('bookmark.autoGet')">
+          <el-switch v-model="bookMark.autoIcon" />
+        </el-form-item>
+        <el-form-item v-if="!bookMark.autoIcon" :label="t('bookmark.textIcon')">
+          <el-switch v-model="bookMark.textIcon" />
+        </el-form-item>
+        <el-form-item
+            v-if="!(bookMark.autoIcon || bookMark.textIcon)"
+            :label="t('bookmark.iconURL')"
+            prop="icon"
+            type="url"
         >
-          <a-input v-model:value="topSite.icon" placeholder="图标URL" />
-        </a-form-item>
-      </a-form>
-    </a-modal>
+          <el-input v-model="bookMark.icon" :placeholder="t('bookmark.iconURL')" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="cancel(ruleFormRef)">
+          {{ t('bookmark.cancel') }}
+        </el-button>
+        <el-button type="primary" @click="onSaveCustomTopSite(ruleFormRef)">
+          {{t('bookmark.OK')}}
+        </el-button>
+      </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup type="module">
-import { computed, onBeforeMount, reactive } from "vue"
-import { DragType, OpenPageTarget, SortData, TopSiteItem, TopSites } from "@/enum-interface"
-import { useStore } from "@/store"
-import { TopSiteActions, TopSiteGetters, TopSiteMutations } from "@/store/bookmark"
-import { useI18n } from "vue-i18n"
-import { Form } from "ant-design-vue"
-// import { getFavicon } from "@/plugins/extension"
+  /**
+   * 导入（import）
+   */
+  import { computed, onBeforeMount, reactive, ref } from "vue"
+  import { useStore } from "@/store"
+  import { BookMarkActions, BookMarkGetters, BookMarkMutations } from "@/store/bookmark"
 
-const { t } = useI18n()
-const { state, getters, commit, dispatch } = useStore()
+  // 外部导入
+  import { DragType, OpenPageTarget, SortData, BookMarkItem, BookMarks } from "@/enum-interface"
+  import { useI18n } from "vue-i18n"
+  import { Plus } from "@element-plus/icons-vue";
+  import type { FormInstance } from 'element-plus'
+  // import { getFavicon } from "@/plugins/extension"
 
-const topSiteSetting = computed(() => state.setting.topSite)
-const topSites = computed<TopSites>(() => getters[TopSiteGetters.getCurrentTopSites])
+  /**
+   * 常/变量（const/let）的定义
+   */
+  const { t } = useI18n()
+  const { state, getters, commit, dispatch } = useStore()
+  const ruleFormRef = ref<FormInstance>()
 
-// 定义了三个响应式对象：data、topSite和rules
-const data = reactive({
-  currentDrag: -1,
-  shake: false,
-  editStatus: false,
-  showAddModal: false
-})
+  /**
+   * 响应式对象（reactive,computed）
+   */
+  const bookMarkSetting = computed(() => state.setting.bookMark)
+  const bookMarks = computed<BookMarks>(() => getters[BookMarkGetters.getCurrentBookMarks])
 
-const topSite = reactive({
-  title: "",
-  url: "",
-  icon: "",
-  textIcon: false,
-  autoIcon: true
-})
+  // 定义了三个响应式对象：data、bookMark和rules
+  const data = reactive({
+    currentDrag: -1,
+    shake: false,
+    editStatus: false,
+    showAddModal: false
+  })
 
-const rules = reactive({
-  title: [{ required: true, message: "请输入名称" }],
-  url: [{ required: true, message: "请输入地址URL", type: "url" }],
-  icon: [{ required: false, message: "请输入图标URL", type: "url" }]
-})
+  const bookMark = reactive({
+    title: "",
+    url: "",
+    icon: "",
+    textIcon: false,
+    autoIcon: true
+  })
 
-// Form.useForm：创建了一个表单实例 // 返回一个包含三个属性的对象：validate，resetFields和validateInfos。
-const { validate, resetFields, validateInfos } = Form.useForm(topSite, rules)
+  const rules = reactive({
+    title: [{ required: true, message: "请输入名称", trigger: 'blur' }],
+    url: [{ required: true, message: "请输入地址URL", type: "url", trigger: 'blur' }],
+    icon: [{ required: false, message: "请输入图标URL", type: "url", trigger: 'blur' }]
+  })
 
-function openPage(url: string) {
-  window.open(url, OpenPageTarget.Blank)
-}
 
-function deleteTopSite(index: number) {
-  commit(TopSiteMutations.deleteTopSite, index)
-}
-
-// 进入编辑状态
-function openEditStatus() {
-  data.shake = true
-  data.editStatus = true
-
-  // 点击其他位置关闭编辑状态
-  document.body.addEventListener("click", closeEditStatus)
-}
-
-function closeEditStatus(e: Event) {
-  if (data.editStatus) {
-    e.stopPropagation()
-
-    data.shake = false
-    data.editStatus = false
-    document.body.removeEventListener("click", closeEditStatus)
+  /**
+   * 函数（function）定义
+   */
+  // 打开该网站的首页
+  function openPage(url: string) {
+    window.open('https://'+url, OpenPageTarget.Blank)
   }
-}
 
-function onDragIcon(type: DragType, index: number) {
-  switch (type) {
-    case DragType.start:
-      data.currentDrag = index
-      openEditStatus()
-      return
-    case DragType.enter:
-      if (data.currentDrag === index) return
-      const sortData: SortData = {
-        from: data.currentDrag,
-        to: index
-      }
-
-      commit(TopSiteMutations.sortTopSites, sortData)
-      data.currentDrag = index
-      return
-    case DragType.end:
-      data.currentDrag = -1
-      return
+  // 删除
+  function deleteBookMark(index: number) {
+    commit(BookMarkMutations.deleteBookMark, index)
   }
-}
 
-async function onSaveCustomTopSite() {
-  try {
-    await validate()
-    const icon = topSite.autoIcon ? getFavicon(topSite.url) : undefined
-    const customData: TopSiteItem = {
-      ...topSite,
-      custom: true,
-      icon
+  // 进入编辑状态
+  function openEditStatus() {
+    data.shake = true
+    data.editStatus = true
+
+    // 点击其他位置关闭编辑状态
+    document.body.addEventListener("click", closeEditStatus)
+  }
+
+  // 关闭编辑状态
+  function closeEditStatus(e: Event) {
+    // 如果出于编辑状态
+    if (data.editStatus) {
+      e.stopPropagation() // 阻止事件传播
+
+      data.shake = false // 重置抖动状态
+      data.editStatus = false // 关闭编辑状态
+      document.body.removeEventListener("click", closeEditStatus) // 移除事件监听器
     }
-    commit(TopSiteMutations.addTopSite, customData)
-
-    resetFields()
-    data.showAddModal = false
-  } catch {}
-}
-
-// 初始化应用程序
-// init：检查应用程序内存储的数据中是否包含已有的顶部网站更新时间信息，如果没有，则调用TopSiteActions.syncBrowserTopSites异步函数从浏览器API中同步顶部网站数据。
-async function init() {
-  if (!state.topSite.lastUpdateTime) {
-    await dispatch(TopSiteActions.syncBrowserTopSites)
   }
-}
-// onBeforeMount：命周期函数之一，组件的实例被创建后，mounted生命周期函数被调用之前
-// 组件挂载前执行，以确保在组件渲染前先初始化顶部网站数据
-onBeforeMount(init)
+
+  // 拖拽
+  function onDragIcon(type: DragType, index: number) {
+    const sortData: SortData = {
+      from: -1,
+      to: -1
+    }
+    switch (type) {
+      // 开始
+      case DragType.start:
+        // 记录当前拖拽项的位置并打开编辑状态
+        data.currentDrag = index
+        openEditStatus()
+        return
+
+      // 进入
+      case DragType.enter:
+        // 如果当前拖拽项与进入项相同则返回
+        if (data.currentDrag === index) return
+
+        sortData.from = data.currentDrag
+        sortData.to = index
+
+        // 调用好的 mutations 方法进行排序
+        commit(BookMarkMutations.sortBookMarks, sortData)
+        data.currentDrag = index // 更新当前拖拽项位置
+        return
+
+      // 结束
+      case DragType.end:
+        data.currentDrag = -1 // 重置当前拖拽项位置
+        return
+    }
+  }
+  // 保存自定义置顶网站
+  const onSaveCustomTopSite = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return
+    await formEl.validate((valid, fields) => {
+      if (valid) {
+        console.log('submit!')
+        // 如果设置自动获取图标，则获取该网站的图标地址
+        const icon = undefined
+
+        // 创建自定义置顶网站数据并添加到置顶网站列表中
+        const customData: BookMarkItem = {
+          ...bookMark,
+          custom: true,
+          icon
+        }
+        commit(BookMarkMutations.addBookMark, customData)
+
+        // 重置表单数据并关闭添加网站对话框
+        formEl.resetFields()
+        data.showAddModal = false
+      } else {
+        console.log('error submit!', fields)
+      }
+    })
+  }
+
+  // 取消提交
+  const cancel = (formEl: FormInstance | undefined) => {
+    // 重置表单数据并关闭添加网站对话框
+    formEl.resetFields()
+    data.showAddModal = false
+  }
+
+  // 初始化应用程序
+  // init：检查应用程序内存储的数据中是否包含已有的顶部网站更新时间信息，如果没有，则调用TopSiteActions.syncBrowserTopSites异步函数从浏览器API中同步顶部网站数据。
+  async function init() {
+    if (!state.bookMark.lastUpdateTime) {
+      await dispatch(BookMarkActions.syncBrowserBookMarks)
+    }
+  }
+
+  /**
+   * 生命周期函数onBeforeMount
+   */
+  // onBeforeMount：生命周期函数之一，组件的实例被创建后，mounted生命周期函数被调用之前
+  // 组件挂载前执行，以确保在组件渲染前先初始化顶部网站数据
+  onBeforeMount(init)
 </script>
 
 <style lang="less">
-@item-size-max: 128px;
-@col: v-bind("topSiteSetting.col");
-@row: v-bind("topSiteSetting.row");
-@gap: v-bind("`${topSiteSetting.gap}px`");
-@board-size: v-bind("`${topSiteSetting.boardSize}px`");
-@board-color: v-bind("topSiteSetting.boardColor");
-@board-opacity: v-bind("topSiteSetting.boardOpacity");
-@board-radius: v-bind("`${topSiteSetting.boardRadius}px`");
+  // 设置最大图标尺寸
+  @item-size-max: 128px;
+  // 设置顶部网站导航栏的列数和行数
+  @col: v-bind("bookMarkSetting.col");
+  @row: v-bind("bookMarkSetting.row");
+  // 设置图标之间的间距
+  @gap: 42px;
+  // 设置整个顶部网站导航栏的大小和背景颜色
+  @board-size: v-bind("`${bookMarkSetting.boardSize}px`");
+  @board-color: v-bind("bookMarkSetting.boardColor");
+  @board-opacity: v-bind("bookMarkSetting.boardOpacity");
+  @board-radius: 5px;
 
-.top-site-warp {
-  height: calc(@row * @item-size-max + (@row - 1) * @gap);
-  width: calc(@col * @item-size-max + (@col - 1) * @gap);
+  // 定义样式规则
+  .bookmark-warp {
+    // 计算整个顶部网站导航栏的高度和宽度
+    height: calc(@row * @item-size-max + (@row - 1) * @gap);
+    width: calc(@col * @item-size-max + (@col - 1) * @gap);
 
-  .top-site-grid {
-    display: grid;
-    grid-template-columns: repeat(@col, @item-size-max);
-    grid-template-rows: repeat(@row, @item-size-max);
-    gap: @gap;
-  }
-
-  .top-site-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    row-gap: 8px;
-
-    &.hide {
-      opacity: 0;
+    // 定义图标网格布局
+    .bookmark-grid {
+      display: grid;
+      grid-template-columns: repeat(@col, @item-size-max); //  repeat():将 @col 个固定大小的列等分在容器中。
+      grid-template-rows: repeat(@row, @item-size-max);
+      gap: @gap;
     }
 
-    &.flip-list-enter-from,
-    &.flip-list-leave-to {
-      transform: translateY(@board-size);
-    }
+    // 定义图标的样式
+    .bookmark-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      row-gap: 8px;
 
-    .top-site-icon {
-      width: @board-size;
-      height: @board-size;
-      cursor: pointer;
+      transition: transform 0.3s linear, opacity 0.3s linear 0.2s;
+      transition-delay: calc(var(--delay-factor) * 50ms);
 
-      &.shake-active {
-        animation: shake 0.3s infinite;
+      // 定义“隐藏”类的样式（即不透明度为 0）
+      &.hide {
+        opacity: 0;
       }
 
-      .icon-board {
-        height: 100%;
-        background-color: @board-color;
-        opacity: @board-opacity;
-        border-radius: @board-radius;
+      // 定义图标的进入和离开动画样式
+      &.flip-list-enter-from,
+      &.flip-list-leave-to {
+        transform: translateY(@board-size);
       }
 
-      .bubble-delete {
-        width: 18px;
-        height: 18px;
+      // 定义图标本身的样式
+      .bookmark-icon {
+        width: @board-size;
+        height: @board-size;
+        cursor: pointer;
 
-        position: absolute;
-        top: -9px;
-        right: -9px;
-        color: #f5f5f5;
-        background-color: #f5222d;
-        text-align: center;
-        line-height: 18px;
-        font-size: 12px;
-        border-radius: 50%;
+        // 定义抖动动画样式
+        &.shake-active {
+          animation: shake 0.3s infinite;
+        }
 
-        &::before {
-          content: "X";
+        // 定义图标的删除按钮样式
+        .bubble-delete {
+          width: 18px;
+          height: 18px;
+
+          position: absolute;
+          top: 0;
+          right: 0;
+          color: #f5f5f5;
+          background-color: #f5222d;
+          text-align: center;
+          line-height: 18px;
+          font-size: 12px;
+          border-radius: 50%;
+
+          // 设置删除按钮的文本内容为 "X"
+          &::before {
+            content: "X";
+          }
         }
       }
-    }
 
-    .icon-title {
-      display: inline-block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: @item-size-max;
-      text-align: center;
-      user-select: none;
-    }
-  }
-}
-
-[data-theme="dark"] {
-  .top-site-warp {
-    .top-site-item {
-      .icon-board {
-        background-color: #1f1f1f !important;
-        transition: background-color 0.3s ease;
+      // 定义图标标题的样式
+      .icon-title {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis; // 文本过长时显示省略号
+        white-space: nowrap; // 防止文本换行
+        max-width: @item-size-max;
+        text-align: center; // 水平居中文本
+        user-select: none; // 用户无法选中元素中的文本
       }
     }
   }
-}
+
+  @keyframes shake {
+    0%,
+    50%,
+    100% {
+      transform: rotate(0deg);
+    }
+
+    25% {
+      transform: rotate(-4deg);
+    }
+    75% {
+      transform: rotate(4deg);
+    }
+  }
+  //// 定义深色主题下的样式规则
+  //[data-theme="dark"] {
+  //  .top-site-warp {
+  //    .top-site-item {
+  //      // 定义深色主题下的背景板颜色样式
+  //      .icon-board {
+  //        background-color: #1f1f1f !important;
+  //        transition: background-color 0.3s ease;
+  //      }
+  //    }
+  //  }
+  //}
 </style>

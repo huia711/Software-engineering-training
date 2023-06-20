@@ -9,7 +9,8 @@ export default {
   },
   home: {
     search: "Search",
-    warning: "Warning: The search value cannot be empty"
+    warning: "Warning: The search value cannot be empty",
+    MainTab: "Main Tab"
   },
   theme: {
     setting: "Theme Setting",
@@ -50,17 +51,24 @@ export default {
       overallCenter: "Overall center",
     }
   },
-  topsite: {
-    setting: "Topsite Setting",
-    topSiteData: "Topsite data",
-    topSiteDataTip: "last sync: {0}",
+  bookmark: {
+    setting: "Bookmark Setting",
+    BookmarkData: "Bookmark data",
+    BookmarkDataTip: "last sync: {0}",
     sync: "Sync",
     iconSize: "Icon size",
     boardSize: "Board size",
     boardColor: "Board color",
     boardOpacity: "Board opacity",
     boardRound: "Board round",
-    add: "Add topsite"
+    add: "Add site",
+    siteTitle: "Site title",
+    siteURL: "Site URL",
+    autoGet: "Automatically get icon",
+    OK: "OK",
+    cancel: "Cancel",
+    textIcon: "Text icon",
+    iconURL:"Icon URL",
   },
   other: {
     setting: "Other Setting",
@@ -80,7 +88,7 @@ export default {
     license: "Released under the MIT License"
   },
   popup: {
-    topsite: "Topsite",
+    bookmark: "Bookmark",
     searchHistory: "SearchHistory"
   }
 };

@@ -2,6 +2,22 @@ import { Option } from "@/enum-interface"
 import { computed, reactive } from "vue"
 
 /**
+ * 前缀匹配
+ */
+export function matchPrefix(text: string, query: string) {
+  // 将文本和查询字符串都转换为小写字母形式
+  const textLower = text.toLowerCase()
+  const queryLower = query.toLowerCase()
+
+  // 并将它们转换成标准化的 Unicode 内码点序列
+  const textNormalized = textLower.normalize('NFD')
+  const queryNormalized = queryLower.normalize('NFD')
+
+  // 判断文本是否以查询字符串开头
+  return textNormalized.startsWith(queryNormalized);
+}
+
+/**
  * 校验各种类型数据是否为空
  *
  * @param obj 对象

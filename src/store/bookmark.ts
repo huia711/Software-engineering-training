@@ -1,51 +1,75 @@
+/**
+ * 导入（import）
+ */
 import { createStoreModule } from "./index"
 // import { getBrowserTopSites, getFavicon } from "@/plugins/extension"
-import { SortData, TopSiteItem, TopSites } from "@/enum-interface"
+import { SortData, BookMarkItem, BookMarks } from "@/enum-interface"
 import { copy } from "@/utils/common"
 import { debounce } from "@/utils/async"
 // import { verifyImageUrl } from "@/utils/file"
 
-export interface TopSiteState {
-  topSites: TopSites
+/**
+ * 自定义类型（type）的定义
+ */
+// state
+export interface BookMarkState {
+  bookMarks: BookMarks
   lastUpdateTime?: number
 }
 
-export interface TopSiteItemVo extends TopSiteItem {
+//
+export interface BookMarkItemVo extends BookMarkItem {
   index: number
 }
 
-export enum TopSiteGetters {
-  getCurrentTopSites = "GET_CURRENT_TOP_SITES"
+// getter
+export enum BookMarkGetters {
+  getCurrentBookMarks = "GET_CURRENT_BOOK_MARK"
 }
 
-export enum TopSiteMutations {
-  addTopSite = "ADD_TOP_SITE",
-  updateTopSite = "UPDATE_TOP_SITE",
-  deleteTopSite = "DELETE_TOP_SITE",
-  sortTopSites = "SORT_TOP_SITES",
-  updateTopSites = "UPDATE_TOP_SITES",
+// mutations
+export enum BookMarkMutations {
+  addBookMark = "ADD_BOOK_MARK",
+  updateBookMark = "UPDATE_BOOK_MARK",
+  deleteBookMark = "DELETE_BOOK_MARK",
+  sortBookMarks = "SORT_BOOK_MARKS",
+  updateBookMarks = "UPDATE_BOOK_MARKS",
   editLastUpdateTime = "EDIT_LAST_UPDATE_TIME"
 }
 
-export enum TopSiteActions {
-  syncBrowserTopSites = "SYNC_BROWSER_TOP_SITES"
+// action
+export enum BookMarkActions {
+  syncBrowserBookMarks = "SYNC_BROWSER_BOOK_MARKS"
 }
 
-const TOP_SITE_STORAGE = "top-site-data"
 
-// createStoreModule：创建一个Vuex模块
-export default createStoreModule<TopSiteState>({
+/**
+ * 常/变量（const/let）的定义
+ */
+// key
+const BOOK_MARK_STORAGE = "book-mark-data"
 
-  // state
+/**
+ * 默认导出（export default）定义
+ * module的定义
+ */
+export default createStoreModule<BookMarkState>({
+  /**
+   * state
+   */
   state() {
-    const defaultState: TopSiteState = {
+    // 设置默认状态值
+    const defaultState: BookMarkState = {
       // 创建一个数组保存网站
-      topSites: [],
+      bookMarks: [],
       lastUpdateTime: undefined
     }
 
-    const topSitesData = JSON.parse(localStorage[TOP_SITE_STORAGE] ?? "[]")
-    copy(topSitesData, defaultState, true)
+    // 从本地存储中读取
+    const bookMarksData = JSON.parse(localStorage[BOOK_MARK_STORAGE] ?? "[]")
+    console.log(bookMarksData)
+    // 将本地存储中读取到的合并到默认状态中
+    copy(bookMarksData, defaultState, true)
 
     return defaultState
   },
@@ -58,11 +82,12 @@ export default createStoreModule<TopSiteState>({
      * @param rootState
      * @returns
      */
-    [TopSiteGetters.getCurrentTopSites]: ({ topSites }, _, rootState) => {
+    [BookMarkGetters.getCurrentBookMarks]: ({ bookMarks }, _, rootState) => {
       // 从根状态中获取topSite配置对象
-      const topSiteSetting = rootState.setting.topSite
+      const bookMarkSetting = rootState.setting.bookMark
+      console.log(bookMarkSetting)
       // 根据配置筛选出前topSiteSetting.col * topSiteSetting.row项网站数据
-      return topSites.filter((_item, index) => index < topSiteSetting.col * topSiteSetting.row)
+      return bookMarks.filter((_item, index) => index < bookMarkSetting.col * bookMarkSetting.row)
     }
   },
   mutations: {
@@ -71,18 +96,18 @@ export default createStoreModule<TopSiteState>({
      * @param state
      * @param data
      */
-    [TopSiteMutations.addTopSite]: (state, data: TopSiteItem) => {
-      state.topSites.push(data)
-      saveTopSiteState(state)
+    [BookMarkMutations.addBookMark]: (state, data: BookMarkItem) => {
+      state.bookMarks.push(data)
+      saveBookMarkState(state)
     },
     /**
      * 更新单个导航
      * @param state
      * @param data
      */
-    [TopSiteMutations.updateTopSite]: (state, data: TopSiteItemVo) => {
-      state.topSites[data.index] = data
-      saveTopSiteState(state)
+    [BookMarkMutations.updateBookMark]: (state, data: BookMarkItemVo) => {
+      state.bookMarks[data.index] = data
+      saveBookMarkState(state)
     },
 
     /**
@@ -90,9 +115,9 @@ export default createStoreModule<TopSiteState>({
      * @param state
      * @param index
      */
-    [TopSiteMutations.deleteTopSite]: (state, index: number) => {
-      state.topSites.splice(index, 1)
-      saveTopSiteState(state)
+    [BookMarkMutations.deleteBookMark]: (state, index: number) => {
+      state.bookMarks.splice(index, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
+      saveBookMarkState(state)
     },
 
     /**
@@ -100,13 +125,13 @@ export default createStoreModule<TopSiteState>({
      * @param state
      * @param sort
      */
-    [TopSiteMutations.sortTopSites]: (state, sort: SortData) => {
-      const topSites = state.topSites
-      const from = topSites[sort.from]
+    [BookMarkMutations.sortBookMarks]: (state, sort: SortData) => {
+      const bookMarks = state.bookMarks
+      const from = bookMarks[sort.from]
 
-      topSites.splice(sort.from, 1)
-      topSites.splice(sort.to, 0, from)
-      saveTopSiteState(state)
+      bookMarks.splice(sort.from, 1) // 移除 from 索引位置的元素
+      bookMarks.splice(sort.to, 0, from) // 将已经移除的元素 from 插入到目标位置 to
+      saveBookMarkState(state)
     },
 
     /**
@@ -114,57 +139,57 @@ export default createStoreModule<TopSiteState>({
      * @param state
      * @param topSites
      */
-    [TopSiteMutations.updateTopSites]: (state, topSites: TopSites) => {
-      state.topSites = topSites
-      saveTopSiteState(state)
+    [BookMarkMutations.updateBookMarks]: (state, bookMarks: BookMarks) => {
+      state.bookMarks = bookMarks
+      saveBookMarkState(state)
     },
 
-    // /**
-    //  * 更新上次更新时间
-    //  * @param state
-    //  * @param newTime
-    //  */
-    // [TopSiteMutations.editLastUpdateTime]: (state, newTime: number) => {
-    //   state.lastUpdateTime = newTime
-    //   saveTopSiteState(state)
-    // }
+    /**
+     * 更新上次更新时间
+     * @param state
+     * @param newTime
+     */
+    [BookMarkMutations.editLastUpdateTime]: (state, newTime: number) => {
+      state.lastUpdateTime = newTime
+      saveBookMarkState(state)
+    }
+  },
+  actions: {
+    /**
+     * 同步浏览器导航
+     * 从浏览器获取最近浏览
+     * @param param0
+     */
+    [BookMarkActions.syncBrowserBookMarks]: async ({ state, commit }) => {
+      const now = Date.now()
+      const customBookMarks = state.bookMarks.filter(item => item.custom)
+      // const list = await getBrowserTopSites()
+
+      // // 并行校验图标是否有效
+      // const bookMarks = await Promise.all(
+      //   list.map<Promise<BookMarkItem>>(async item => {
+      //     const icon = item.favicon || getFavicon(item.url)
+      //     const verify = await verifyImageUrl(icon)
+      //
+      //     return {
+      //       title: item.title ?? "无标题",
+      //       url: item.url,
+      //       icon: verify ? icon : undefined,
+      //       textIcon: !verify,
+      //       custom: false
+      //     }
+      //   })
+      // )
+
+      console.log("load browser top-sites:", `${Date.now() - now}ms`)
+      // commit(BookMarkMutations.updateBookMarks, customBookMarks.concat(bookMarks))
+      commit(BookMarkMutations.editLastUpdateTime, now)
+    }
   }
-  // actions: {
-  //   /**
-  //    * 同步浏览器导航
-  //    * 从浏览器获取最近浏览
-  //    * @param param0
-  //    */
-  //   [TopSiteActions.syncBrowserTopSites]: async ({ state, commit }) => {
-  //     const now = Date.now()
-  //     const customTopSites = state.topSites.filter(item => item.custom)
-  //     const list = await getBrowserTopSites()
-  //
-  //     // 并行校验图标是否有效
-  //     const topSites = await Promise.all(
-  //       list.map<Promise<TopSiteItem>>(async item => {
-  //         const icon = item.favicon || getFavicon(item.url)
-  //         const verify = await verifyImageUrl(icon)
-  //
-  //         return {
-  //           title: item.title ?? "无标题",
-  //           url: item.url,
-  //           icon: verify ? icon : undefined,
-  //           textIcon: !verify,
-  //           custom: false
-  //         }
-  //       })
-  //     )
-  //
-  //     console.log("load browser top-sites:", `${Date.now() - now}ms`)
-  //     commit(TopSiteMutations.updateTopSites, customTopSites.concat(topSites))
-  //     commit(TopSiteMutations.editLastUpdateTime, now)
-  //   }
-  // }
 })
 
 // 保存数据节流防抖
-const saveTopSiteState = debounce((data: TopSiteState) => {
+const saveBookMarkState = debounce((data: BookMarkState) => {
   const settingJson = JSON.stringify(data)
-  localStorage.setItem(TOP_SITE_STORAGE, settingJson)
+  localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
 }, 250)

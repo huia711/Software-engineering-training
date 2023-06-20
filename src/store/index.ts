@@ -7,7 +7,7 @@ import { createStore, useStore as HomeUseStore, Module, Store } from 'vuex' //�
 // 导入三个module的state（search，setting和bookmark）
 import search, { SearchState } from './search'
 import setting, { SettingState } from './setting'
-import topSite, { TopSiteState } from './bookmark'
+import bookMark, { BookMarkState } from './bookmark'
 import settings, { SettingsState } from './settings'
 
 /**
@@ -17,7 +17,7 @@ import settings, { SettingsState } from './settings'
 export type RootState = {
   search: SearchState;
   setting: SettingState;
-  topSite: TopSiteState;
+  bookMark: BookMarkState;
   settings: SettingsState
 };
 
@@ -33,7 +33,7 @@ const store = createStore<RootState>({
   modules: {
     search,
     setting,
-    topSite,
+    bookMark,
     settings
   },
 });
@@ -63,3 +63,4 @@ export default {
     app.use(store, STORE_KEY);
   }
 };
+

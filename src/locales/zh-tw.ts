@@ -9,7 +9,8 @@ export default {
   },
   home: {
     search: "搜索",
-    warning: "警告：搜尋值不能為空"
+    warning: "警告：搜尋值不能為空",
+    MainTab: "主頁面"
   },
   theme: {
     setting: "主題設置",
@@ -50,17 +51,24 @@ export default {
       overallCenter: "整體居中"
     }
   },
-  topsite: {
+  bookmark: {
     setting: "導航欄設置",
-    topSiteData: "最近瀏覽數據",
-    topSiteDataTip: "最近同步: {0}",
+    BookmarkData: "最近瀏覽數據",
+    BookmarkDataTip: "最近同步: {0}",
     sync: "同步",
     iconSize: "圖標大小",
     boardSize: "底板大小",
     boardColor: "底板顏色",
     boardOpacity: "底板不透明度",
     boardRound: "底板圓角",
-    add: "添加導航"
+    add: "添加導航",
+    siteTitle: "網站標題",
+    siteURL: "網站URL",
+    autoGet: "自動獲取圖標",
+    OK: "確定",
+    cancel: "取消",
+    textIcon: "文字圖示",
+    iconURL:"圖示URL",
   },
   other: {
     setting: "其他設置",
@@ -80,7 +88,7 @@ export default {
     license: "遵循 MIT 開源協議"
   },
   popup: {
-    topsite: "首頁導航",
+    bookmark: "首頁導航",
     searchHistory: "搜索歷史"
   }
 };

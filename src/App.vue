@@ -9,6 +9,7 @@
 <script>
   import ConfigProvider from "@/components/ConfigProvider.vue";
   export default{
+    components: {ConfigProvider},
     beforeCreate(){
       document.querySelector('body').setAttribute('style','margin:auto')
     }

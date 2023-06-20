@@ -9,7 +9,8 @@ export default {
     },
     home: {
         search: "搜索",
-        warning: "警告:搜索值不能为空"
+        warning: "警告:搜索值不能为空",
+        MainTab: "主页面"
     },
     theme: {
         setting: "主题设置",
@@ -50,17 +51,25 @@ export default {
             overallCenter: "整体居中"
         }
     },
-    topsite: {
+    bookmark: {
         setting: "导航栏设置",
-        topSiteData: "最近浏览数据",
-        topSiteDataTip: "最近同步: {0}",
+        BookmarkData: "最近浏览数据",
+        BookmarkDataTip: "最近同步: {0}",
         sync: "同步",
         iconSize: "图标大小",
         boardSize: "底板大小",
         boardColor: "底板颜色",
         boardOpacity: "底板不透明度",
         boardRound: "底板圆角",
-        add: "添加导航"
+        add: "添加导航",
+        siteTitle: "网站标题",
+        siteURL: "网站URL",
+        autoGet: "自动获取图标",
+        OK: "确定",
+        cancel: "取消",
+        textIcon: "文字图标",
+        iconURL:"图标URL",
+
     },
     other: {
         setting: "其他设置",
@@ -80,7 +89,7 @@ export default {
         license: "遵循 MIT 开源协议"
     },
     popup: {
-        topsite: "首页导航",
+        bookmark: "首页导航",
         searchHistory: "搜索历史"
     }
 };

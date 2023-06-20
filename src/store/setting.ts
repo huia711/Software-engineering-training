@@ -2,18 +2,18 @@
  * 导入（import）
  */
 import { createStoreModule } from "./index"
-import { copy, isEmpty } from "@/utils/common"
+import { copy } from "@/utils/common"
 // import { wallpaperStore } from "@/plugins/localforage"
 // import { isImageFile } from "@/utils/file"
 import { getDailyWallpaperUrl } from "@/api/bing"
 import { debounce } from "@/utils/async"
 // import { isObjectURL } from "@/utils/browser"
-import { saveAs } from "file-saver"
+// import { saveAs } from "file-saver"
 import {
   BackgroundSetting,
   BackgroundType,
   ThemeMode,
-  TopSiteSetting,
+  BookMarkSetting,
   Option,
   LayoutSetting,
   AlignType,
@@ -22,7 +22,7 @@ import {
   OpenPageTarget,
   LanguageType
 } from "@/enum-interface"
-import {SearchSuggestion} from "@/enum-interface";
+import { SearchSuggestion } from "@/enum-interface";
 
 /**
  * 自定义类型（type）的定义
@@ -32,7 +32,7 @@ export interface SettingState {
   themeMode: ThemeMode
   search: SearchSetting
   background: BackgroundSetting
-  topSite: TopSiteSetting
+  bookMark: BookMarkSetting
   layout: LayoutSetting
   popup: PopupSettting
 }
@@ -44,7 +44,7 @@ export enum SettingMutations {
   updateThemeMode = "UPDATE_THEME_MODE",  // 更新主题设置
   updateBackgroundSetting = "UPDATE_BACKGROUND_SETTING",  // 更新壁纸设置
   updateSearchSetting = "UPDATE_SEARCH_SETTING",  // 更新搜索设置
-  updateTopSiteSetting = "UPDATE_TOP_SITE_SETTING",  // 更新常用网站设置
+  updateBookMarkSetting = "UPDATE_BOOK_MARK_SETTING",  // 更新常用网站设置
   updateLayoutSetting = "UPDATE_LAYOUT_SETTING",  // 更新布局设置
   updatePopupSetting = "UPDATE_POPUP_SETTING"  // 更新弹出窗口设置
 }
@@ -97,7 +97,7 @@ export default createStoreModule<SettingState>({
         useSearchEngines: ["bing", "google", "baidu"],
         suggestion: SearchSuggestion.none
       },
-      topSite: {
+      bookMark: {
         enable: false,
         col: 6,
         row: 2,
@@ -179,8 +179,8 @@ export default createStoreModule<SettingState>({
      * @param state
      * @param topSite
      */
-    [SettingMutations.updateTopSiteSetting]: (state, topSite: Option<TopSiteSetting>) => {
-      copy(topSite, state.topSite)
+    [SettingMutations.updateBookMarkSetting]: (state, topSite: Option<BookMarkSetting>) => {
+      copy(topSite, state.bookMark)
       saveSettingState(state)
     },
 

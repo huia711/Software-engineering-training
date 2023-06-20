@@ -20,11 +20,11 @@ export interface BackgroundSetting {
     autoOpacity?: boolean
 }
 
-export interface TopSiteIcon {
+export interface BookMarkIcon {
     size: number
 }
 
-export interface TopSiteSetting {
+export interface BookMarkSetting {
     enable: boolean,
     row: number
     col: number

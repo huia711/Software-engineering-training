@@ -2,10 +2,8 @@
  * 导入（import）
  */
 import {createStoreModule} from "./index"
-import {SearchData, SearchEngineData, SearchEngineItem, } from "@/enum-interface"
-import {isEmpty} from "@/utils/common"
+import {HistoryItem, SearchData, SearchEngineData, SearchSuggestion,} from "@/enum-interface"
 import {getBaiduSuggestion, getBingSuggestion, getGoogleSuggestion} from "@/api/suggestion"
-import {SearchSuggestion} from "@/enum-interface";
 
 /**
  * 自定义类型（type）的定义
@@ -13,7 +11,7 @@ import {SearchSuggestion} from "@/enum-interface";
 // state
 export interface SearchState {
   searchEngines: SearchEngineData // 搜索引擎列表
-  // history: Array<HistoryItem>  // 搜索历史记录
+  history: Array<HistoryItem>  // 搜索历史记录
   // rules: RuleDataMap // 规则列表
 }
 
@@ -24,12 +22,12 @@ export enum SearchGetters {
 
 // mutation
 export enum SearchMutations {
-  // putHistory = "PUT_HISTORY", // 添加一条搜索历史
-  // deleteHistory = "DELETE_HISTORY", // 删除指定的搜索历史
-  // cleanHistory = "CLEAN_HISTORY", // 清空搜索历史
-  // loadHistory = "LOAD_HISTORY", // 加载搜索历史
-  addSearchEngine = "ADD_SEARCH_ENGINE", // 添加一个搜索引擎
-  deleteSearchEngine = "DELETE_SEARCH_ENGINE" // 删除一个搜索引擎
+  putHistory = "PUT_HISTORY", // 添加一条搜索历史
+  deleteHistory = "DELETE_HISTORY", // 删除指定的搜索历史
+  cleanHistory = "CLEAN_HISTORY", // 清空搜索历史
+  loadHistory = "LOAD_HISTORY", // 加载搜索历史
+  // addSearchEngine = "ADD_SEARCH_ENGINE", // 添加一个搜索引擎
+  // deleteSearchEngine = "DELETE_SEARCH_ENGINE" // 删除一个搜索引擎
 }
 
 // action
@@ -43,18 +41,18 @@ export enum SearchActions {
  * 常/变量（const/let）的定义
  */
 // 用于本地存储搜索引擎的key
-const SEARCH_ENGINES_STORAGE = "search-engines"
-// // 用于本地存储搜索历史记录的key
-// const SEARCH_HISTORY_STORAGE = "search-history"
-// // 搜索历史记录的最大长度
-// const SEARCH_HISTORY_LENGTH = 100
+// const SEARCH_ENGINES_STORAGE = "search-engines"
+// 用于本地存储搜索历史记录的key
+const SEARCH_HISTORY_STORAGE = "search-history"
+// 搜索历史记录的最大长度
+const SEARCH_HISTORY_LENGTH = 10
 
-// 匹配指定模式的文件导入到一个对象中
+// // 匹配指定模式的文件导入到一个对象中
 // const ruleModules = import.meta.glob<true, string, Rule>("/src/rules/*.json", { eager: true })
-// 将所有规则文件解析成一个规则列表数组
+// // 将所有规则文件解析成一个规则列表数组,之后存到数据库
 // const rules: Rules = Object.values(ruleModules)
 
-// 之后存到数据库
+// 浏览器数据
 export const searchEnginesData: SearchEngineData = {
   google: {
     id: "google",
@@ -92,7 +90,7 @@ export default createStoreModule<SearchState>({
     // 设置默认状态值
     const defaultState: SearchState = {
       searchEngines: { ...searchEnginesData },
-      // history: [],
+      history: [],
       // rules: Object.fromEntries(rules.map(item => [item.id, new RuleData(item)]))
     }
 
@@ -100,6 +98,10 @@ export default createStoreModule<SearchState>({
     // const searchEngines = JSON.parse(localStorage[SEARCH_ENGINES_STORAGE] ?? "{}")
     // // 将本地存储中读取到的搜索引擎列表合并到默认状态中
     // Object.assign(defaultState.searchEngines, searchEngines)
+
+    // 从本地存储中读取历史搜索记录
+    const history = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
+    Object.assign(defaultState.history, history)
 
     return defaultState
   },
@@ -126,71 +128,74 @@ export default createStoreModule<SearchState>({
    * mutations
    */
   mutations: {
-  //   /**
-  //    * 添加搜索历史
-  //    * @param param0
-  //    * @param newHistory
-  //    */
-  //   [SearchMutations.putHistory]: (state, newHistory: HistoryItem) => {
-  //     let history: Array<HistoryItem> = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
-  //
-  //     // 去重并在头添加
-  //     history = history.filter(item => item.searchText !== newHistory.searchText)
-  //     history.unshift(newHistory)
-  //
-  //     state.history = history
-  //     saveSearchHistory(history)
-  //   },
-  //
-  //   /**
-  //    * 删除搜索历史
-  //    * @param param0
-  //    * @param index
-  //    */
-  //   [SearchMutations.deleteHistory]: (state, index: number) => {
-  //     const history: Array<HistoryItem> = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
-  //     history.splice(index, 1)
-  //
-  //     state.history = history
-  //     saveSearchHistory(history)
-  //   },
-  //
-  //   /**
-  //    * 加载搜索历史
-  //    * @param state
-  //    */
-  //   [SearchMutations.loadHistory]: state => {
-  //     const history: Array<HistoryItem> = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
-  //     state.history = history
-  //   },
-  //
-  //   /**
-  //    * 清除所有搜索历史
-  //    * @param state
-  //    */
-  //   [SearchMutations.cleanHistory]: state => {
-  //     state.history = []
-  //     localStorage.removeItem(SEARCH_HISTORY_STORAGE)
-  //   },
-  //
-  //   // 添加自定义搜索引擎
-  //   [SearchMutations.addSearchEngine]: (state, data: SearchEngineItem) => {
-  //     const searchEnginesNew = {
-  //       ...state.searchEngines,
-  //       [data.id]: data
-  //     }
-  //
-  //     state.searchEngines = searchEnginesNew
-  //     // saveSearchEngineData(searchEnginesNew)
-  //   },
-  //
-  //   // 删除自定义搜索引擎
-  //   [SearchMutations.deleteSearchEngine]: (state, searchKey: string) => {
-  //     const searchEnginesNew = deepClone(state.searchEngines, searchKey)
-  //
-  //     state.searchEngines = searchEnginesNew
-  //     // saveSearchEngineData(searchEnginesNew)
-  //   }
+    /**
+     * 添加搜索历史
+     * @param param0
+     * @param newHistory
+     */
+    [SearchMutations.putHistory]: (state, newHistory: HistoryItem) => {
+      let history: Array<HistoryItem> = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
+
+      // 去重并在头添加
+      history = history.filter(item => item.searchText !== newHistory.searchText)
+      // 在头添加(最新的在前面）
+      history.unshift(newHistory)
+
+      // 将更新后的历史记录数组保存到 Vuex 状态
+      state.history = history
+
+      saveSearchHistory(history)
+    },
+
+    /**
+     * 删除搜索历史
+     * @param param0
+     * @param index
+     */
+    [SearchMutations.deleteHistory]: (state, index: number) => {
+      const history: Array<HistoryItem> = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
+      history.splice(index, 1)
+
+      state.history = history
+      saveSearchHistory(history)
+    },
+
+    /**
+     * 加载搜索历史
+     * @param state
+     */
+    [SearchMutations.loadHistory]: state => {
+      // 将本地存储中的搜索历史记录加载为数组，如果没有历史记录则默认为空数组
+      state.history = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
+    },
+
+    /**
+     * 清除所有搜索历史
+     * @param state
+     */
+    [SearchMutations.cleanHistory]: state => {
+      state.history = []
+      localStorage.removeItem(SEARCH_HISTORY_STORAGE)
+    },
+    //
+    //   // 添加自定义搜索引擎
+    //   [SearchMutations.addSearchEngine]: (state, data: SearchEngineItem) => {
+    //     const searchEnginesNew = {
+    //       ...state.searchEngines,
+    //       [data.id]: data
+    //     }
+    //
+    //     state.searchEngines = searchEnginesNew
+    //     // saveSearchEngineData(searchEnginesNew)
+    //   },
+    //
+    //   // 删除自定义搜索引擎
+    //   [SearchMutations.deleteSearchEngine]: (state, searchKey: string) => {
+    //     const searchEnginesNew = deepClone(state.searchEngines, searchKey)
+    //
+    //     state.searchEngines = searchEnginesNew
+    //     // saveSearchEngineData(searchEnginesNew)
+    //   }
   },
 
   /**
@@ -207,15 +212,15 @@ export default createStoreModule<SearchState>({
       // 获取搜索设置信息，并获取正在使用的搜索引擎和打开搜索结果的方式
       const setting = rootState.setting.search
       const currentEngine = rootState.setting.search.currentEngine
-      const target = setting.openPageTarget!
+      // const target = setting.openPageTarget!
 
-      // // 将搜索历史记录包装成一个对象，并提交到 mutations 中更新 state
-      // const history: HistoryItem = {
-      //   engineId: currentEngine,
-      //   searchText: searchTrim,
-      //   timestamp: Date.now()
-      // }
-      // commit(SearchMutations.putHistory, history)
+      // 将搜索历史记录包装成一个对象，并提交到 mutations 中更新 state
+      const history: HistoryItem = {
+        engineId: currentEngine,
+        searchText: searchTrim,
+        timestamp: Date.now()
+      }
+      commit(SearchMutations.putHistory, history)
 
       // 组装搜索数据，包括搜索引擎、搜索内容和打开方式
       const data: SearchData = {
@@ -263,4 +268,27 @@ export default createStoreModule<SearchState>({
     }
   }
 })
+
+// function saveSearchEngineData(data: SearchEngineData) {
+//   const saveData = deepClone(data, ...Object.keys(DEFAULT_SEARCH_ENGINES))
+//   const dataJson = JSON.stringify(saveData)
+//   localStorage.setItem(SEARCH_ENGINES_STORAGE, dataJson)
+// }
+
+/**
+ * 将搜索历史保存到本地存储
+ * @param data 搜索历史数据
+ */
+function saveSearchHistory(data: Array<HistoryItem>) {
+  const length = data.length
+
+  // 如果历史记录超过了最大值，则从末尾删除多余项
+  if (length > SEARCH_HISTORY_LENGTH) {
+    data.splice(SEARCH_HISTORY_LENGTH - 1, length - SEARCH_HISTORY_LENGTH)
+  }
+
+  // 将历史记录转换成 JSON 字符串，并保存到本地存储中
+  const dataJson = JSON.stringify(data)
+  localStorage.setItem(SEARCH_HISTORY_STORAGE, dataJson)
+}
 
