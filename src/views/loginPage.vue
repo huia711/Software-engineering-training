@@ -1,17 +1,18 @@
 <template>
     <main class="base">
         <div id="wallpaper">
-        </div>
+        <div v-show="spinnerZIndex" id="spinnerLayer"><spinner/></div>
         <div class="pageLayout">
             <closeButton @close="closePage"/>
             <div class="global">
-                <modernButton :srcPath="userHeadImgPath" 
-                :textUnderButton="registerMode === true ? 'Register' : 'Login for ' + userName" @buttonClicked="userHeadImgClicked" 
+                <modernButton 
+                :srcPath="userHeadImgPath" 
+                :textUnderButton="registerMode === true ? 'Register' : 'Login'" 
                 :customButtonStyle="imgStyle" />
                 <div class="loginPage">
                     <!-- 显示登录/注册界面 -->
                     <p v-show="registerMode" class="inputBoxs">昵称：<inputBox :visibleButton = "false" :widthExpand="32" @dataChanged="registerNameGet" /></p>
-                    <p class="inputBoxs">账号：<inputBox :visibleButton = "false" :widthExpand="32" @dataChanged="accountGet" /></p>
+                    <p v-show="!registerMode" class="inputBoxs">账号：<inputBox :visibleButton = "false" :defaultContent="account" :widthExpand="32" @dataChanged="accountGet" /></p>
                     <p class="inputBoxs">密码：<inputBox :visibleButton = "true" :widthExpand="32" @dataChanged="passwdGet" /></p>
                     <p v-show="registerMode" class="inputBoxs">确认密码：<inputBox :visibleButton = "true" @dataChanged="confPasswdGet" /></p>
                     <modernButton buttonText="登 录" :customButtonStyle="loginButtonStyle" @buttonClicked="loginButtonClicked" @mouseOn="loginButtonMouseStateChange(true)" @mouseLeave="loginButtonMouseStateChange(false)" />
@@ -19,6 +20,7 @@
                     <p style="color: red;height: 20px;">{{ warningMsg }}</p>
                 </div>
             </div>
+        </div>
         </div>
     </main>
     
@@ -31,9 +33,10 @@ import inputBox from '@/components/basis/inputBox.vue';
 import closeButton from '@/components/basis/closeButton.vue';
 import { computed } from '@vue/reactivity';
 import cal from '@/utils/calculation';
-import axios from '@/plugins/axios';
+import spinner from '@/components/basis/spinnerBox.vue'
 import { useStore } from '@/store';
 import $ from 'jquery'
+import axios from "@/plugins/axios"
 import { mapMutations } from 'vuex';
 
 export default{
@@ -44,6 +47,7 @@ export default{
             backgroundImg: computed(()=>store.state.settings.backgroundImg),
             imgStyle: computed(()=>store.state.settings.imgStyle),
             userName: computed(()=>store.state.settings.userName),
+            userHeadImgPath: computed(()=>store.state.settings.avatar),
             store
         }
     },
@@ -56,12 +60,13 @@ export default{
     },
     data(){
         return{
-            registerMode: false,
-            registerName: "",
             account: "",
             passwd: "",
             confPasswd: "",
             warningMsg: "",
+            registerName: "",
+            registerMode: false,
+            spinnerZIndex: false,
             colorStyle: cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),
             buttonColorStyle: cal.hexToRgb(this.pageColorStyle.buttonColor.hex),
             loginButtonStyle: {
@@ -89,13 +94,14 @@ export default{
         }
     },
     methods:{
-        ...mapMutations(['setUserName']),
+        ...mapMutations(['setUserName','setUserId','setAvatar','initSettings']),
         loginButtonClicked(){
             if(this.registerMode === false){
                 if(this.account === "" || this.passwd === "")
                     this.warningMsg = "账号或密码不能为空!"
                 else{
                     this.warningMsg = ""
+                    this.spinnerZIndex = true
                     // 登录方法
                     let data = {
                         "id" : this.account,
@@ -103,15 +109,67 @@ export default{
                         "password" : this.passwd,
                         "confirmPassword": this.confPasswd
                     }
-                    axios.post('http://localhost:8080/user/login',data).then(
-                    response=>{
-                        if(response.message==="登陆成功！"){
-                            this.setUserName(response.data.userName)
+                    axios.post('http://localhost:2020/user/login',data).then(response=>{
+                        if(response.data.code === 200){
+                            // 登陆成功
+                            /** 
+                             * 返回消息内容格式：
+                             * {
+                             *  code:...
+                             *  data:
+                             *      {
+                             *          userName:...
+                             *          pageColorStyle:{...}<= 主题颜色对象，详见settings.ts第35行
+                             *          searchItemCount:...
+                             *          avatar:...          <= 用户头像URL，无则返回"null"
+                             *          backgroundURL:...   <= 用户背景图片URL，无则返回"null"
+                             *          ...                 <= 后期可能增加的其它用户数据
+                             *      }
+                             *  ...
+                             * }
+                             */
+                            this.setUserName(response.data.data.userName)
+                            this.setUserId(this.account)
+                            // 初始化用户设置
+                            this.initSettings({
+                                pageColorStyle: response.data.data.pageColorStyle,
+                                searchItemCount: response.data.data.searchItemCount
+                            })
+                            // 获取用户头像
+                            /**
+                             * 返回格式：
+                             * {
+                             *  code:...
+                             *  data:...  <= 图片数据
+                             * }
+                             */
+                            if(response.data.data.avatar !== "null")
+                                axios.get(response.data.data.avatar).then(response=>{
+                                    if(response.data.code === 200){
+                                        const avatarData = response.data.data
+                                        const avatarBlob = new Blob([avatarData], { type: 'image/jpeg' });
+                                        this.setAvatar(URL.createObjectURL(avatarBlob))
+                                    } else {
+                                        this.setAvatar('img/userHead.png')
+                                    }
+                                })
+                            // 获取用户背景图片，格式同上方头像
+                            if(response.data.data.backgroundURL !== "null")
+                                axios.get(response.data.data.backgroundURL).then(response=>{
+                                    if(response.data.code === 200){
+                                        const backgroundData = response.data.data
+                                        const backgroundBlob = new Blob([backgroundData], { type: 'image/jpeg' });
+                                        this.setBackgroundImage(URL.createObjectURL(backgroundBlob))
+                                    }
+                                })
+                            this.spinnerZIndex = false
                         } else {
+                            this.spinnerZIndex = false
                             this.warningMsg = "账号或密码错误!"
                         }
-                    }, error=>{
-                        console.log('ERROR',error.message)
+                    },(error)=>{
+                        this.spinnerZIndex = false
+                        this.warningMsg = "无法连接服务器"
                     })
                 }
             }
@@ -138,23 +196,30 @@ export default{
                 this.registerMode = true
             }
             else{
-                if(this.registerName === "" || this.account === "" || this.passwd === "")
-                    this.warningMsg = "用户昵称、账号和密码不能为空!"
+                if(this.registerName === "" || this.passwd === "")
+                    this.warningMsg = "用户昵称和密码不能为空!"
                 else{
                     if(this.passwd !== this.confPasswd)
                         this.warningMsg = "两次输入的密码不一致!"
                     else{
                         this.warningMsg = ""
                         // 注册方法
+                        this.spinnerZIndex = true
                         let data = {
-                            "id" : this.account,
-                            "password" : this.passwd
+                            "userName" : this.registerName,
+                            "password" : this.passwd,
+                            "confirmPassword": this.passwd
                         }
-                        axios.post('http://localhost:8080/user/register',data).then(
-                        response=>{
-                            console.log('http://localhost:8080/user/register',response)
-                        }, error=>{
-                            console.log('ERROR',error.message)
+                        axios.post('http://localhost:2020/user/register',data).then(response=>{
+                            if(response.data.code === 200){
+                                // 注册成功
+                                this.setUserName(this.registerName)
+                                this.account = response.data.data.id
+                            }
+                            this.spinnerZIndex = false
+                        },error=>{
+                            this.spinnerZIndex = false
+                            this.warningMsg = "无法连接服务器"
                         })
                     }
                 }
@@ -189,20 +254,13 @@ export default{
             }
         }
     },
-    props:{
-        userHeadImgPath:{
-            // 用户头像路径，注意要使用png图片，否则将会有白边
-            type: String,
-            default: "../../src/img/userHead.png"
-        },
-        isLogin:{
-            type: Boolean,
-            required: true
-        }
+    watch:{
+        spinnerZIndex(newVal,oldVal){console.log(newVal)}
     },
     components:{
         modernButton,
         inputBox,
+        spinner,
         closeButton
     }
 }
@@ -226,9 +284,20 @@ export default{
     z-index: 100;
 }
 
+#spinnerLayer{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 200;
+}
+
 #wallpaper{
     display: flex;
-    position: fixed;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     height: 100%;
     top: 0;

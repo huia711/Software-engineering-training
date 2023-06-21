@@ -105,7 +105,8 @@ export default{
 
 <style scoped>
 .base{
-  height:750px;
+  width: 100%;
+  height:100%;
   display: flex;
   margin: auto;
   justify-content: center;

@@ -8,6 +8,7 @@
         placeHolder="您也可在此输入图片链接" 
         :widthExpand="50" style="margin: 20px;"
         :defaultContent="displayPath"
+        :clearAllButton="true"
         @dataChanged="getdisplayPath"
         @inputFinished="checkURL"
         />
@@ -26,9 +27,9 @@ import modernButton from '@/components/basis/modernButton.vue'
 import inputBox from '@/components/basis/inputBox.vue'
 import { useStore } from '@/store'
 import { computed } from '@vue/reactivity'
-import axios from '@/plugins/axios'
 import cal from '@/utils/calculation'
 import { mapMutations } from 'vuex'
+import axios from "@/plugins/axios"
 export default {
   setup(){
     const store = useStore();
@@ -80,18 +81,20 @@ export default {
     checkURL(){
       if(this.displayPath!==""){
         // 从用户输入的URL获取图片
-        axios.get(this.displayPath, { responseType: 'arraybuffer' })
-        .then(response => {
-          const imageDat = response.data;
-          const imageBlob = new Blob([imageDat], { type: 'image/jpeg' });
-          const imageUrl = URL.createObjectURL(imageBlob);
-        // 现在，你可以将 imageUrl 用作 img 标签的 src 属性了。
-          this.imageURL = imageUrl
-          this.displayPath = imageUrl.replace("blob:","")
-        })
-        .catch(error => {
-          console.error(error);
-        });
+        try{
+          axios.get(this.displayPath, { responseType: 'arraybuffer' }).then(response=>{
+            this.imageData = response.data;
+            const imageBlob = new Blob([this.imageData], { type: 'image/jpeg' });
+            const imageUrl = URL.createObjectURL(imageBlob);
+          // 现在，你可以将 imageUrl 用作 img 标签的 src 属性了。
+            this.imageURL = imageUrl
+            this.displayPath = imageUrl.replace("blob:","")
+          }, error=>{
+            console.log(error.message)
+          })
+        }catch(error){
+          console.log(error)
+        }
       }
     },
     getdisplayPath(path){
@@ -100,19 +103,21 @@ export default {
     uploadPicture(){
       if(this.imageURL !== ""){
         let data = {
-          "id": this.userId,
-          "url": this.displayPath,
+          "id": this.id,
+          "imageData": this.imageData,
           "description": "Customized background"
         }
-        // 推送用户图片URL
-        axios.post('http://localhost:8080/user/img',data).then(response=>{
-          console.log('http://localhost:8080/user/img',response)
-        }, error=>{
-          console.log('ERROR',error.message)
-        })
+        // 推送用户图片数据
+        axios.post('http://localhost:2020/user/uploadBackground',data).then(response=>
+        {
+          console.log('http://localhost:2020/user',response)
+        }, error=>{console.log(error.message)})
         // 推送完后加载背景图片
         this.setBackgroundImage(this.imageURL)
       }
+    },
+    handleClearEvent(){
+      this.imageURL = ""
     },
     uploadButtonState(state){
       if(state){

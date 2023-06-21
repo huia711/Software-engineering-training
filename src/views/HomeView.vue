@@ -1,60 +1,59 @@
 <template>
+  <!-- 背景 -->
   <div id="wallpaper">
-  <main id="main" class="main" @scroll="handleScroll">
-    <!-- 背景 -->
+    <div id="setting-background">
+      <main id="main" class="main" @scroll="handleScroll">
 
-    <section class="sec1" id="sec1">
-      <!-- 搜索框 -->
-      <search class="search" :value="searchText"/>
-      <BookMark/>
-    </section>
+        <section class="sec1" id="sec1">
+          <!-- 搜索框 -->
+          <search class="search" :value="searchText"/>
+          <BookMark/>
+        </section>
 
-    <section class="sec2" id="sec2">
-      <BookMark/>
-    </section>
+        <section class="sec2" id="sec2">
+          <BookMark/>
+        </section>
 
-    <!-- 设置目录 -->
-    <el-menu
-        :default-active = page.toString()
-        class="el-menu"
-        :collapse="isCollapse"
-    >
-      <el-menu-item index="1" id="menu1" @click="scroll('1')">
-        <el-icon><IconMenu/></el-icon>
-        <template #title> {{menu1}} </template>
-      </el-menu-item>
+        <!-- 设置目录 -->
+        <el-menu
+            :default-active = page.toString()
+            class="el-menu-left"
+            :collapse="isCollapse"
+        >
+          <el-menu-item index="1" id="menu1" @click="scroll('1')">
+            <el-icon><IconMenu/></el-icon>
+            <template #title> {{menu1}} </template>
+          </el-menu-item>
 
-      <el-menu-item index="2" id="menu2" @click="scroll('2')">
-        <el-icon><Document/></el-icon>
-        <template #title>Navigator Four</template>
-      </el-menu-item>
-    </el-menu>
+          <el-menu-item index="2" id="menu2" @click="scroll('2')">
+            <el-icon><Document/></el-icon>
+            <template #title>Navigator Four</template>
+          </el-menu-item>
+        </el-menu>
 
-    <div class="temp">
-      <router-link to="/register" style="text-decoration: none; color: black;">
-        <modernButton
-          :custom-button-style="imgStyle"
-          srcPath="img/userHead.png"
-          textUnderButton="User"
-        />
-      </router-link>
-      
-      <modernButton
-          id="setting-button"
-          :custom-button-style="imgStyle"
-          srcPath="img/setting.png"
-          @buttonClicked="settingVisibleState(true)"
-          textUnderButton="settings"
-      />
+        <div class="entries">
+          <div @click="userPageClicked"><el-button round><el-icon><User /></el-icon></el-button></div>
+          <div @click="settingVisibleState">
+            <el-button round :loading="isSettingUploading">
+              <el-icon v-show="settingUploadSuccess !== 0">
+                <Close v-show="settingUploadSuccess === -1"/>
+                <Check v-show="settingUploadSuccess === 1"/>
+              </el-icon>
+              <el-icon>
+                <Setting />
+              </el-icon>
+            </el-button>
+          </div>
+        </div>
+
+        <div id="setting-page">
+          <settingPage
+              id="settingMainPage"
+              v-click-outside="handleClickOutside"
+          />
+        </div>
+      </main>
     </div>
-
-    <div id="setting-page">
-      <settingPage
-          id="settingMainPage"
-          v-click-outside="handleClickOutside"
-      />
-    </div>
-  </main>
   </div>
 </template>
 
@@ -66,16 +65,16 @@
 import {computed, onBeforeUnmount, onMounted, ref} from "vue"
 import { useStore } from "@/store"
 import { useRoute } from "vue-router"
+import axios from "@/plugins/axios"
 // 导入组件Component
 import Search from "@/views/home/IndexSearch.vue"
 import settingPage from '@/views/settingPage/settingPage.vue'
-import modernButton from '@/components/basis/modernButton.vue'
 import BookMark from '@/views/home/BookMark.vue'
 // 外部导入
 import $ from 'jquery';
 import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
-import { Document, Menu as IconMenu } from '@element-plus/icons-vue'
+import { Document, Menu as IconMenu, Setting, User, Close, Check } from '@element-plus/icons-vue'
 
 export default {
   data(){
@@ -83,17 +82,63 @@ export default {
     return{
       settingVisible: false,
       imgStyle: computed(() => store.state.settings.imgStyle),
-      backgroungImage: computed(() => store.state.settings.backgroundImg)
+      backgroungImage: computed(() => store.state.settings.backgroundImg),
+      userName: computed(() => store.state.settings.userName),
+      settingPageShadow: 0,
+      isSettingUploading: false,
+      settingUploadSuccess: 0,
+      store
     }
   },
   methods:{
-    ...mapMutations(['confirmSettings']),
-    settingVisibleState (stat) {
-      this.settingVisible = stat
+    ...mapMutations(['confirmPageColorStyle']),
+    userPageClicked () {
+      if(this.userName !== "Guest"){
+        // 个人页面
+      } else {
+        this.$router.push('/register')
+      }
+    },
+    settingVisibleState () {
+      this.settingVisible = true
+      this.settingPageShadow = 0.6
+      this.settingUploadSuccess = 0
     },
     handleClickOutside(){
       this.settingVisible = false
-      this.confirmSettings()
+      this.settingPageShadow = 0
+      this.confirmPageColorStyle()
+      if(this.store.state.settings.userId !== ""){
+        this.isSettingUploading = true
+        let data = {
+          "Id": this.store.state.settings.userId,
+          "pageColorStyle": this.store.state.settings.pageColorStyle,
+          "searchItemCount": this.store.state.settings.searchItemCount
+        }
+        axios.post('http://localhost:2020/user/settings', data).then(response=>{
+          if(response.data.code === 400){
+            // 同步失败
+            this.settingUploadSuccess = -1
+            setTimeout(()=>{
+              this.settingUploadSuccess = 0
+            },5000)
+          } else {
+            this.settingUploadSuccess = 1
+          }
+          this.isSettingUploading = false
+        },error=>{
+          this.settingUploadSuccess = -1
+          this.isSettingUploading = false
+          setTimeout(()=>{
+            this.settingUploadSuccess = 0
+          },5000)
+        })
+      } else {
+        this.settingUploadSuccess = -1
+        setTimeout(()=>{
+          this.settingUploadSuccess = 0
+        },5000)
+      }
     }
   },
   watch:{
@@ -146,20 +191,18 @@ export default {
       console.log("page"+page)
     }
 
-    onMounted(()=>{
+    onMounted(() => {
+      window.addEventListener('scroll', handleScroll)
       if(store.state.settings.backgroundImg !== ""){
         $("#wallpaper").addClass("backgroundImg");
       } else {
         $("#wallpaper").removeClass("backgroundImg");
       }
     })
-
-    onMounted(() => {
-      window.addEventListener('scroll', handleScroll)
-    })
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', handleScroll)
     })
+
     return {
       page,
       menu1,
@@ -169,16 +212,18 @@ export default {
 
       fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
       searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
-      fontColor: computed(() => store.state.settings.buttonColor.hex)
     }
   },
   components:{
     Search,
-    modernButton,
     settingPage,
     BookMark,
     IconMenu,
-    Document
+    Document,
+    Setting,
+    Close,
+    Check,
+    User
   }
 }
 
@@ -195,18 +240,19 @@ export default {
     justify-content: center; /* 将内容在水平方向上居中对齐 */
     align-items: center; /* 将内容在垂直方向上居中对齐 */
     row-gap: 42px; /* 将每个子元素之间的间距设置为 42 像素 */
+    z-index: 0;
   }
 
   #wallpaper{
     display: flex;
-    //position: fixed;
+    /* position: fixed; */
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 0;
+    z-index: -100;
   }
 
   #wallpaper.backgroundImg {
@@ -214,6 +260,16 @@ export default {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+  }
+
+  #setting-background {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    transition: all 0.3s linear;
+    background-color: v-bind("'rgba(0,0,0,' + settingPageShadow +')'");
   }
 
   .sec1 {
@@ -234,7 +290,7 @@ export default {
     scroll-snap-align: start; /* 滚动时该元素的开始位置将与滚动容器的开始位置对齐 */
   }
 
-  .el-menu {
+  .el-menu-left {
     position: fixed;
     top: 40%;
     left: 1%;
@@ -243,18 +299,24 @@ export default {
     width: 50px;
   }
 
+  .el-menu-top {
+    position: fixed;
+    top: 0%;
+    width: 100%;
+  }
+
   @import '@/font/font.css';
   body {
     font-family: SmileySans,serif;
   }
-  .temp{
+  .entries{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     font-family: 'SmileySans';
     justify-content: space-around;
     position: fixed;
     top: 5%;
-    left: 90%;
+    right: 5%;
     z-index: 0;
   }
 
@@ -262,7 +324,7 @@ export default {
     width: 100%;
     height: 100%;
     position: fixed;
-    top: -30%;
+    top: -40%;
     left: 40%;
     transform: scale(0.1);
     z-index: -100;

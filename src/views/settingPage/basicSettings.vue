@@ -1,5 +1,6 @@
 <template>
     <div class="basis">
+    <el-scrollbar height="550px">
         <div>
             <p>主题颜色(((o(*ﾟ▽ﾟ*)o)))♡</p>
             <div>
@@ -24,6 +25,7 @@
             <p>语言设置♬╭(╯ε╰)╮</p>
             <otherSetting/>
         </div>
+    </el-scrollbar>
     </div>
 </template>
 
