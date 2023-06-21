@@ -13,11 +13,21 @@
         @mousedown="visibilityStateChanged(true)" 
         @mouseup="visibilityStateChanged(false)" 
         @mouseleave="visibilityStateChanged(false)"
-        >...</button>
+        ><el-icon>
+            <View v-show="!passwordVisible"/>
+            <Hide v-show="passwordVisible"/>
+        </el-icon>
+        </button>
+        <button v-if="clearAllButton" @click="clearInput" class="toggle-password-visibility__toggle">
+            <el-icon>
+                <CircleCloseFilled v-show="inputData !== ''"/>
+            </el-icon>
+        </button>
     </div>
 </template>
 
 <script>
+import { View , Hide, CircleCloseFilled } from '@element-plus/icons-vue'
     export default{
         data(){
             return{
@@ -33,6 +43,10 @@
             },
             visibilityStateChanged(nextState = false){
                 this.passwordVisible = nextState
+            },
+            clearInput(){
+                this.inputData = ""
+                this.$emit("clearEvent")
             }
         },
         watch:{
@@ -53,6 +67,10 @@
                 required: true,
                 type: Boolean
             },
+            clearAllButton:{
+                default: false,
+                type: Boolean
+            },
             widthExpand:{
                 type: Number,
                 default: 0
@@ -65,7 +83,12 @@
                 type: String,
                 default: ""
             }
-        }
+        },
+        components:{
+    View,
+    Hide,
+    CircleCloseFilled,
+}
     }
 </script>
 

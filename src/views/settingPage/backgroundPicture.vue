@@ -4,8 +4,10 @@
     <div class="radioSwitch">
       <radioSwitch :text-array="textArray" @changeSelection="backgroundSource"/>
     </div>
+    
     <div class="show">
       <!-- 网络图片展示 -->
+      <el-scrollbar>
       <div class="basis">
         <spinnerBox v-show="state.pictureLoading"/>
         <div style="display: flex;flex-direction: column;align-items: center;justify-content: center; cursor: pointer;"
@@ -16,9 +18,10 @@
         <!-- 从本地读取图片，仅供测试使用 -->
         <!-- <input type="file" style="width: 600px; height: 100px;" ref="testInput" multiple @change="testFunc"> -->
         <div v-for="(image, index) in state.images" :key="index">
-          <imageViewer :image-url="image.url" :image-alt="image.alt" :image-description="image.description" />
+          <imageViewer :image-url="image.url" :image-description="image.description" />
         </div>
       </div>
+      </el-scrollbar>
       <!-- 本地图片上传 -->
       <div>
         <fileChoose />
@@ -37,12 +40,11 @@ import fileChoose from '@/components/basis/fileChoose.vue';
 import spinnerBox from '@/components/basis/spinnerBox.vue';
 import closeButton from '@/components/basis/closeButton.vue';
 
-const textArray = ["网络图片","本地图片"];
+const textArray = ["网络图片","上传图片"];
 
 // 定义图片数据类型
 interface ImageInfo {
   url: string,
-  alt: string,
   description: string
 }
 
@@ -55,9 +57,29 @@ async function loadWebPicture(){
   try {
     state.pictureLoading = true
     state.pictureLoaded = true
-    // 从服务器获取背景图片
-    const response = await axios.get<any>('http://localhost:8080/api/web-images');
-    state.images.values = response.data;
+    // 清空旧数据
+    while(state.images.length > 0){
+      URL.revokeObjectURL(state.images.at(0).url)
+      state.images.pop()
+    }
+    // 从服务器获取背景图片URL
+    const response = await axios.get<any>('http://localhost:2020/user/web-images');
+    const imageURLs = Array<ImageInfo>(response.data)
+    var i = 0
+    for(i = 0; i < state.images.length; i++){
+      // 根据URL数组从服务器获取图片数据
+      axios.get(imageURLs.at(i).url).then(response=>{
+        const imageDat = response.data.imageData;
+        const imageBlob = new Blob([imageDat], { type: 'image/jpeg' });
+        state.images.push({
+          url: URL.createObjectURL(imageBlob),
+          description: response.data.description
+        })
+      },error=>{
+        console.log('ERROR',error.message)
+        state.pictureLoaded = false
+      })
+    }
   } catch (error) {
     console.log(error);
     state.pictureLoaded = false
@@ -70,7 +92,7 @@ const state = reactive({
   pictureLoading: true,
   pictureLoaded: true,
   // 使用 ref 定义响应式数据
-  images: ref<Array<ImageInfo>>([])
+  images: ref<Array<ImageInfo>>([]),
 });
 
 const backgroundSource = (index:number)=>{

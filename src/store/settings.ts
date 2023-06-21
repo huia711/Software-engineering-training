@@ -14,11 +14,11 @@ export interface SettingsState {
     backgroundImg: string
     userId: string
     userName: string
+    avatar: string
 }
 
 export enum SettingsMutationTypes {
     setSearchItemCount = "SET_SEARCH_ITEM_COUNT",
-    setBackgroundImg = "SET_BACKGROUND_IMG"
 }
 
 export default createStoreModule<SettingsState>({
@@ -51,18 +51,19 @@ export default createStoreModule<SettingsState>({
                 presetColor: 0,
                 backgroundColor: {
                     hex: "#ffffff",
-                    alpha: 1
+                    alpha: 0.7
                 },
                 buttonColor: {
                     hex: "#000000",
-                    alpha: 0.2
+                    alpha: 0.3
                 }
             },
-            searchItemCount: 5,
             tempSelectedPresetColorStyle: 0,
+            searchItemCount: 5,
             backgroundImg: "",
             userId: "",
             userName: "Guest",
+            avatar: "img/userHead.png"
         }
 
         return defaultState
@@ -80,6 +81,14 @@ export default createStoreModule<SettingsState>({
             state.searchItemCount = payload;
         },
 
+        initSettings(state, payload: any) {
+            state.pageColorStyle = payload.pageColorStyle;
+            state.tempPageColorStyle = payload.pageColorStyle;
+            state.searchItemCount = payload.searchItemCount;
+        },
+        setAvatar(state, payload:string) {
+            state.avatar = payload;
+        },
         setBackgroundImage(state, payload:string) {
             state.backgroundImg = payload;
         },
@@ -96,9 +105,6 @@ export default createStoreModule<SettingsState>({
             state.tempPageColorStyle = payload;
         },
         confirmPageColorStyle(state) {
-            state.pageColorStyle = state.tempPageColorStyle;
-        },
-        confirmSettings(state) {
             state.pageColorStyle = state.tempPageColorStyle;
         }
     }
