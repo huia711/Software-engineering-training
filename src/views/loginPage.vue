@@ -109,68 +109,91 @@ export default{
                         "password" : this.passwd,
                         "confirmPassword": this.confPasswd
                     }
-                    axios.post('http://localhost:2020/user/login',data).then(response=>{
-                        if(response.data.code === 200){
-                            // 登陆成功
-                            /** 
-                             * 返回消息内容格式：
-                             * {
-                             *  code:...
-                             *  data:
-                             *      {
-                             *          userName:...
-                             *          pageColorStyle:{...}<= 主题颜色对象，详见settings.ts第35行
-                             *          searchItemCount:...
-                             *          avatar:...          <= 用户头像URL，无则返回"null"
-                             *          backgroundURL:...   <= 用户背景图片URL，无则返回"null"
-                             *          ...                 <= 后期可能增加的其它用户数据
-                             *      }
-                             *  ...
-                             * }
-                             */
-                            this.setUserName(response.data.data.userName)
-                            this.setUserId(this.account)
-                            // 初始化用户设置
-                            this.initSettings({
-                                pageColorStyle: response.data.data.pageColorStyle,
-                                searchItemCount: response.data.data.searchItemCount
-                            })
-                            // 获取用户头像
-                            /**
-                             * 返回格式：
-                             * {
-                             *  code:...
-                             *  data:...  <= 图片数据
-                             * }
-                             */
-                            if(response.data.data.avatar !== "null")
-                                axios.get(response.data.data.avatar).then(response=>{
-                                    if(response.data.code === 200){
-                                        const avatarData = response.data.data
-                                        const avatarBlob = new Blob([avatarData], { type: 'image/jpeg' });
-                                        this.setAvatar(URL.createObjectURL(avatarBlob))
-                                    } else {
-                                        this.setAvatar('img/userHead.png')
-                                    }
+                    try {
+                        axios.post('http://localhost:2020/user/login',data).then(response=>{
+                            if(response.data.code === 200){
+                                // 登陆成功
+                                /** 
+                                 * 返回消息内容格式：
+                                 * {
+                                 *  code:...
+                                 *  data:
+                                 *      {
+                                 *          userName:...
+                                 *          backgroundColor:...         <= 背景颜色
+                                 *          backgroundAlpha:...         <= 背景颜色Alpha
+                                 *          buttonColor:...             <= 按钮颜色
+                                 *          backgroundAlpha:...         <= 按钮颜色Alpha
+                                 *          customBackgroundColor:...   
+                                 *          customButtonColor:...
+                                 *          presetColor:...
+                                 *          searchItemCount:...
+                                 *          avatar:...              <= 用户头像URL，无则返回"null"
+                                 *          backgroundURL:...       <= 用户背景图片URL，无则返回"null"
+                                 *          ...                     <= 后期可能增加的其它用户数据
+                                 *      }
+                                 *  ...
+                                 * }
+                                 */
+                                this.setUserName(response.data.data.userName)
+                                this.setUserId(this.account)
+                                // 初始化用户设置
+                                this.initSettings({
+                                    pageColorStyle: {
+                                        customBackgroundColor: response.data.data.customBackgroundColor,
+                                        customButtonColor: response.data.data.customButtonColor,
+                                        presetColor: response.data.data.presetColor,
+                                        backgroundColor:{
+                                            hex: response.data.data.backgroundColor,
+                                            alpha: response.data.data.backgroundAlpha
+                                        },
+                                        buttonColor:{
+                                            hex: response.data.data.buttonColor,
+                                            alpha: response.data.data.buttonAlpha
+                                        },
+                                    },
+                                    searchItemCount: response.data.data.searchItemCount
                                 })
-                            // 获取用户背景图片，格式同上方头像
-                            if(response.data.data.backgroundURL !== "null")
-                                axios.get(response.data.data.backgroundURL).then(response=>{
-                                    if(response.data.code === 200){
-                                        const backgroundData = response.data.data
-                                        const backgroundBlob = new Blob([backgroundData], { type: 'image/jpeg' });
-                                        this.setBackgroundImage(URL.createObjectURL(backgroundBlob))
-                                    }
-                                })
+                                // 获取用户头像
+                                /**
+                                 * 返回格式：
+                                 * {
+                                 *  code:...
+                                 *  data:...  <= 图片数据
+                                 * }
+                                 */
+                                if(response.data.data.avatar !== "null")
+                                    axios.get(response.data.data.avatar).then(response=>{
+                                        if(response.data.code === 200){
+                                            const avatarData = response.data.data
+                                            const avatarBlob = new Blob([avatarData], { type: 'image/jpeg' });
+                                            this.setAvatar(URL.createObjectURL(avatarBlob))
+                                        } else {
+                                            this.setAvatar('img/userHead.png')
+                                        }
+                                    })
+                                // 获取用户背景图片，格式同上方头像
+                                if(response.data.data.backgroundURL !== "null")
+                                    axios.get(response.data.data.backgroundURL).then(response=>{
+                                        if(response.data.code === 200){
+                                            const backgroundData = response.data.data
+                                            const backgroundBlob = new Blob([backgroundData], { type: 'image/jpeg' });
+                                            this.setBackgroundImage(URL.createObjectURL(backgroundBlob))
+                                        }
+                                    })
+                                this.spinnerZIndex = false
+                            } else {
+                                this.spinnerZIndex = false
+                                this.warningMsg = "账号或密码错误!"
+                            }
+                        },(error)=>{
                             this.spinnerZIndex = false
-                        } else {
-                            this.spinnerZIndex = false
-                            this.warningMsg = "账号或密码错误!"
-                        }
-                    },(error)=>{
-                        this.spinnerZIndex = false
-                        this.warningMsg = "无法连接服务器"
-                    })
+                            this.warningMsg = "无法连接服务器"
+                        })
+                    } catch (error) {
+                        console.log(error)
+                        this.spinnerZIndex = flase
+                    }
                 }
             }
             else{
