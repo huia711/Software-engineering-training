@@ -72,7 +72,7 @@ export default {
       // 创建 FileReader 对象
       // const reader = new FileReader();
       // reader.onload = (event) => {
-      //    获取图片 base64 数据并设置到 data 中
+      //   获取图片 base64 数据并设置到 data 中
       //   this.imageData = event.target.result.toString();
       // };
       // 读取文件数据
