@@ -46,10 +46,16 @@
           </div>
         </div>
 
+        <div id="user-page">
+          <userPage 
+            v-click-outside="handleClickOutsideUserPage"
+            @pageHide="handleClickOutsideUserPage"
+          />
+        </div>
+
         <div id="setting-page">
           <settingPage
-              id="settingMainPage"
-              v-click-outside="handleClickOutside"
+              v-click-outside="handleClickOutsideSettingPage"
           />
         </div>
       </main>
@@ -69,6 +75,7 @@ import axios from "@/plugins/axios"
 // 导入组件Component
 import Search from "@/views/home/IndexSearch.vue"
 import settingPage from '@/views/settingPage/settingPage.vue'
+import userPage from "./userPage/userPage.vue"
 import BookMark from '@/views/home/BookMark.vue'
 // 外部导入
 import $ from 'jquery';
@@ -81,10 +88,11 @@ export default {
     const store = useStore();
     return{
       settingVisible: false,
+      userVisible: false,
       imgStyle: computed(() => store.state.settings.imgStyle),
       backgroungImage: computed(() => store.state.settings.backgroundImg),
-      userName: computed(() => store.state.settings.userName),
-      settingPageShadow: 0,
+      userId: computed( ()=> store.state.settings.userId),
+      pageShadow: 0,
       isSettingUploading: false,
       settingUploadSuccess: 0,
       store
@@ -93,26 +101,38 @@ export default {
   methods:{
     ...mapMutations(['confirmPageColorStyle']),
     userPageClicked () {
-      if(this.userName !== "Guest"){
+      if(this.userId !== ""){
         // 个人页面
+        this.userVisible = true
+        this.pageShadow = 0.6
       } else {
         this.$router.push('/register')
       }
     },
     settingVisibleState () {
       this.settingVisible = true
-      this.settingPageShadow = 0.6
+      this.pageShadow = 0.6
       this.settingUploadSuccess = 0
     },
-    handleClickOutside(){
+    handleClickOutsideUserPage(){
+      this.userVisible = false
+      this.pageShadow = 0
+    },
+    handleClickOutsideSettingPage(){
       this.settingVisible = false
-      this.settingPageShadow = 0
+      this.pageShadow = 0
       this.confirmPageColorStyle()
       if(this.store.state.settings.userId !== ""){
         this.isSettingUploading = true
         let data = {
           "Id": this.store.state.settings.userId,
-          "pageColorStyle": this.store.state.settings.pageColorStyle,
+          "backgroundColor": this.store.state.settings.pageColorStyle.backgroundColor.hex,
+          "backgroundAlpha": this.store.state.settings.pageColorStyle.backgroundColor.alpha,
+          "buttonColor": this.store.state.settings.pageColorStyle.buttonColor.hex,
+          "buttonAlpha": this.store.state.settings.pageColorStyle.buttonColor.alpha,
+          "customBackgroungColor": this.store.state.settings.pageColorStyle.customBackgroundColor,
+          "customButtonColor": this.store.state.settings.pageColorStyle.customButtonColor,
+          "presetColor": this.store.state.settings.pageColorStyle.presetColor,
           "searchItemCount": this.store.state.settings.searchItemCount
         }
         axios.post('http://localhost:2020/user/settings', data).then(response=>{
@@ -129,6 +149,7 @@ export default {
         },error=>{
           this.settingUploadSuccess = -1
           this.isSettingUploading = false
+          console.log("ERROR:",error.message)
           setTimeout(()=>{
             this.settingUploadSuccess = 0
           },5000)
@@ -147,6 +168,13 @@ export default {
         $("#setting-page").removeClass("slide_out").addClass("slide_in");
       } else {
         $("#setting-page").removeClass("slide_in").addClass("slide_out");
+      }
+    },
+    userVisible(newVal,oldVal){
+      if (newVal) {
+        $("#user-page").removeClass("slide_out").addClass("slide_in");
+      } else {
+        $("#user-page").removeClass("slide_in").addClass("slide_out");
       }
     },
     backgroungImage(newVal, oldVal){
@@ -217,6 +245,7 @@ export default {
   components:{
     Search,
     settingPage,
+    userPage,
     BookMark,
     IconMenu,
     Document,
@@ -269,7 +298,7 @@ export default {
     height: 100%;
     z-index: 100;
     transition: all 0.3s linear;
-    background-color: v-bind("'rgba(0,0,0,' + settingPageShadow +')'");
+    background-color: v-bind("'rgba(0,0,0,' + pageShadow +')'");
   }
 
   .sec1 {
@@ -318,6 +347,30 @@ export default {
     top: 5%;
     right: 5%;
     z-index: 0;
+  }
+
+  #user-page {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: -40%;
+    left: 35%;
+    transform: scale(0.1);
+    z-index: -100;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  #user-page.slide_in{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) scale(1);
+    z-index: 100;
+    opacity: 1;
+  }
+
+  #user-page.slide_out{
+    opacity: 0;
   }
 
   #setting-page{

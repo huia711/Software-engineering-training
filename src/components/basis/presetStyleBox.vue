@@ -2,7 +2,7 @@
     <div class="basic">
         <div class="presetStyle" @mouseenter="mouseOn(true)" @mouseleave="mouseOn(false)" @click="selected">
             <p>预览</p>
-            <modernButton buttonText="预览" @mouseOn="mouseOnEvent" @mouseLeave="mouseLeaveEvent" :customButtonStyle="btnStyle"/>
+            <modernButton buttonText="预览" :customButtonStyle="btnStyle"/>
         </div>
         <p>{{ textUnderBox }}</p>
     </div>
@@ -17,7 +17,7 @@ export default{
             bkgColorStyle: cal.hexToRgb(this.presetStyle.backgroundColor.hex),
             btnAlpha: this.presetStyle.buttonColor.alpha,
             btnStyle:{
-                backgroundColor: cal.rgbaTextSpawn(cal.hexToRgb(this.presetStyle.buttonColor.hex),this.presetStyle.buttonColor.alpha),
+                backgroundColor: this.presetStyle.buttonColor.hex,
                 width: "70px",
                 height: "35px",
                 borderColor:"transparent",
@@ -32,12 +32,6 @@ export default{
         }
     },
     methods:{
-        mouseOnEvent(){
-            this.btnStyle.backgroundColor = cal.rgbaTextSpawn(cal.hexToRgb(this.presetStyle.buttonColor.hex),this.presetStyle.buttonColor.alpha + 0.4)
-        },
-        mouseLeaveEvent(){
-            this.btnStyle.backgroundColor = cal.rgbaTextSpawn(cal.hexToRgb(this.presetStyle.buttonColor.hex),this.presetStyle.buttonColor.alpha)
-        },
         mouseOn(state){
             this.isMouseOn = state
             if(state === true)

@@ -59,7 +59,7 @@ export default{
                 Object({
                 backgroundColor:{
                     hex:"#ffffff",
-                    alpha:0.7
+                    alpha:1
                 },
                 buttonColor:{
                     hex:"#000000",

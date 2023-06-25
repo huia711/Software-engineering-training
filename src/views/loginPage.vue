@@ -1,12 +1,12 @@
 <template>
     <main class="base">
         <div id="wallpaper">
-        <div v-show="spinnerZIndex" id="spinnerLayer"><spinner/></div>
-        <div class="pageLayout">
+        <div v-loading="spinnerZIndex" element-loading-background="rgba(0,0,0,0.6)" class="pageLayout">
             <closeButton @close="closePage"/>
             <div class="global">
                 <modernButton 
                 :srcPath="userHeadImgPath" 
+                :autoCalculation="false"
                 :textUnderButton="registerMode === true ? 'Register' : 'Login'" 
                 :customButtonStyle="imgStyle" />
                 <div class="loginPage">
@@ -15,8 +15,8 @@
                     <p v-show="!registerMode" class="inputBoxs">账号：<inputBox :visibleButton = "false" :defaultContent="account" :widthExpand="32" @dataChanged="accountGet" /></p>
                     <p class="inputBoxs">密码：<inputBox :visibleButton = "true" :widthExpand="32" @dataChanged="passwdGet" /></p>
                     <p v-show="registerMode" class="inputBoxs">确认密码：<inputBox :visibleButton = "true" @dataChanged="confPasswdGet" /></p>
-                    <modernButton buttonText="登 录" :customButtonStyle="loginButtonStyle" @buttonClicked="loginButtonClicked" @mouseOn="loginButtonMouseStateChange(true)" @mouseLeave="loginButtonMouseStateChange(false)" />
-                    <modernButton buttonText="注 册" :customButtonStyle="registerButtonStyle" @buttonClicked="regButtonClicked" @mouseOn="registerButtonMouseStateChange(true)" @mouseLeave="registerButtonMouseStateChange(false)" />
+                    <modernButton buttonText="登 录" :customButtonStyle="buttonStyle" @buttonClicked="loginButtonClicked" />
+                    <modernButton buttonText="注 册" :customButtonStyle="buttonStyle" @buttonClicked="regButtonClicked" />
                     <p style="color: red;height: 20px;">{{ warningMsg }}</p>
                 </div>
             </div>
@@ -33,7 +33,6 @@ import inputBox from '@/components/basis/inputBox.vue';
 import closeButton from '@/components/basis/closeButton.vue';
 import { computed } from '@vue/reactivity';
 import cal from '@/utils/calculation';
-import spinner from '@/components/basis/spinnerBox.vue'
 import { useStore } from '@/store';
 import $ from 'jquery'
 import axios from "@/plugins/axios"
@@ -69,19 +68,8 @@ export default{
             spinnerZIndex: false,
             colorStyle: cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),
             buttonColorStyle: cal.hexToRgb(this.pageColorStyle.buttonColor.hex),
-            loginButtonStyle: {
-                backgroundColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex),this.pageColorStyle.buttonColor.alpha),
-                width:"250px",
-                height:"35px",
-                borderColor:"transparent",
-                borderRadius:"6px",
-                cursor:"pointer",
-                outlineColor:"transparent",
-                wordSpacing:"50px",
-                divHeight:"4rem"
-            },
-            registerButtonStyle: {
-                backgroundColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex),this.pageColorStyle.buttonColor.alpha),
+            buttonStyle: {
+                backgroundColor: this.pageColorStyle.buttonColor.hex,
                 width:"250px",
                 height:"35px",
                 borderColor:"transparent",
@@ -94,7 +82,7 @@ export default{
         }
     },
     methods:{
-        ...mapMutations(['setUserName','setUserId','setAvatar','initSettings']),
+        ...mapMutations(['setUserName','setUserId','setAvatar','initSettings','setBackgroundImage']),
         loginButtonClicked(){
             if(this.registerMode === false){
                 if(this.account === "" || this.passwd === "")
@@ -163,7 +151,7 @@ export default{
                                  * }
                                  */
                                 if(response.data.data.avatar !== "null")
-                                    axios.get(response.data.data.avatar).then(response=>{
+                                    axios.get(response.data.data.avatar, { responseType: 'arraybuffer' }).then(response=>{
                                         if(response.data.code === 200){
                                             const avatarData = response.data.data
                                             const avatarBlob = new Blob([avatarData], { type: 'image/jpeg' });
@@ -174,7 +162,7 @@ export default{
                                     })
                                 // 获取用户背景图片，格式同上方头像
                                 if(response.data.data.backgroundURL !== "null")
-                                    axios.get(response.data.data.backgroundURL).then(response=>{
+                                    axios.get(response.data.data.backgroundURL, { responseType: 'arraybuffer' }).then(response=>{
                                         if(response.data.code === 200){
                                             const backgroundData = response.data.data
                                             const backgroundBlob = new Blob([backgroundData], { type: 'image/jpeg' });
@@ -192,7 +180,7 @@ export default{
                         })
                     } catch (error) {
                         console.log(error)
-                        this.spinnerZIndex = flase
+                        this.spinnerZIndex = false
                     }
                 }
             }
@@ -200,18 +188,6 @@ export default{
                 // 转至登录页面
                 this.registerMode = false
             }
-        },
-        loginButtonMouseStateChange(state){
-            if(state === true)
-                this.loginButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,cal.min(this.pageColorStyle.buttonColor.alpha + 0.4, 1))
-            else
-                this.loginButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,this.pageColorStyle.buttonColor.alpha)
-        },
-        registerButtonMouseStateChange(state){
-            if(state === true)
-                this.registerButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,cal.min(this.pageColorStyle.buttonColor.alpha + 0.4, 1))
-            else
-                this.registerButtonStyle.backgroundColor = cal.rgbaTextSpawn(this.buttonColorStyle,this.pageColorStyle.buttonColor.alpha)
         },
         regButtonClicked(){
             if(this.registerMode === false){
@@ -277,13 +253,9 @@ export default{
             }
         }
     },
-    watch:{
-        spinnerZIndex(newVal,oldVal){console.log(newVal)}
-    },
     components:{
         modernButton,
         inputBox,
-        spinner,
         closeButton
     }
 }

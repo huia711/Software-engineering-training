@@ -19,7 +19,6 @@ data(){
 methods: {
   setBackgroundImage(){
     this.store.commit(SettingsMutationTypes.setBackgroundImg, this.imageUrl)
-    console.log(this.store.state.settings.backgroundImg)
   }
 },
 props: {

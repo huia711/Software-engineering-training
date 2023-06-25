@@ -9,6 +9,7 @@
                           <modernButton
                               :buttonText="option"
                               :customButtonStyle="curSelected===index ? buttonSelectedStyle : buttonNotSelectedStyle"
+                              :autoCalculation="index !== curSelected"
                               @buttonClicked="buttonClick(index)"
                               @mouseOn="buttonOn(index)"
                               @mouseLeave="buttonOn(-1)"
@@ -41,21 +42,22 @@ import { computed } from '@vue/reactivity'
 
 export default{
     setup(){
-      const store = useStore()
-      return{
-          pageColorStyle: computed(() => store.state.settings.pageColorStyle)
-      }
+        const store = useStore();
+        return{
+            pageColorStyle: computed(() => store.state.settings.pageColorStyle),
+            buttonColor: computed(()=>store.state.settings.pageColorStyle.buttonColor.hex),
+        }
     },
     data(){
         return{
-            colorStyle: cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),
+            colorStyle: computed(()=>cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.backgroundColor.hex), this.pageColorStyle.backgroundColor.alpha)),
             options:["通 用","壁 纸","隐 私","高 级","关 于"],
             curSelected: 0,
             curOn: -1,
             buttonSelectedStyle:{
                 borderColor:"transparent",
                 borderRadius:"5px",
-                backgroundColor: computed(()=>cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex), this.pageColorStyle.buttonColor.alpha)),
+                backgroundColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex), this.pageColorStyle.buttonColor.alpha),
                 outlineColor:"transparent",
                 cursor:"pointer",
                 wordSpacing:"6px",
@@ -67,7 +69,8 @@ export default{
             buttonNotSelectedStyle:{
                 borderColor:"transparent",
                 borderRadius:"5px",
-                backgroundColor:"transparent",
+                backgroundColor: "transparent",
+                onColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex), 0.15),
                 outlineColor:"transparent",
                 cursor:"pointer",
                 wordSpacing:"6px",
@@ -88,8 +91,9 @@ export default{
         },
     },
     watch:{
-        pageColorStyle(newVal,oldVal){
-            this.colorStyle = cal.hexToRgb(newVal.backgroundColor.hex)
+        pageColorStyle(newVal, oldVal){
+            this.buttonSelectedStyle.backgroundColor = cal.rgbaTextSpawn(cal.hexToRgb(newVal.buttonColor.hex), newVal.buttonColor.alpha)
+            this.buttonNotSelectedStyle.onColor = cal.rgbaTextSpawn(cal.hexToRgb(newVal.buttonColor.hex), 0.15)
         }
     },
     components:{
@@ -125,7 +129,7 @@ export default{
   display: flex;
   justify-content: center;
   flex-direction: row;
-  background-color: rgba(v-bind("colorStyle.r"),v-bind("colorStyle.g"),v-bind("colorStyle.b"),v-bind("pageColorStyle.backgroundColor.alpha"));
+  background-color: v-bind("colorStyle");
   border-radius: 10px;
   width: auto;
   height: auto;
@@ -136,7 +140,7 @@ export default{
   margin: 5px;
   padding: 5px;
   list-style: none;
-  border-right: v-bind("'1px solid ' + pageColorStyle.buttonColor.hex");
+  border-right: v-bind("'1px solid ' + buttonColor");
 }
 
 .listItem{

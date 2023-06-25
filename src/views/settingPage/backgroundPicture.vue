@@ -8,8 +8,7 @@
     <div class="show">
       <!-- 网络图片展示 -->
       <el-scrollbar>
-      <div class="basis">
-        <spinnerBox v-show="state.pictureLoading"/>
+      <div class="basis" v-loading="state.pictureLoading" element-loading-background="transparent">
         <div style="display: flex;flex-direction: column;align-items: center;justify-content: center; cursor: pointer;"
         @click="loadWebPicture">
           <closeButton v-show="!state.pictureLoaded"/>
@@ -37,7 +36,6 @@ import { ref, onMounted, reactive } from 'vue';
 import imageViewer from '@/components/basis/imageViewer.vue';
 import radioSwitch from '@/components/basis/radioSwitch.vue';
 import fileChoose from '@/components/basis/fileChoose.vue';
-import spinnerBox from '@/components/basis/spinnerBox.vue';
 import closeButton from '@/components/basis/closeButton.vue';
 
 const textArray = ["网络图片","上传图片"];
@@ -76,7 +74,7 @@ async function loadWebPicture(){
           description: response.data.description
         })
       },error=>{
-        console.log('ERROR',error.message)
+        console.log('ERROR ',error.message)
         state.pictureLoaded = false
       })
     }

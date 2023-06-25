@@ -38,7 +38,7 @@ export default createStoreModule<SettingsState>({
                 presetColor: 0,
                 backgroundColor: {
                     hex: "#ffffff",
-                    alpha: 0.7
+                    alpha: 1
                 },
                 buttonColor: {
                     hex: "#000000",
@@ -51,7 +51,7 @@ export default createStoreModule<SettingsState>({
                 presetColor: 0,
                 backgroundColor: {
                     hex: "#ffffff",
-                    alpha: 0.7
+                    alpha: 1
                 },
                 buttonColor: {
                     hex: "#000000",
