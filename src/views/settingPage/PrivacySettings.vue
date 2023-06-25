@@ -4,10 +4,7 @@
         <router-link to="/register" style="text-decoration: none;">
             <p>登录</p>
         </router-link>
-        <p>后转至</p>
-        <router-link to="/register" style="text-decoration: none;">
-            <p>个人页面</p>
-        </router-link>
+        <p>后转至个人页面</p>
     </div>
 </template>
 

@@ -1,10 +1,8 @@
 <template>
     <div class="avatar">
-        <button class="buttonStyle" @click="clicked" @mouseenter="buttonMouseOn" @mouseleave="buttonMouseLeave">
+        <button class="buttonStyle" @click="clicked" @mouseenter="buttonMouseOn(true)" @mouseleave="buttonMouseLeave(true)">
             <div>
-                <img v-if="srcPath !== ''" class="avatar_img" :src="mouseOn === true ? onImgPath : srcPath" 
-                @mouseenter="imgMouseOn(true)" 
-                @mouseleave="imgMouseOn(false)"/>
+                <img v-if="srcPath !== ''" class="avatar_img" :src="srcPath" />
             </div>
         {{ buttonText }}</button>
         
@@ -14,33 +12,81 @@
 </template>
 
 <script>
+import cal from '@/utils/calculation'
 export default{
     data(){
+        let defaultColor = null
+        if(this.autoCalculation === true){
+            defaultColor = cal.rgbaTextSpawn(cal.hexToRgb(this.customButtonStyle.backgroundColor), 0.3)
+        } else {
+            defaultColor = this.customButtonStyle.backgroundColor
+        }
         return{
             mouseOn: false,
+            realBackgroundColor: defaultColor,
+            buttonAlpha: 0.3
         }
     },
     methods:{
         clicked(){
             this.$emit("buttonClicked")
         },
-        buttonMouseOn(){
-            this.$emit("mouseOn")
+        buttonMouseOn(mode){
+            if(this.autoCalculation === true){
+                this.buttonAlpha = 0.6
+                if(this.customButtonStyle.backgroundColor === "transparent")
+                    this.realBackgroundColor = this.customButtonStyle.onColor
+                else
+                    this.realBackgroundColor = cal.rgbaTextSpawn(cal.hexToRgb(this.customButtonStyle.backgroundColor), this.buttonAlpha)
+            } else {
+                this.realBackgroundColor = this.customButtonStyle.backgroundColor
+            }
+            this.mouseOn = true
+            if(mode === true)
+                this.$emit("mouseOn")
         },
-        buttonMouseLeave(){
-            this.$emit("mouseLeave")
+        buttonMouseLeave(mode){
+            if(this.autoCalculation === true){
+                this.buttonAlpha = 0.3
+                if(this.customButtonStyle.backgroundColor === "transparent")
+                    this.realBackgroundColor = "transparent"
+                else
+                    this.realBackgroundColor = cal.rgbaTextSpawn(cal.hexToRgb(this.customButtonStyle.backgroundColor), this.buttonAlpha)
+            } else {
+                this.realBackgroundColor = this.customButtonStyle.backgroundColor
+            }
+            this.mouseOn = false
+            if(mode === true)
+                this.$emit("mouseLeave")
         },
-        imgMouseOn(isMouseOn){
-            if(this.onImgPath!=="")
-                this.mouseOn = isMouseOn
+    },
+    watch:{
+        autoCalculation(newVal, oldVal){
+            if(this.mouseOn)
+                this.buttonMouseOn(false)
+            else
+                this.buttonMouseLeave(false)
+        },
+        'customButtonStyle.onColor'(newVal){
+            if(this.mouseOn)
+                this.buttonMouseOn(false)
+            else
+                this.buttonMouseLeave(false)
+        },
+        'customButtonStyle.backgroundColor'(newVal){
+            console.log(newVal)
+            if(this.mouseOn)
+                this.buttonMouseOn(false)
+            else
+                this.buttonMouseLeave(false)
         }
     },
     props:{
-        srcPath:{
-            type: String,
-            default: ""
+        autoCalculation:{
+            type: Boolean,
+            default: true
         },
-        onImgPath:{
+        srcPath:{
             type: String,
             default: ""
         },
@@ -52,16 +98,17 @@ export default{
           type: Object,
           default: function () {
             return {
-              backgroundColor: "transparent",
-              width: "auto",
-              height: "auto",
-              borderColor: "black",
-              borderRadius: "6px",
-              cursor: "pointer",
-              outlineColor: "transparent",
-              fontSize: "12",
-              wordSpacing: "10px",
-              divHeight: "4rem"
+                backgroundColor: "transparent",
+                width: "auto",
+                height: "auto",
+                borderColor: "black",
+                borderRadius: "6px",
+                cursor: "pointer",
+                outlineColor: "transparent",
+                onColor: "#ffffff",
+                fontSize: "12",
+                wordSpacing: "10px",
+                divHeight: "4rem"
             }
           }
         },
@@ -100,7 +147,7 @@ export default{
 }
 
 .buttonStyle {
-    background-color: v-bind("customButtonStyle.backgroundColor");
+    background-color: v-bind("realBackgroundColor");
     width: v-bind("customButtonStyle.width");
     height: v-bind("customButtonStyle.height");
     border-color: v-bind("customButtonStyle.borderColor");

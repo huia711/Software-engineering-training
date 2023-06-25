@@ -14,8 +14,6 @@
         />
         <modernButton buttonText="确认上传" 
         :customButtonStyle="buttonStyle" 
-        @mouseOn="uploadButtonState(true)" 
-        @mouseLeave="uploadButtonState(false)"
         @buttonClicked="uploadPicture"
         />
         <input ref="fileInput" type="file" style="display:none;" accept="image/*" @change="handleFileChange" />
@@ -36,6 +34,7 @@ export default {
     return{
       curAlpha: 0,
       pageColorStyle: computed(() => store.state.settings.pageColorStyle),
+      selectWindowColor: computed(() => cal.rgbaTextSpawn(cal.hexToRgb(store.state.settings.pageColorStyle.buttonColor.hex), 0.3)),
       id: computed(()=> store.state.settings.userId),
       store
     }
@@ -46,9 +45,7 @@ export default {
       imageURL: "",
       imageData: null,
       buttonStyle:{
-        backgroundColor:cal.rgbaTextSpawn(
-                        cal.hexToRgb(this.pageColorStyle.buttonColor.hex),
-                        cal.max(this.curAlpha,this.pageColorStyle.buttonColor.alpha)),
+        backgroundColor: this.pageColorStyle.buttonColor.hex,
         width: "100px",
         height: "30px",
         borderColor: "transparent",
@@ -119,22 +116,10 @@ export default {
     handleClearEvent(){
       this.imageURL = ""
     },
-    uploadButtonState(state){
-      if(state){
-        this.curAlpha = cal.min(0.8, this.pageColorStyle.buttonColor.alpha + 0.2)
-      } else {
-        this.curAlpha = 0
-      }
-      this.buttonStyle.backgroundColor = cal.rgbaTextSpawn(
-                                         cal.hexToRgb(this.pageColorStyle.buttonColor.hex),
-                                         cal.max(this.curAlpha,this.pageColorStyle.buttonColor.alpha))
-    }
   },
   watch:{
     pageColorStyle(newVal,oldVal){
-      this.buttonStyle.backgroundColor = cal.rgbaTextSpawn(
-                                         cal.hexToRgb(newVal.buttonColor.hex),
-                                         cal.max(this.curAlpha,newVal.buttonColor.alpha))
+      this.buttonStyle.backgroundColor = newVal.buttonColor.hex
     }
   },
   components:{
@@ -155,7 +140,7 @@ export default {
     min-height: 200px;
     height: auto;
     width: 300px;
-    background-color: lightgrey;
+    background-color: v-bind("selectWindowColor");
     align-items: center;
     justify-content: center;
     cursor: pointer;

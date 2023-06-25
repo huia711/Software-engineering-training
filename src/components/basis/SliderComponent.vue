@@ -3,7 +3,6 @@
         <p class="text">{{ text }}</p>
         <div class="base">
             <p class="text" style="justify-content: flex-end;">{{ curValue }}</p>
-            <div></div>
             <div class="slider" ref="Slider">
                 <!-- Left side -->
                 <!-- Width based on the current value -->

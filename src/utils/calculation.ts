@@ -27,10 +27,15 @@ function max(a: number,b: number){
     return a > b ? a : b;
 }
 
+function abs(a: number){
+    return a > 0 ? a : -a;
+}
+
 export default {
     hexToRgb,
     rgbaToObj,
     rgbaTextSpawn,
     min,
-    max
+    max,
+    abs
 };
