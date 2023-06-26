@@ -62,16 +62,20 @@ async function loadWebPicture(){
     }
     // 从服务器获取背景图片URL
     const response = await axios.get<any>('http://localhost:2020/user/web-images');
-    const imageURLs = Array<ImageInfo>(response.data)
+    const imageURLs = Array<string>(response.data.url)
+    const imageDescriptions = Array<string>(response.data.description)
     var i = 0
-    for(i = 0; i < state.images.length; i++){
+    for(i = 0; i < imageURLs.length; i++){
       // 根据URL数组从服务器获取图片数据
-      axios.get(imageURLs.at(i).url).then(response=>{
-        const imageDat = response.data.imageData;
+      axios.get(imageURLs.at(i)).then(response=>{
+        let imageStr = window.atob(response.data.data.image);
+        const imageDat = new Uint8Array(imageStr.length)
+        for(let j = 0; j < imageStr.length; j++)
+          imageDat[j] = imageStr.charCodeAt(j)
         const imageBlob = new Blob([imageDat], { type: 'image/jpeg' });
         state.images.push({
           url: URL.createObjectURL(imageBlob),
-          description: response.data.description
+          description: imageDescriptions.at(i)??''
         })
       },error=>{
         console.log('ERROR ',error.message)

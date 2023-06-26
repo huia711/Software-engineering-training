@@ -161,6 +161,9 @@ export default{
             axios.post("http://localhost:2020/user/deleteAccount",data).then(response=>{
                 if(response.data.code === 200){
                     // 删除成功
+                    this.setUserId("")
+                    this.setUserName("Guest")
+                    this.setAvatar("img/userHead.png")
                     this.messageTitle = ""
                     this.message = "已删除！"
                     this.messageVisible = true
