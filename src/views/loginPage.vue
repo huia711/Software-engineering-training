@@ -151,28 +151,30 @@ export default{
                                  * }
                                  */
                                 if(response.data.data.avatar !== "null")
-                                    axios.get(response.data.data.avatar, { responseType: 'arraybuffer' }).then(response=>{
-                                        if(response.data.code === 200){
-                                            const avatarData = response.data.data
-                                            const avatarBlob = new Blob([avatarData], { type: 'image/jpeg' });
-                                            this.setAvatar(URL.createObjectURL(avatarBlob))
-                                        } else {
-                                            this.setAvatar('img/userHead.png')
-                                        }
+                                    axios.get(response.data.data.avatar).then(response=>{
+                                        let imagestr = window.atob(response.data.data.image);
+                                        const imageBytes = new Uint8Array(imagestr.length);
+                                        for(let i = 0;i < imagestr.length; i++)
+                                            imageBytes[i] = imagestr.charCodeAt(i);
+                                        const avatarBlob = new Blob([imageBytes],{ type:'iamge/jpeg' });
+                                        this.setAvatar(URL.createobjectURL(avatarBlob));
                                     })
                                 // 获取用户背景图片，格式同上方头像
                                 if(response.data.data.backgroundURL !== "null")
-                                    axios.get(response.data.data.backgroundURL, { responseType: 'arraybuffer' }).then(response=>{
+                                    axios.get(response.data.data.backgroundURL).then(response=>{
                                         if(response.data.code === 200){
-                                            const backgroundData = response.data.data
-                                            const backgroundBlob = new Blob([backgroundData], { type: 'image/jpeg' });
-                                            this.setBackgroundImage(URL.createObjectURL(backgroundBlob))
+                                            let imagestr = window.atob(response.data.data.image);
+                                            const imageBytes = new Uint8Array(imagestr.length);
+                                            for(let i = 0;i < imagestr.length; i++)
+                                                imageBytes[i] = imagestr.charCodeAt(i);
+                                            const backgroundBlob = new Blob([imageBytes], { type: 'image/jpeg' });
+                                            this.setBackgroundImage(URL.createObjectURL(backgroundBlob));
                                         }
                                     })
                                 this.spinnerZIndex = false
                             } else {
                                 this.spinnerZIndex = false
-                                this.warningMsg = "账号或密码错误!"
+                                this.warningMsg = response.data.msg
                             }
                         },(error)=>{
                             this.spinnerZIndex = false
