@@ -17,15 +17,23 @@
         <!-- 从本地读取图片，仅供测试使用 -->
         <!-- <input type="file" style="width: 600px; height: 100px;" ref="testInput" multiple @change="testFunc"> -->
         <div v-for="(image, index) in state.images" :key="index">
-          <imageViewer :image-url="image.url" :image-description="image.description" />
+          <imageViewer :image-url="image.url" :imageDescription="image.description" />
         </div>
       </div>
       </el-scrollbar>
       <!-- 本地图片上传 -->
       <div>
-        <fileChoose />
+        <fileChoose @error="handleError"/>
       </div>
     </div>
+    <el-dialog :title="state.messageTitle" v-model="state.messageVisible" width="30%">
+      <span>{{ state.message }}</span>
+      <template #footer>
+      <span class="dialog-footer">
+          <el-button type="primary" @click="state.messageVisible = false">确认</el-button>
+      </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -57,31 +65,36 @@ async function loadWebPicture(){
     state.pictureLoaded = true
     // 清空旧数据
     while(state.images.length > 0){
-      URL.revokeObjectURL(state.images.at(0).url)
+      URL.revokeObjectURL(state.images[0].url)
       state.images.pop()
     }
     // 从服务器获取背景图片URL
-    const response = await axios.get<any>('http://localhost:2020/user/web-images');
-    const imageURLs = Array<string>(response.data.url)
-    const imageDescriptions = Array<string>(response.data.description)
-    var i = 0
-    for(i = 0; i < imageURLs.length; i++){
-      // 根据URL数组从服务器获取图片数据
-      axios.get(imageURLs.at(i)).then(response=>{
-        let imageStr = window.atob(response.data.data.image);
-        const imageDat = new Uint8Array(imageStr.length)
-        for(let j = 0; j < imageStr.length; j++)
-          imageDat[j] = imageStr.charCodeAt(j)
-        const imageBlob = new Blob([imageDat], { type: 'image/jpeg' });
-        state.images.push({
-          url: URL.createObjectURL(imageBlob),
-          description: imageDescriptions.at(i)??''
+    axios.get<any>('http://localhost:2020/user/web-images').then(response=>{
+      const imageURLs = String(response.data.data.url).split(',')
+      const imageDescriptions = String(response.data.data.description).split(',')
+      var i = 0
+      for(i = 0; i < imageURLs.length; i++){
+        // 根据URL数组从服务器获取图片数据
+        let description = imageDescriptions[i]??''
+        axios.get(imageURLs[i]).then(response=>{
+          let imageStr = window.atob(response.data.data.image);
+          const imageDat = new Uint8Array(imageStr.length)
+          for(let j = 0; j < imageStr.length; j++)
+            imageDat[j] = imageStr.charCodeAt(j)
+          const imageBlob = new Blob([imageDat], { type: 'image/jpeg' });
+          state.images.push({
+            url: URL.createObjectURL(imageBlob),
+            description: description
+          })
+        },error=>{
+          console.log('ERROR ',error.message)
+          state.pictureLoaded = false
         })
-      },error=>{
-        console.log('ERROR ',error.message)
-        state.pictureLoaded = false
-      })
-    }
+      }
+    }, error=>{
+      console.log(error);
+      state.pictureLoaded = false
+    });
   } catch (error) {
     console.log(error);
     state.pictureLoaded = false
@@ -95,10 +108,19 @@ const state = reactive({
   pictureLoaded: true,
   // 使用 ref 定义响应式数据
   images: ref<Array<ImageInfo>>([]),
+  message: "",
+  messageTitle: "",
+  messageVisible: false
 });
 
 const backgroundSource = (index:number)=>{
   state.backgroundSourceIndex = index
+}
+
+const handleError = (title: string, msg: string)=>{
+  state.messageTitle = title
+  state.message = msg
+  state.messageVisible = true
 }
 
 // 仅供测试使用

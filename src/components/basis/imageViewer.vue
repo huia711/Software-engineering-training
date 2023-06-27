@@ -1,5 +1,5 @@
 <template>
-    <div class="imgBasis" @click="setBackgroundImage">
+    <div class="imgBasis" @click="setBackgroundImg">
       <img class="imgStyle" :src="imageUrl" :alt="imageAlt"/>
       <div class="imgDescription">
         <p style="font-size: 30px; word-spacing: 15px;">{{ imageDescription }}</p>
@@ -9,7 +9,7 @@
   
 <script>
 import { useStore } from '@/store';
-import { SettingsMutationTypes } from '@/store/settings';
+import { mapMutations } from 'vuex';
 export default {
 data(){
   return{
@@ -17,8 +17,9 @@ data(){
   }
 },
 methods: {
-  setBackgroundImage(){
-    this.store.commit(SettingsMutationTypes.setBackgroundImg, this.imageUrl)
+  ...mapMutations(['setBackgroundImage']),
+  setBackgroundImg(){
+    this.setBackgroundImage(this.imageUrl)
   }
 },
 props: {

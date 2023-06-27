@@ -140,7 +140,8 @@ export default{
             if(this.userId !== ""){
                 this.setAvatar("img/userHead.png")
                 this.setUserName("Guest")
-                this.setUserId("")  
+                this.setUserId("")
+                this.$emit("pageHide")
             }
             else
                 this.unLogined()

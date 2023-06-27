@@ -74,7 +74,6 @@ export default{
                 this.buttonMouseLeave(false)
         },
         'customButtonStyle.backgroundColor'(newVal){
-            console.log(newVal)
             if(this.mouseOn)
                 this.buttonMouseOn(false)
             else

@@ -44,6 +44,9 @@ export default {
       displayPath: "",
       imageURL: "",
       imageData: null,
+      message: "",
+      messageTitle: "",
+      messageVisible: false,
       buttonStyle:{
         backgroundColor: this.pageColorStyle.buttonColor.hex,
         width: "100px",
@@ -78,20 +81,16 @@ export default {
     checkURL(){
       if(this.displayPath!==""){
         // 从用户输入的URL获取图片
-        try{
-          axios.get(this.displayPath, { responseType: 'arraybuffer' }).then(response=>{
-            this.imageData = response.data;
-            const imageBlob = new Blob([this.imageData], { type: 'image/jpeg' });
-            const imageUrl = URL.createObjectURL(imageBlob);
-          // 现在，你可以将 imageUrl 用作 img 标签的 src 属性了。
-            this.imageURL = imageUrl
-            this.displayPath = imageUrl.replace("blob:","")
-          }, error=>{
-            console.log(error.message)
-          })
-        }catch(error){
-          console.log(error)
-        }
+        axios.get(this.displayPath, { responseType: 'arraybuffer' }).then(response=>{
+          this.imageData = response.data;
+          const imageBlob = new Blob([this.imageData], { type: 'image/jpeg' });
+          const imageUrl = URL.createObjectURL(imageBlob);
+        // 现在，你可以将 imageUrl 用作 img 标签的 src 属性了。
+          this.imageURL = imageUrl
+          this.displayPath = imageUrl.replace("blob:","")
+        }, error=>{
+          this.$emit("error","错误","获取失败!ERROR:"+error.message)
+        })
       }
     },
     getdisplayPath(path){
@@ -108,7 +107,9 @@ export default {
         axios.post('http://localhost:2020/user/uploadBackground',data).then(response=>
         {
           console.log('http://localhost:2020/user',response)
-        }, error=>{console.log(error.message)})
+        }, error=>{
+          this.$emit("error","错误","上传失败!ERROR:"+error.message)
+        })
         // 推送完后加载背景图片
         this.setBackgroundImage(this.imageURL)
       }
