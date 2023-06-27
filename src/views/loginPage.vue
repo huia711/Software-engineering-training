@@ -157,7 +157,7 @@ export default{
                                         for(let i = 0;i < imagestr.length; i++)
                                             imageBytes[i] = imagestr.charCodeAt(i);
                                         const avatarBlob = new Blob([imageBytes],{ type:'iamge/jpeg' });
-                                        this.setAvatar(URL.createobjectURL(avatarBlob));
+                                        this.setAvatar(URL.createObjectURL(avatarBlob));
                                     })
                                 // 获取用户背景图片，格式同上方头像
                                 if(response.data.data.backgroundURL !== "null")
@@ -172,6 +172,7 @@ export default{
                                         }
                                     })
                                 this.spinnerZIndex = false
+                                this.closePage()
                             } else {
                                 this.spinnerZIndex = false
                                 this.warningMsg = response.data.msg
