@@ -85,7 +85,6 @@ export default createStoreModule<BookMarkState>({
     [BookMarkGetters.getCurrentBookMarks]: ({ bookMarks }, _, rootState) => {
       // 从根状态中获取topSite配置对象
       const bookMarkSetting = rootState.setting.bookMark
-      console.log(bookMarkSetting)
       // 根据配置筛选出前topSiteSetting.col * topSiteSetting.row项网站数据
       return bookMarks.filter((_item, index) => index < bookMarkSetting.col * bookMarkSetting.row)
     }

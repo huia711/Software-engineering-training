@@ -109,7 +109,7 @@
         <el-button @click="cancel(ruleFormRef)">
           {{ t('bookmark.cancel') }}
         </el-button>
-        <el-button type="primary" @click="onSaveCustomTopSite(ruleFormRef)">
+        <el-button type="primary" @click="onSaveCustomBookMark(ruleFormRef)">
           {{t('bookmark.OK')}}
         </el-button>
       </span>
@@ -237,7 +237,7 @@
     }
   }
   // 保存自定义置顶网站
-  const onSaveCustomTopSite = async (formEl: FormInstance | undefined) => {
+  const onSaveCustomBookMark = async (formEl: FormInstance | undefined) => {
     if (!formEl) return
     await formEl.validate((valid, fields) => {
       if (valid) {
@@ -321,9 +321,6 @@
       justify-content: center;
       row-gap: 8px;
 
-      transition: transform 0.3s linear, opacity 0.3s linear 0.2s;
-      transition-delay: calc(var(--delay-factor) * 50ms);
-
       // 定义“隐藏”类的样式（即不透明度为 0）
       &.hide {
         opacity: 0;
@@ -332,7 +329,18 @@
       // 定义图标的进入和离开动画样式
       &.flip-list-enter-from,
       &.flip-list-leave-to {
+        opacity: 0;
         transform: translateY(@board-size);
+      }
+
+      &.flip-list-enter-active,
+      &.flip-list-leave-active,
+      &.flip-list-move {
+        transition: all 0.3s ease;
+      }
+
+      &.flip-list-enter-active {
+        transition-delay: 0.3s;
       }
 
       // 定义图标本身的样式
