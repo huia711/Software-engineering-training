@@ -1,14 +1,14 @@
+import { pa } from "element-plus/es/locale";
 import {createStoreModule} from "./index";
 import {
     ImgStyle,
     PageColorStyle,
-    TempPageColorStyle
 } from "@/enum-interface"
 
 export interface SettingsState {
     imgStyle: ImgStyle
     pageColorStyle: PageColorStyle
-    tempPageColorStyle: TempPageColorStyle
+    tempPageColorStyle: PageColorStyle
     searchItemCount: number
     tempSelectedPresetColorStyle: number
     backgroundImg: string
@@ -36,6 +36,7 @@ export default createStoreModule<SettingsState>({
                 customBackgroundColor: false,
                 customButtonColor: false,
                 presetColor: 0,
+                fontColor: "black",
                 backgroundColor: {
                     hex: "#ffffff",
                     alpha: 1
@@ -49,6 +50,7 @@ export default createStoreModule<SettingsState>({
                 customBackgroundColor: false,
                 customButtonColor: false,
                 presetColor: 0,
+                fontColor: "black",
                 backgroundColor: {
                     hex: "#ffffff",
                     alpha: 1
@@ -92,6 +94,9 @@ export default createStoreModule<SettingsState>({
         setBackgroundImage(state, payload:string) {
             state.backgroundImg = payload;
         },
+        setFontColor(state, payload:string) {
+            state.pageColorStyle.fontColor = payload;
+        },
         setUserId(state, payload:string) {
             state.userId = payload;
         },
@@ -101,7 +106,7 @@ export default createStoreModule<SettingsState>({
         setTempSelectedPresetColorStyle(state, payload:number) {
             state.tempSelectedPresetColorStyle = payload;
         },
-        setTempPageColorStyle(state, payload:TempPageColorStyle) {
+        setTempPageColorStyle(state, payload:PageColorStyle) {
             state.tempPageColorStyle = payload;
         },
         confirmPageColorStyle(state) {

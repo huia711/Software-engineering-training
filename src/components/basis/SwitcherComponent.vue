@@ -39,6 +39,10 @@ export default{
             type: Boolean,
             default: false
         },
+        fontColor:{
+            type: String,
+            default: "black"
+        },
         texts:{
             type:String,
             default: ""
@@ -64,6 +68,7 @@ export default{
     justify-content: center;
     word-spacing: 10px;
     margin: 0px;
+    color: v-bind("fontColor");
 }
 
 .switch {

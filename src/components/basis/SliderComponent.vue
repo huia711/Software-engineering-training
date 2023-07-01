@@ -115,6 +115,10 @@ export default{
         textWidth:{
             type:Number,
             default:100
+        },
+        fontColor:{
+            type:String,
+            default:"black"
         }
     }
 }
@@ -142,6 +146,7 @@ export default{
     margin: 0px;
     width: v-bind("textWidth + 'px'");
     height: 20px;
+    color: v-bind("fontColor");
 }
 
 .slider {

@@ -2,17 +2,17 @@
     <div class="fileChooser">
         <div @click="openFileBrowser" class="chooser">
             <img v-if="imageURL" :src="imageURL" alt="Invalid resource" style="height: auto; width: auto; max-height: 300px;" />
-            <p class="textDisplay">您可以点击此处并选择本地图片进行上传</p>
+            <p class="textDisplay">{{ t('settingPage.wallpaper.uploadImages.tips') }}</p>
         </div>
         <inputBox :visibleButton="false" 
-        placeHolder="您也可在此输入图片链接" 
+        :placeHolder="t('settingPage.wallpaper.uploadImages.links')" 
         :widthExpand="50" style="margin: 20px;"
         :defaultContent="displayPath"
         :clearAllButton="true"
         @dataChanged="getdisplayPath"
         @inputFinished="checkURL"
         />
-        <modernButton buttonText="确认上传" 
+        <modernButton :buttonText="t('settingPage.wallpaper.confirm')" 
         :customButtonStyle="buttonStyle" 
         @buttonClicked="uploadPicture"
         />
@@ -27,16 +27,19 @@ import { useStore } from '@/store'
 import { computed } from '@vue/reactivity'
 import cal from '@/utils/calculation'
 import { mapMutations } from 'vuex'
+import { useI18n } from 'vue-i18n'
 import axios from "@/plugins/axios"
 export default {
   setup(){
     const store = useStore();
+    const {t} = useI18n();
     return{
       curAlpha: 0,
       pageColorStyle: computed(() => store.state.settings.pageColorStyle),
       selectWindowColor: computed(() => cal.rgbaTextSpawn(cal.hexToRgb(store.state.settings.pageColorStyle.buttonColor.hex), 0.3)),
       id: computed(()=> store.state.settings.userId),
-      store
+      store,
+      t
     }
   },
   data(){
@@ -49,6 +52,7 @@ export default {
       messageVisible: false,
       buttonStyle:{
         backgroundColor: this.pageColorStyle.buttonColor.hex,
+        fontColor: this.pageColorStyle.fontColor,
         width: "100px",
         height: "30px",
         borderColor: "transparent",
@@ -70,13 +74,13 @@ export default {
       this.displayPath = this.imageURL.replace("blob:","")
 
       // 创建 FileReader 对象
-      // const reader = new FileReader();
-      // reader.onload = (event) => {
-      //   获取图片 base64 数据并设置到 data 中
-      //   this.imageData = event.target.result.toString();
-      // };
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        // 获取图片 base64 数据并设置到 data 中
+        this.imageData = event.target.result.toString();
+      };
       // 读取文件数据
-      // reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
     },
     checkURL(){
       if(this.displayPath!==""){
@@ -89,7 +93,8 @@ export default {
           this.imageURL = imageUrl
           this.displayPath = imageUrl.replace("blob:","")
         }, error=>{
-          this.$emit("error","错误","获取失败!ERROR:"+error.message)
+          this.$emit("error",this.t('elDialog.errorMessages.title'),
+          this.t('elDialog.errorMessages.errorTypes.fetchFailure')+error.message)
         })
       }
     },
@@ -106,9 +111,13 @@ export default {
         // 推送用户图片数据
         axios.post('http://localhost:2020/user/uploadBackground',data).then(response=>
         {
-          console.log('http://localhost:2020/user',response)
+          if(response.data.code!==200){
+            this.$emit("error",this.t('elDialog.errorMessages.title'),
+            this.t('elDialog.errorMessages.errorTypes.uploadFailure')+response.data.msg)
+          }
         }, error=>{
-          this.$emit("error","错误","上传失败!ERROR:"+error.message)
+          this.$emit("error",this.t('elDialog.errorMessages.title'),
+          this.t('elDialog.errorMessages.errorTypes.uploadFailure')+error.message)
         })
         // 推送完后加载背景图片
         this.setBackgroundImage(this.imageURL)
@@ -121,6 +130,9 @@ export default {
   watch:{
     pageColorStyle(newVal,oldVal){
       this.buttonStyle.backgroundColor = newVal.buttonColor.hex
+    },
+    'pageColorStyle.fontColor'(newVal){
+      this.buttonStyle.fontColor = newVal
     }
   },
   components:{
@@ -151,6 +163,7 @@ export default {
     display: flex;
     position: fixed;
     z-index: 100;
+    color: v-bind("pageColorStyle.fontColor");
 }
 
 .fileChooser{

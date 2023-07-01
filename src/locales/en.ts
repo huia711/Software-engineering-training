@@ -90,5 +90,111 @@ export default {
   popup: {
     bookmark: "Bookmark",
     searchHistory: "SearchHistory"
+  },
+  elDialog: {
+    messages:{
+      warningTitle: "Warning",
+      deleteSuccess: "Delete successfully",
+      deleteWarning: "Are you sure to delete this account?(It would dispear permanently)",
+    },
+    errorMessages:{
+      title: "ERROR",
+      errorTypes:{
+        uploadFailure: "Upload failed:",
+        fetchFailure: "Fetch failed:",
+        deleteFailure: "Delete failed:",
+        notLogined: "Account not logined!",
+        noImageClipped: "Please select an area to clip!",
+        noCanvas: "Cannot process image!",
+        blankName: "New name cannot be blank!",
+        repeatName: "New name already exists!",
+        blankOldPassword: "Current password cannot be blank!",
+        blankNewPassword: "New password cannot be blank!",
+        wrongPassword: "Wrong current password!",
+        passwordNotEqual: "Passwords are not the same!"
+      }
+    },
+    buttons:{
+      confirm: "Ok",
+      cancle: "No"
+    }
+  },
+  loginPage: {
+    login:"Login",
+    register: "Register",
+    account: "Account:",
+    password: "Password:",
+    username: "Name:",
+    confirmPassword: "Confirm again:",
+    warnings:{
+      loginNotComplete: "Complete the account and password",
+      registerNotComplete: "Complete usernmae and password",
+      serverUnreachable: "Server unreachable",
+      passwordNotEqual: "Passwords are not the same"
+    }
+  },
+  userPage:{
+    username: "Name:",
+    password: "Password:······",
+    logout: "Logout",
+    deleteAccount: "Delete Account",
+    imageClip:{
+        clipWindow: "Clip 4 Avatar",
+        upload: "Upload",
+        preview: "Preview",
+        close: "Close"
+    },
+    editName:{
+        edit: "New name:",
+        confirm: "Confirm",
+        cancle: "Cancle"
+    },
+    editPassword:{
+        oldPassword: "Current password:",
+        newPassword: "New password:",
+        confirmPassword: "Confirm again:",
+        confirm: "Confirm",
+        cancle: "Cancle"
+    }
+},
+  settingPage: {
+    common: {
+      title: "Common",
+      settings: {
+        theme:{
+          title: "Theme",
+          customizedBackgroundColor: "Customized Background Color",
+          customizedButtonColor: "Customized Button Color",
+          fontColor: "Font Color",
+          presetColor: "Preset Theme",
+          preview: "Preview",
+          dayMode: "Day Mode",
+          nightMode: "Night Mode"
+        },
+        lang: {
+          title: "Language"
+        }
+      }
+    },
+    wallpaper: {
+      title: "Wallpaper",
+      reload: "Reload",
+      webImages: "Preset",
+      uploadImages: {
+        title: "Custom",
+        tips: "Click here and choose a file to upload",
+        links: "You can also enter the image link here"
+      },
+      confirm: "Confirm"
+    },
+    advance: {
+      title: "Advance",
+      maxSearchCount: "Maximun Search Results",
+    },
+    about: {
+      title: "About",
+      author: "软件中级实训制作组",
+      rights: "2023 All rights reserved",
+    }
   }
 };

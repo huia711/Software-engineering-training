@@ -133,6 +133,7 @@ export default {
           "customBackgroungColor": this.store.state.settings.pageColorStyle.customBackgroundColor,
           "customButtonColor": this.store.state.settings.pageColorStyle.customButtonColor,
           "presetColor": this.store.state.settings.pageColorStyle.presetColor,
+          "fontColor": this.store.state.settings.pageColorStyle.fontColor,
           "searchItemCount": this.store.state.settings.searchItemCount
         }
         axios.post('http://localhost:2020/user/settings', data).then(response=>{
@@ -199,16 +200,13 @@ export default {
     let page = 1
 
     const handleScroll = () => {
-      console.log(document.getElementById('main').scrollTop)
       if (document.getElementById('main').scrollTop === 0) {
         page = 1
         document.getElementById('menu1').click()
-        console.log("page"+page)
       }
       if (document.getElementById('main').scrollTop > document.getElementById('main').clientHeight) {
         page = 2
         document.getElementById('menu2').click()
-        console.log("page"+page)
       }
     }
 
@@ -216,7 +214,6 @@ export default {
       const element = document.getElementById('sec'+sec)
       element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
       page = sec
-      console.log("page"+page)
     }
 
     onMounted(() => {
@@ -336,7 +333,7 @@ export default {
 
   @import '@/font/font.css';
   body {
-    font-family: SmileySans,serif;
+    font-family: serif;
   }
   .entries{
     display: flex;
