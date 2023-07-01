@@ -5,12 +5,12 @@
 
 <script>
 import cal from '@/utils/calculation'
+import { computed } from '@vue/reactivity';
 
 export default{
     data(){
         return{
-            colorStyle: cal.hexToRgb(this.blankColorStyle.backgroundColor.hex),
-            colorAlpha: this.blankColorStyle.backgroundColor.alpha
+            colorStyle: computed(()=>cal.rgbaTextSpawn(cal.hexToRgb(this.blankColorStyle),1))
         }
     },
     watch:{
@@ -29,15 +29,8 @@ export default{
             default:"auto"
         },
       blankColorStyle: {
-        type: Object,
-        default: function () {
-          return {
-            backgroundColor: {
-              hex: "#000000",
-              alpha: 0
-            }
-          }
-        }
+        type: String,
+        default: "#000000"
       }
     }
 }
@@ -50,6 +43,6 @@ export default{
     outline: 0px;
     margin: v-bind("height");
     padding: 0px;
-    background-color: v-bind("'rgba(' + colorStyle.r + ',' + colorStyle.g + ',' + colorStyle.b + ',' + colorAlpha + ')'");
+    background-color: v-bind("colorStyle");
 }
 </style>

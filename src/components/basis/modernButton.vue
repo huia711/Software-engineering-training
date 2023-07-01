@@ -104,6 +104,7 @@ export default{
                 borderRadius: "6px",
                 cursor: "pointer",
                 outlineColor: "transparent",
+                fontColor: "black",
                 onColor: "#ffffff",
                 fontSize: "12",
                 wordSpacing: "10px",
@@ -149,12 +150,13 @@ export default{
     background-color: v-bind("realBackgroundColor");
     width: v-bind("customButtonStyle.width");
     height: v-bind("customButtonStyle.height");
+    color: v-bind("customButtonStyle.fontColor");
     border-color: v-bind("customButtonStyle.borderColor");
     border-radius: v-bind("customButtonStyle.borderRadius");
     cursor: v-bind("customButtonStyle.cursor");
     outline-color: v-bind("customButtonStyle.outlineColor");
     font-size: v-bind("customButtonStyle.fontSize");
     word-spacing: v-bind("customButtonStyle.wordSpacing");
-    font-family: SmileySans,serif;
+    font-family: serif;
 }
 </style>

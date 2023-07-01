@@ -1,22 +1,22 @@
 <template>
     <main class="base">
-        <div id="wallpaper">
-        <div v-loading="spinnerZIndex" element-loading-background="rgba(0,0,0,0.6)" class="pageLayout">
+        <div id="wallpaper" v-loading="spinnerZIndex" element-loading-background="rgba(0,0,0,0.6)">
+        <div class="pageLayout">
             <closeButton @close="closePage"/>
             <div class="global">
                 <modernButton 
                 :srcPath="userHeadImgPath" 
                 :autoCalculation="false"
-                :textUnderButton="registerMode === true ? 'Register' : 'Login'" 
+                :textUnderButton="registerMode === true ? t('loginPage.register') : t('loginPage.login')" 
                 :customButtonStyle="imgStyle" />
                 <div class="loginPage">
                     <!-- 显示登录/注册界面 -->
-                    <p v-show="registerMode" class="inputBoxs">昵称：<inputBox :visibleButton = "false" :widthExpand="32" @dataChanged="registerNameGet" /></p>
-                    <p v-show="!registerMode" class="inputBoxs">账号：<inputBox :visibleButton = "false" :defaultContent="account" :widthExpand="32" @dataChanged="accountGet" /></p>
-                    <p class="inputBoxs">密码：<inputBox :visibleButton = "true" :widthExpand="32" @dataChanged="passwdGet" /></p>
-                    <p v-show="registerMode" class="inputBoxs">确认密码：<inputBox :visibleButton = "true" @dataChanged="confPasswdGet" /></p>
-                    <modernButton buttonText="登 录" :customButtonStyle="buttonStyle" @buttonClicked="loginButtonClicked" />
-                    <modernButton buttonText="注 册" :customButtonStyle="buttonStyle" @buttonClicked="regButtonClicked" />
+                    <p v-show="registerMode" class="inputBoxs">{{ t('loginPage.username') }}<inputBox :visibleButton = "false" :widthExpand="32" @dataChanged="registerNameGet" /></p>
+                    <p v-show="!registerMode" class="inputBoxs">{{ t('loginPage.account') }}<inputBox :visibleButton = "false" :defaultContent="account" :widthExpand="32" @dataChanged="accountGet" /></p>
+                    <p class="inputBoxs">{{ t('loginPage.password') }}<inputBox :visibleButton = "true" :widthExpand="32" @dataChanged="passwdGet" /></p>
+                    <p v-show="registerMode" class="inputBoxs">{{ t('loginPage.confirmPassword') }}<inputBox :visibleButton = "true" @dataChanged="confPasswdGet" /></p>
+                    <modernButton :buttonText="t('loginPage.login')" :customButtonStyle="buttonStyle" @buttonClicked="loginButtonClicked" />
+                    <modernButton :buttonText="t('loginPage.register')" :customButtonStyle="buttonStyle" @buttonClicked="regButtonClicked" />
                     <p style="color: red;height: 20px;">{{ warningMsg }}</p>
                 </div>
             </div>
@@ -34,6 +34,7 @@ import closeButton from '@/components/basis/closeButton.vue';
 import { computed } from '@vue/reactivity';
 import cal from '@/utils/calculation';
 import { useStore } from '@/store';
+import { useI18n } from 'vue-i18n';
 import $ from 'jquery'
 import axios from "@/plugins/axios"
 import { mapMutations } from 'vuex';
@@ -41,13 +42,13 @@ import { mapMutations } from 'vuex';
 export default{
     setup(){
         const store = useStore();
+        const {t} = useI18n();
         return {
             pageColorStyle: computed(()=>store.state.settings.pageColorStyle),
-            backgroundImg: computed(()=>store.state.settings.backgroundImg),
             imgStyle: computed(()=>store.state.settings.imgStyle),
-            userName: computed(()=>store.state.settings.userName),
             userHeadImgPath: computed(()=>store.state.settings.avatar),
-            store
+            store,
+            t
         }
     },
     mounted(){
@@ -66,14 +67,14 @@ export default{
             registerName: "",
             registerMode: false,
             spinnerZIndex: false,
-            colorStyle: cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),
-            buttonColorStyle: cal.hexToRgb(this.pageColorStyle.buttonColor.hex),
+            colorStyle: computed(()=>cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),this.pageColorStyle.backgroundColor.alpha)),
             buttonStyle: {
                 backgroundColor: this.pageColorStyle.buttonColor.hex,
                 width:"250px",
                 height:"35px",
                 borderColor:"transparent",
                 borderRadius:"6px",
+                fontColor: this.pageColorStyle.fontColor,
                 cursor:"pointer",
                 outlineColor:"transparent",
                 wordSpacing:"50px",
@@ -86,7 +87,7 @@ export default{
         loginButtonClicked(){
             if(this.registerMode === false){
                 if(this.account === "" || this.passwd === "")
-                    this.warningMsg = "账号或密码不能为空!"
+                    this.warningMsg = this.t('loginPage.warnings.loginNotComplete')
                 else{
                     this.warningMsg = ""
                     this.spinnerZIndex = true
@@ -115,6 +116,7 @@ export default{
                                  *          customBackgroundColor:...   
                                  *          customButtonColor:...
                                  *          presetColor:...
+                                 *          fontColor:...
                                  *          searchItemCount:...
                                  *          avatar:...              <= 用户头像URL，无则返回"null"
                                  *          backgroundURL:...       <= 用户背景图片URL，无则返回"null"
@@ -128,6 +130,7 @@ export default{
                                 // 初始化用户设置
                                 this.initSettings({
                                     pageColorStyle: {
+                                        fontColor: response.data.data.fontColor,
                                         customBackgroundColor: response.data.data.customBackgroundColor,
                                         customButtonColor: response.data.data.customButtonColor,
                                         presetColor: response.data.data.presetColor,
@@ -154,7 +157,7 @@ export default{
                                     axios.get(response.data.data.avatar).then(response=>{
                                         let imagestr = window.atob(response.data.data.image);
                                         const imageBytes = new Uint8Array(imagestr.length);
-                                        for(let i = 0;i < imagestr.length; i++)
+                                        for(let i = 0; i < imagestr.length; i++)
                                             imageBytes[i] = imagestr.charCodeAt(i);
                                         const avatarBlob = new Blob([imageBytes],{ type:'iamge/jpeg' });
                                         this.setAvatar(URL.createObjectURL(avatarBlob));
@@ -165,7 +168,7 @@ export default{
                                         if(response.data.code === 200){
                                             let imagestr = window.atob(response.data.data.image);
                                             const imageBytes = new Uint8Array(imagestr.length);
-                                            for(let i = 0;i < imagestr.length; i++)
+                                            for(let i = 0; i < imagestr.length; i++)
                                                 imageBytes[i] = imagestr.charCodeAt(i);
                                             const backgroundBlob = new Blob([imageBytes], { type: 'image/jpeg' });
                                             this.setBackgroundImage(URL.createObjectURL(backgroundBlob));
@@ -179,7 +182,7 @@ export default{
                             }
                         },(error)=>{
                             this.spinnerZIndex = false
-                            this.warningMsg = "无法连接服务器"
+                            this.warningMsg = this.t('loginPage.warnings.serverUnreachable')
                         })
                     } catch (error) {
                         console.log(error)
@@ -199,10 +202,10 @@ export default{
             }
             else{
                 if(this.registerName === "" || this.passwd === "")
-                    this.warningMsg = "用户昵称和密码不能为空!"
+                    this.warningMsg = this.t('loginPage.warnings.registerNotComplete')
                 else{
                     if(this.passwd !== this.confPasswd)
-                        this.warningMsg = "两次输入的密码不一致!"
+                        this.warningMsg = this.t('loginPage.warnings.passwordNotEqual')
                     else{
                         this.warningMsg = ""
                         // 注册方法
@@ -221,7 +224,7 @@ export default{
                             this.spinnerZIndex = false
                         },error=>{
                             this.spinnerZIndex = false
-                            this.warningMsg = "无法连接服务器"
+                            this.warningMsg = this.t('loginPage.warnings.serverUnreachable')
                         })
                     }
                 }
@@ -249,7 +252,7 @@ export default{
         confirmPasswd(){
             if(this.passwd !== this.confPasswd && this.registerMode === true){
                 // 两次输入的密码不一致
-                this.warningMsg = "两次输入的密码不一致!"
+                this.warningMsg = this.t('loginPage.warnings.passwordNotEqual')
             }
             else{
                 this.warningMsg = ""
@@ -327,13 +330,14 @@ export default{
     justify-content: center;
     height: 500px;
     width: 400px;
-    background-color: rgba(v-bind("colorStyle.r"),v-bind("colorStyle.g"),v-bind("colorStyle.b"),v-bind("pageColorStyle.backgroundColor.alpha"));
+    background-color: v-bind("colorStyle");
     border-radius: 15px;
 }
 
 .inputBoxs{
     display: flex;
     align-items: baseline;
+    color: v-bind("pageColorStyle.fontColor");
 }
 
 </style>

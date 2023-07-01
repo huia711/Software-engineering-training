@@ -1,14 +1,27 @@
 <template>
     <div class="basis">
         <div class="texts">
-            <p>软件中级实训制作组</p>
-            <p>2023 © All Rights Reserved</p>
+            <p>{{ t('settingPage.about.author') }}</p>
+            <p>{{ t('settingPage.about.rights') }}</p>
         </div>
     </div>
 </template>
 
 <script>
+import { useStore } from '@/store';
+import { useI18n } from 'vue-i18n';
+import { computed } from '@vue/reactivity';
 
+export default{
+    setup(){
+        const store = useStore();
+        const {t} = useI18n();
+        return{
+            fontColor: computed(()=>store.state.settings.pageColorStyle.fontColor),
+            t
+        }
+    }
+}
 </script>
 
 <style scoped>
@@ -22,7 +35,7 @@
     justify-content: center;
     align-items: center;
     background-color: transparent;
-    font-family: SmileySans,serif;
+    font-family: serif;
 }
 
 .texts{
@@ -30,5 +43,6 @@
     align-items: center;
     flex-direction: column;
     justify-content: center;
+    color: v-bind("fontColor");
 }
 </style>

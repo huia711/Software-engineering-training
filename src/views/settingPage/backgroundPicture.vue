@@ -12,7 +12,7 @@
         <div style="display: flex;flex-direction: column;align-items: center;justify-content: center; cursor: pointer;"
         @click="loadWebPicture">
           <closeButton v-show="!state.pictureLoaded"/>
-          <p v-show="!state.pictureLoaded">重新加载</p>
+          <p v-show="!state.pictureLoaded" :style="'color:'+fontColor">{{ t('settingPage.wallpaper.reload') }}</p>
         </div>
         <!-- 从本地读取图片，仅供测试使用 -->
         <!-- <input type="file" style="width: 600px; height: 100px;" ref="testInput" multiple @change="testFunc"> -->
@@ -30,7 +30,7 @@
       <span>{{ state.message }}</span>
       <template #footer>
       <span class="dialog-footer">
-          <el-button type="primary" @click="state.messageVisible = false">确认</el-button>
+          <el-button type="primary" @click="state.messageVisible = false">{{ t('elDialog.buttons.confirm') }}</el-button>
       </span>
       </template>
     </el-dialog>
@@ -40,13 +40,25 @@
 <script lang="ts" setup>
 // 引入 axios 库
 import axios from '@/plugins/axios';
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, watch } from 'vue';
 import imageViewer from '@/components/basis/imageViewer.vue';
 import radioSwitch from '@/components/basis/radioSwitch.vue';
 import fileChoose from '@/components/basis/fileChoose.vue';
 import closeButton from '@/components/basis/closeButton.vue';
+import { useStore } from '@/store';
+import { useI18n } from 'vue-i18n';
+import { computed } from '@vue/reactivity';
 
-const textArray = ["网络图片","上传图片"];
+const { t , locale } = useI18n();
+const webImages = t('settingPage.wallpaper.webImages');
+const uploadImages = t('settingPage.wallpaper.uploadImages.title');
+const textArray = ref([webImages, uploadImages]);
+
+watch(locale,(newLocale)=>{
+  const newWebImages = t('settingPage.wallpaper.webImages');
+  const newUploadImages = t('settingPage.wallpaper.uploadImages.title');
+  textArray.value.splice(0, textArray.value.length, newWebImages, newUploadImages);
+})
 
 // 定义图片数据类型
 interface ImageInfo {
@@ -122,6 +134,9 @@ const handleError = (title: string, msg: string)=>{
   state.message = msg
   state.messageVisible = true
 }
+
+const store = useStore();
+const fontColor = computed(()=>store.state.settings.pageColorStyle.fontColor)
 
 // 仅供测试使用
 // const testFunc = (eve:any)=>{

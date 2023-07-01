@@ -11,19 +11,19 @@
                 <!-- 各个选项 -->
                 <div class="selection">
                     <!-- 用户名 -->
-                    <p style="width: 150px;">用户名：{{ userName }}</p>
+                    <p style="width: 150px;" class="text">{{ t('userPage.username') + userName }}</p>
                     <div class="editPen" @click="editNamePageVisible(true)"><el-icon><EditPen/></el-icon></div>
                 </div>
                 <div class="selection">
                     <!-- 密码 -->
-                    <p style="width: 150px;">密码：······</p>
+                    <p style="width: 150px;" class="text">{{t('userPage.password')  }}</p>
                     <div class="editPen" @click="editPasswordPageVisible(true)"><el-icon><EditPen/></el-icon></div>
                 </div>
                 <!-- 退出登录 -->
-                <modernButton buttonText="退出登录" :customButtonStyle="logoutButtonStyle" 
+                <modernButton :buttonText="t('userPage.logout')" :customButtonStyle="logoutButtonStyle" 
                 @buttonClicked="logout"/>
                 <!-- 删除账号 -->
-                <modernButton buttonText="删除账号" :customButtonStyle="deleteAccountButtonStyle" :autoCalculation="false"
+                <modernButton :buttonText="t('userPage.deleteAccount')" :customButtonStyle="deleteAccountButtonStyle" :autoCalculation="false"
                 @buttonClicked="deleteWarning" @mouseOn="deleteAccountButtonState(true)" @mouseLeave="deleteAccountButtonState(false)"/>
             </div>
         </div>
@@ -42,12 +42,12 @@
         @cancle="editPasswordPageVisible(false)"
         style="display: flex; z-index: 200; position: fixed;"/>
         <!-- 提示框 -->
-        <el-dialog title="警告" v-model="dialogVisible" width="30%">
-            <span>确认删除账号？（账号将永久消失！）</span>
+        <el-dialog :title="t('userPage.messages.warningTitle')" v-model="dialogVisible" width="30%">
+            <span>{{ t('elDialog.messages.deleteWarning') }}</span>
             <template #footer>
             <span class="dialog-footer">
-                <el-button type="primary" @click="dialogVisible = false">取消</el-button>
-                <el-button @click="deleteAccount">确认</el-button>
+                <el-button type="primary" @click="dialogVisible = false">{{ t('elDialog.buttons.cancle') }}</el-button>
+                <el-button @click="deleteAccount">{{ t('elDialog.buttons.confirm') }}</el-button>
             </span>
             </template>
         </el-dialog>
@@ -55,7 +55,7 @@
             <span>{{ message }}</span>
             <template #footer>
             <span class="dialog-footer">
-                <el-button type="primary" @click="handleMessageConfirm">确认</el-button>
+                <el-button type="primary" @click="handleMessageConfirm">{{ t('elDialog.buttons.confirm') }}</el-button>
             </span>
             </template>
         </el-dialog>
@@ -68,6 +68,7 @@ import imageClip from '@/components/basis/imageClip.vue';
 import editName from '@/components/basis/editName.vue';
 import editPassword from '@/components/basis/editPassword.vue';
 import { useStore } from '@/store'
+import { useI18n } from 'vue-i18n'
 import { EditPen } from '@element-plus/icons-vue';
 import { computed } from '@vue/reactivity';
 import cal from '@/utils/calculation'
@@ -76,12 +77,14 @@ import axios from 'axios';
 export default{
     setup(){
         const store = useStore();
+        const {t} = useI18n();
         return{
             userId: computed(()=>store.state.settings.userId),
             imgStyle: computed(()=>store.state.settings.imgStyle),
             pageColorStyle: computed(()=>store.state.settings.pageColorStyle),
             userHeadImgPath: computed(()=>store.state.settings.avatar),
             userName: computed(()=>store.state.settings.userName),
+            t
         }
     },
     data(){
@@ -100,6 +103,7 @@ export default{
                 backgroundColor: this.pageColorStyle.buttonColor.hex,
                 borderColor: "transparent",
                 borderRadius: "5px",
+                fontColor: this.pageColorStyle.fontColor,
                 cursor: "pointer",
                 height: "35px",
                 width: "100px",
@@ -109,6 +113,7 @@ export default{
                 backgroundColor: "#ee5454",
                 borderColor: "transparent",
                 borderRadius: "5px",
+                fontColor: "black",
                 cursor: "pointer",
                 height: "35px",
                 width: "100px",
@@ -166,17 +171,17 @@ export default{
                     this.setUserName("Guest")
                     this.setAvatar("img/userHead.png")
                     this.messageTitle = ""
-                    this.message = "已删除！"
+                    this.message = this.t('elDialog.message.deleteSuccess')
                     this.messageVisible = true
                 } else {
-                    this.messageTitle = "错误"
-                    this.message = "删除失败！"
+                    this.messageTitle = this.t('elDialog.errorMessages.title')
+                    this.message = this.t('elDialog.errorMessages.errorTypes.deleteFailure') + "Reply code " + response.data.code
                     this.messageVisible = true
                 }
                 this.loading = false
             }, error =>{
-                this.messageTitle = "错误"
-                this.message = "删除失败！ERROR:" + error.message
+                this.messageTitle = this.t('elDialog.errorMessages.title')
+                this.message = this.t('elDialog.errorMessages.errorTypes.deleteFailure') + error.message
                 this.loading = false
                 this.messageVisible = true
             })
@@ -217,14 +222,17 @@ export default{
                 this.$emit("pageHide")
         },
         unLogined(){
-            this.messageTitle = "错误"
-            this.message = "账号未登录！"
+            this.messageTitle = this.t('elDialog.errorMessages.title')
+            this.message = this.t('elDialog.errorMessages.errorTypes.notLogined')
             this.messageVisible = true
         }
     },
     watch:{
         pageColorStyle(newVal, oldVal){
             this.logoutButtonStyle.backgroundColor = newVal.buttonColor.hex
+        },
+        'pageColorStyle.fontColor'(newVal){
+            this.logoutButtonStyle.fontColor = newVal
         }
     },
     components:{
@@ -246,7 +254,7 @@ export default{
   margin: auto;
   background-size: cover;
   background-attachment: scroll;
-  font-family: SmileySans,serif;
+  font-family: serif;
 }
 
 .basis{
@@ -260,6 +268,10 @@ export default{
     align-items: center;
     border-radius: 10px;
     background-color: v-bind("backgroundColor");
+}
+
+.text{
+    color: v-bind("pageColorStyle.fontColor");
 }
 
 .userHeadImg{

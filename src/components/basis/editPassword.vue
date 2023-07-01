@@ -1,17 +1,17 @@
 <template>
     <div class="base" v-loading="uploading" element-loading-background="rgba(0,0,0,0.6)">
         <div class="container">
-            <p>原密码：<inputBox :visibleButton="true" :clearAllButton="false" :widthExpand="100" @dataChanged="getOldPassword" /></p>
-            <p>新密码：<inputBox :visibleButton="true" :clearAllButton="false" :widthExpand="100" @dataChanged="getNewPassword" /></p>
-            <p>确认密码：<inputBox :visibleButton="true" :clearAllButton="false" :widthExpand="100" @dataChanged="getNewPasswordConfirm" /></p>
-            <modernButton :customButtonStyle="buttonStyle" buttonText="确认修改" @buttonClicked="uploadPassword" element-loading-background="rgba(0,0,0,0.6)" />
-            <modernButton :customButtonStyle="buttonStyle" buttonText="取消" @buttonClicked="cancle" />
+            <p class="text">{{ t('userPage.editPassword.oldPassword') }}<inputBox :visibleButton="true" :clearAllButton="false" :widthExpand="100" @dataChanged="getOldPassword" /></p>
+            <p class="text">{{ t('userPage.editPassword.newPassword') }}<inputBox :visibleButton="true" :clearAllButton="false" :widthExpand="100" @dataChanged="getNewPassword" /></p>
+            <p class="text">{{ t('userPage.editPassword.confirmPassword') }}<inputBox :visibleButton="true" :clearAllButton="false" :widthExpand="100" @dataChanged="getNewPasswordConfirm" /></p>
+            <modernButton :customButtonStyle="buttonStyle" :buttonText="t('userPage.editPassword.confirm')" @buttonClicked="uploadPassword" element-loading-background="rgba(0,0,0,0.6)" />
+            <modernButton :customButtonStyle="buttonStyle" :buttonText="t('userPage.editPassword.cancle')" @buttonClicked="cancle" />
         </div>
         <el-dialog :title="messageTitle" v-model="messageVisible" width="30%">
         <span>{{ message }}</span>
             <template #footer>
             <span class="dialog-footer">
-                <el-button type="primary" @click="messageVisible = false">确认</el-button>
+                <el-button type="primary" @click="messageVisible = false">{{ t('elDialog.buttons.confirm') }}</el-button>
             </span>
             </template>
         </el-dialog>
@@ -24,15 +24,18 @@ import inputBox from './inputBox.vue';
 import axios from 'axios';
 import cal from '@/utils/calculation';
 import { useStore } from '@/store';
+import { useI18n } from 'vue-i18n';
 import { computed } from '@vue/reactivity';
 import { mapMutations } from 'vuex';
 export default{
     setup(){
-        const store = useStore()
+        const store = useStore();
+        const {t} = useI18n();
         return{
             userId: computed(()=>store.state.settings.userId),
             userPassword: computed(()=>store.state.settings.userPassword),
             pageColorStyle: computed(()=>store.state.settings.pageColorStyle),
+            t
         }
     },
     data(){
@@ -51,6 +54,7 @@ export default{
                 height:"35px",
                 borderColor:"transparent",
                 borderRadius:"6px",
+                fontColor: this.pageColorStyle.fontColor,
                 cursor:"pointer",
                 outlineColor:"transparent",
                 wordSpacing:"50px",
@@ -61,6 +65,9 @@ export default{
     watch:{
         pageColorStyle(newVal, oldVal){
             this.buttonStyle.backgroundColor = newVal.buttonColor.hex
+        },
+        'pageColorStyle.fontColor'(newVal){
+            this.buttonStyle.fontColor = newVal
         }
     },
     methods:{
@@ -79,32 +86,26 @@ export default{
         },
         uploadPassword(){
             if(this.oldPasswd === ""){
-                this.message = "原密码不能为空!"
-                this.messageTitle = "错误"
+                this.message = this.t('elDialog.errorMessages.errorTypes.blankOldPassword')
+                this.messageTitle = this.t('elDialog.errorMessages.title')
                 this.messageVisible = true
                 return;
             }
             if(this.newPasswd === ""){
-                this.message = "新密码不能为空!"
-                this.messageTitle = "错误"
-                this.messageVisible = true
-                return;
-            }
-            if(this.confPasswd === ""){
-                this.message = "确认密码不能为空!"
-                this.messageTitle = "错误"
+                this.message = this.t('elDialog.errorMessages.errorTypes.blankNewPassword')
+                this.messageTitle = this.t('elDialog.errorMessages.title')
                 this.messageVisible = true
                 return;
             }
             if(this.oldPasswd !== this.userPassword){
-                this.message = "原密码错误!"
-                this.messageTitle = "警告"
+                this.message = this.t('elDialog.errorMessages.errorTypes.wrongPassword')
+                this.messageTitle = this.t('elDialog.errorMessages.title')
                 this.messageVisible = true
                 return;
             }
             if(this.newPasswd !== this.confPasswd){
-                this.message = "两次输入的密码不一致!"
-                this.messageTitle = "警告"
+                this.message = this.t('elDialog.errorMessages.errorTypes.passwordNotEqual')
+                this.messageTitle = this.t('elDialog.errorMessages.title')
                 this.messageVisible = true
                 return;
             }
@@ -120,14 +121,14 @@ export default{
                     this.setUserPassword(this.newPasswd)
                 } else {
                     // 修改失败
-                    this.message = "ERROR: Reply code " + response.data.code
-                    this.messageTitle = "错误"
+                    this.message = this.t('elDialog.errorMessages.errorTypes.uploadFailure') + "Reply code " + response.data.code
+                    this.messageTitle = this.t('elDialog.errorMessages.title')
                     this.messageVisible = true
                 }
                 this.uploading = false
             }, error=>{
-                this.message = "ERROR:" + error.message
-                this.messageTitle = "错误"
+                this.message = this.t('elDialog.errorMessages.errorTypes.uploadFailure') + error.message
+                this.messageTitle = this.t('elDialog.errorMessages.title')
                 this.uploading = false
                 this.messageVisible = true
             })
@@ -149,7 +150,11 @@ export default{
   margin: auto;
   align-items: center;
   justify-content: center;
-  font-family: SmileySans,serif;
+  font-family: serif;
+}
+
+.text{
+    color: v-bind("pageColorStyle.fontColor");
 }
 
 .container{

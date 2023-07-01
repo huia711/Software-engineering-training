@@ -2,28 +2,43 @@
     <div class="basis">
     <el-scrollbar height="550px">
         <div>
-            <p>主题颜色(((o(*ﾟ▽ﾟ*)o)))♡</p>
+            <p class="text">{{ t('settingPage.common.settings.theme.title') }}</p>
             <div>
-                <switcher texts="自定义页面颜色" :initialstate="curCustomBackgroundColorState" @stateChange="customBackgroundColorStateChange"/>
-                <colorPixer v-if="curCustomBackgroundColorState" :colorChangeCallback="backgroundColorChange" :colorStyle="backgroundColorStyle"/>
+                <switcher :texts="t('settingPage.common.settings.theme.customizedBackgroundColor')" 
+                :initialstate="curCustomBackgroundColorState" :font-color="pageColorStyle.fontColor"
+                @stateChange="customBackgroundColorStateChange"/>
+                <colorPixer v-if="curCustomBackgroundColorState" 
+                :colorChangeCallback="backgroundColorChange" :colorStyle="backgroundColorStyle" :fontColor="pageColorStyle.fontColor"/>
             </div>
             <div>
-                <switcher texts="自定义按钮颜色" :initialstate="curCustomButtonColorState" @stateChange="customButtonColorStateChange"/>
-                <colorPixer v-if="curCustomButtonColorState" :colorChangeCallback="buttonColorChange" :colorStyle="buttonColorStyle"/>
+                <switcher :texts="t('settingPage.common.settings.theme.customizedButtonColor')" 
+                :initialstate="curCustomButtonColorState" :font-color="pageColorStyle.fontColor"
+                @stateChange="customButtonColorStateChange"/>
+                <colorPixer v-if="curCustomButtonColorState" 
+                :colorChangeCallback="buttonColorChange" :colorStyle="buttonColorStyle" :fontColor="pageColorStyle.fontColor"/>
             </div>
             <div>
-                <switcher texts="使用预设主题颜色" :initialstate="curPresetColorState" @stateChange="presetColorStateChange"/>
-                <blankSeparator height="20px"/>
+                <switcher :texts="t('settingPage.common.settings.theme.fontColor') + pageColorStyle.fontColor" 
+                :initialstate="pageColorStyle.fontColor === 'white'"  :font-color="pageColorStyle.fontColor"
+                @stateChange="fontColorChange"/>
+            </div>
+            <div>
+                <switcher :texts="t('settingPage.common.settings.theme.presetColor')" :initialstate="curPresetColorState" 
+                @stateChange="presetColorStateChange"  :font-color="pageColorStyle.fontColor"/>
                 <div v-if="curPresetColorState === true" class="boxs">
-                    <presetStyleBox :presetStyle="presetStyles[0]" textUnderBox="白天模式" @selected="presetColorChange(0)" :isSelected="selectedPresetStyle === 0 ? true : false"/>
-                    <presetStyleBox :presetStyle="presetStyles[1]" textUnderBox="黑夜模式" @selected="presetColorChange(1)" :isSelected="selectedPresetStyle === 1 ? true : false"/>
+                    <presetStyleBox :presetStyle="presetStyles[0]" :textUnderBox="t('settingPage.common.settings.theme.dayMode')" 
+                    :font-color="pageColorStyle.fontColor" :isSelected="selectedPresetStyle === 0 ? true : false"
+                    @selected="presetColorChange(0)"/>
+                    <presetStyleBox :presetStyle="presetStyles[1]" :textUnderBox="t('settingPage.common.settings.theme.nightMode')" 
+                    :font-color="pageColorStyle.fontColor" :isSelected="selectedPresetStyle === 1 ? true : false"
+                    @selected="presetColorChange(1)"/>
                 </div>
             </div>
         </div>
         <div>
-            <blankSeparator :blankColorStyle="blankSeparatorColorStyle" height="20px 0px 20px 0px"/>
-            <p>语言设置♬╭(╯ε╰)╮</p>
-            <otherSetting/>
+            <blankSeparator :blank-color-style="pageColorStyle.buttonColor.hex" height="20px 0px 20px 0px"/>
+            <p class="text">{{ t('settingPage.common.settings.lang.title') }}</p>
+            <otherSetting  class="text"/>
         </div>
     </el-scrollbar>
     </div>
@@ -38,13 +53,16 @@ import otherSetting from '@/views/setting/OtherSetting.vue';
 import { useStore } from '@/store';
 import { mapMutations } from 'vuex';
 import { computed } from '@vue/reactivity';
+import { useI18n } from 'vue-i18n'
 
 export default{
     setup(){
         const store = useStore();
+        const {t} = useI18n();
         return{
             pageColorStyle: computed(()=>store.state.settings.pageColorStyle),
-            selectedPresetStyle: computed(()=>store.state.settings.tempSelectedPresetColorStyle)
+            selectedPresetStyle: computed(()=>store.state.settings.tempSelectedPresetColorStyle),
+            t
         }
     },
     data(){
@@ -57,6 +75,7 @@ export default{
             buttonColorStyle: this.pageColorStyle.buttonColor,
             presetStyles:[
                 Object({
+                fontColor:"black",
                 backgroundColor:{
                     hex:"#ffffff",
                     alpha:1
@@ -66,6 +85,7 @@ export default{
                     alpha:0.3
                 }}),
                 Object({
+                fontColor:"white",
                 backgroundColor:{
                     hex:"#000000",
                     alpha:0.6
@@ -73,17 +93,11 @@ export default{
                 buttonColor:{
                     hex:"#ffffff",
                     alpha:0.3
-                }})],
-            blankSeparatorColorStyle:{
-                backgroundColor:{
-                    hex:"#000000",
-                    alpha:1
-                }
-            }
+                }})]
         }
     },
     methods:{
-        ...mapMutations(['setPageColorStyle','setTempPageColorStyle','setTempSelectedPresetColorStyle','confirmPageColorStyle']),
+        ...mapMutations(['setPageColorStyle','setTempPageColorStyle','setTempSelectedPresetColorStyle','confirmPageColorStyle','setFontColor']),
         customBackgroundColorStateChange(state){
             this.curCustomBackgroundColorState = state
             if(state === false){
@@ -103,6 +117,7 @@ export default{
             this.setTempPageColorStyle(Object({
                 backgroundColor: this.backgroundColorStyle,
                 buttonColor: this.buttonColorStyle,
+                fontColor: this.pageColorStyle.fontColor,
                 customBackgroundColor: this.curCustomBackgroundColorState,
                 customButtonColor: this.curCustomButtonColorState,
                 presetColor: this.curSelectedPresetColorStyle
@@ -128,11 +143,18 @@ export default{
             this.setTempPageColorStyle(Object({
                     backgroundColor: this.backgroundColorStyle,
                     buttonColor: this.buttonColorStyle,
+                    fontColor: this.pageColorStyle.fontColor,
                     customBackgroundColor: this.curCustomBackgroundColorState,
                     customButtonColor: this.curCustomButtonColorState,
                     presetColor: this.curSelectedPresetColorStyle
                 }))
             this.confirmPageColorStyle()
+        },
+        fontColorChange(){
+            if(this.pageColorStyle.fontColor === "black")
+                this.setFontColor("white")
+            else
+                this.setFontColor("black")
         },
         presetColorStateChange(state){
             if(state === true){
@@ -157,6 +179,7 @@ export default{
             this.setTempPageColorStyle(Object({
                 backgroundColor: this.backgroundColorStyle,
                 buttonColor: this.buttonColorStyle,
+                fontColor: this.pageColorStyle.fontColor,
                 customBackgroundColor: this.curCustomBackgroundColorState,
                 customButtonColor: this.curCustomButtonColorState,
                 presetColor: this.curSelectedPresetColorStyle
@@ -167,6 +190,7 @@ export default{
             this.setTempPageColorStyle(Object({
                 backgroundColor: this.backgroundColorStyle,
                 buttonColor: this.buttonColorStyle,
+                fontColor: this.pageColorStyle.fontColor,
                 customBackgroundColor: this.curCustomBackgroundColorState,
                 customButtonColor: this.curCustomButtonColorState,
                 presetColor: this.curSelectedPresetColorStyle
@@ -180,6 +204,7 @@ export default{
             this.setTempPageColorStyle(Object({
                 backgroundColor: this.backgroundColorStyle,
                 buttonColor: this.buttonColorStyle,
+                fontColor: this.presetStyles[index].fontColor,
                 customBackgroundColor: this.curCustomBackgroundColorState,
                 customButtonColor: this.curCustomButtonColorState,
                 presetColor: this.curSelectedPresetColorStyle
@@ -209,6 +234,10 @@ export default{
     min-height: 600px;
     width: 600px;
     overflow: hidden scroll;
+}
+
+.text{
+    color: v-bind("pageColorStyle.fontColor");
 }
 
 .basis::-webkit-scrollbar{
