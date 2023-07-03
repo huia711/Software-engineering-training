@@ -23,7 +23,6 @@
       <el-tabs
           v-model="page"
           type="card"
-          closable
           class="el-tabs"
           tab-position="left"
           @tab-remove="removeTab"
@@ -228,6 +227,7 @@ export default {
     const menu1 = ref(t('home.MainTab'))
     let page = 1
     const tabs =  computed(() => store.state.tab.Tabs)
+    const tabsAdd = computed(() => store.state.tab.TabsAdd)
     let tabIndex = computed(() => store.state.tab.tabIndex)
 
     const handleScroll = () => {
@@ -292,6 +292,8 @@ export default {
       scroll,
       removeTab,
       addTab,
+      tabs,
+      tabsAdd,
 
       fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
       searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数

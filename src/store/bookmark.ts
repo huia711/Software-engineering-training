@@ -97,20 +97,22 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param data
      */
-    [BookMarkMutations.addBookMark]: (state, payload: { data: BookMarkItem, userName: string }) => {
-      const { data, userName } = payload
+    [BookMarkMutations.addBookMark]: (state, payload: { data: BookMarkItem, userId: string }) => {
+      const { data, userId } = payload
+      console.log(userId)
       state.bookMarks.push(data)
-      saveBookMarkState(state, userName)
+      saveBookMarkState(state, userId)
     },
     /**
      * 更新单个导航
      * @param state
      * @param data
      */
-    [BookMarkMutations.updateBookMark]: (state, payload: { data: BookMarkItemVo, userName: string }) => {
-      const { data, userName } = payload
+    [BookMarkMutations.updateBookMark]: (state, payload: { data: BookMarkItemVo, userId: string }) => {
+      const { data, userId } = payload
+      console.log(userId)
       state.bookMarks[data.index] = data
-      saveBookMarkState(state, userName)
+      saveBookMarkState(state, userId)
     },
 
     /**
@@ -118,10 +120,11 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param index
      */
-    [BookMarkMutations.deleteBookMark]: (state, payload: { index: number, userName: string }) => {
-      const { index, userName } = payload
+    [BookMarkMutations.deleteBookMark]: (state, payload: { index: number, userId: string }) => {
+      const { index, userId } = payload
+      console.log(userId)
       state.bookMarks.splice(index, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
-      saveBookMarkState(state, userName)
+      saveBookMarkState(state, userId)
     },
 
     /**
@@ -129,14 +132,14 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param sort
      */
-    [BookMarkMutations.sortBookMarks]: (state, payload: { sort: SortData, userName: string }) => {
-      const { sort, userName } = payload
+    [BookMarkMutations.sortBookMarks]: (state, payload: { sort: SortData, userId: string }) => {
+      const { sort, userId } = payload
       const bookMarks = state.bookMarks
       const from = bookMarks[sort.from]
 
       bookMarks.splice(sort.from, 1) // 移除 from 索引位置的元素
       bookMarks.splice(sort.to, 0, from) // 将已经移除的元素 from 插入到目标位置 to
-      saveBookMarkState(state, userName)
+      saveBookMarkState(state, userId)
     },
 
     /**
@@ -144,10 +147,10 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param topSites
      */
-    [BookMarkMutations.updateBookMarks]: (state, payload: { bookMarks: BookMarks, userName: string }) => {
-      const { bookMarks, userName } = payload
+    [BookMarkMutations.updateBookMarks]: (state, payload: { bookMarks: BookMarks, userId: string }) => {
+      const { bookMarks, userId } = payload
       state.bookMarks = bookMarks
-      saveBookMarkState(state, userName)
+      saveBookMarkState(state, userId)
     },
 
     /**
@@ -155,10 +158,10 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param newTime
      */
-    [BookMarkMutations.editLastUpdateTime]: (state, payload: { newTime: number, userName: string }) => {
-      const { newTime, userName } = payload
+    [BookMarkMutations.editLastUpdateTime]: (state, payload: { newTime: number, userId: string }) => {
+      const { newTime, userId } = payload
       state.lastUpdateTime = newTime
-      saveBookMarkState(state, userName)
+      saveBookMarkState(state, userId)
     }
   },
   actions: {
@@ -205,16 +208,16 @@ export default createStoreModule<BookMarkState>({
 /**
  * 保存数据节流防抖
  */
-const saveBookMarkState = debounce((data: BookMarkState, userName: string) => {
+const saveBookMarkState = debounce((data: BookMarkState, userId: string) => {
   const settingJson = JSON.stringify(data)
   localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
 
+  console.log(userId)
   /**
    * 上传新标签页到服务器
    */
   try {
-    console.log(data.bookMarks)
-    axios.post('http://localhost:2020/user/newURL/'+userName, data.bookMarks).then(response=> {
+    axios.post('http://localhost:2020/user/newURL/'+userId, data.bookMarks).then(response=> {
       if (response.data.code === 200) {
         ElMessage({
           message: "bookmark.updateSuccess",

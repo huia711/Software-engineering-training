@@ -146,7 +146,7 @@
    */
   const bookMarkSetting = computed(() => state.setting.bookMark)
   const bookMarks = computed<BookMarks>(() => getters[BookMarkGetters.getCurrentBookMarks])
-  const userName = computed(() => state.settings.userName)
+  const userId = computed(() => state.settings.userId)
 
   // 定义了三个响应式对象：data、bookMark和rules
   const data = reactive({
@@ -180,9 +180,9 @@
   }
 
   // 删除
-  function deleteBookMark(index: number, userName: string) {
+  function deleteBookMark(index: number, userId: string) {
     console.log(index)
-    commit(BookMarkMutations.deleteBookMark, { index: index, userName: userName })
+    commit(BookMarkMutations.deleteBookMark, { index: index, userId: userId })
   }
 
   // 进入编辑状态
@@ -207,7 +207,7 @@
   }
 
   // 拖拽
-  function onDragIcon(type: DragType, index: number, userName: string) {
+  function onDragIcon(type: DragType, index: number, userId: string) {
     const sortData: SortData = {
       from: -1,
       to: -1
@@ -229,7 +229,7 @@
         sortData.to = index
 
         // 调用好的 mutations 方法进行排序
-        commit(BookMarkMutations.sortBookMarks, { sort: sortData, userName: userName })
+        commit(BookMarkMutations.sortBookMarks, { sort: sortData, userId: userId })
         data.currentDrag = index // 更新当前拖拽项位置
         return
 
@@ -254,7 +254,7 @@
           custom: true,
           icon
         }
-        commit(BookMarkMutations.addBookMark, { data: customData, userName: userName })
+        commit(BookMarkMutations.addBookMark, { data: customData, userId: userId })
 
         // 重置表单数据并关闭添加网站对话框
         formEl.resetFields()
