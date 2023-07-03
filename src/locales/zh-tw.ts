@@ -69,8 +69,6 @@ export default {
     cancel: "取消",
     textIcon: "文字圖示",
     iconURL:"圖示URL",
-
-    updateSuccess:"儲存成功"
   },
   other: {
     setting: "其他設置",

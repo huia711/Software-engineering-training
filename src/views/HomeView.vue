@@ -1,4 +1,5 @@
 <template>
+  <!-- 背景 -->
   <div id="wallpaper">
   <div id="setting-background">
   <main id="main" class="main" @scroll="handleScroll">
@@ -79,6 +80,7 @@
 import {computed, onBeforeUnmount, onMounted, ref} from "vue"
 import { useStore } from "@/store"
 import { useRoute } from "vue-router"
+import axios from "@/plugins/axios"
 // 导入组件Component
 import Search from "@/views/home/IndexSearch.vue"
 import settingPage from '@/views/settingPage/settingPage.vue'
@@ -88,7 +90,7 @@ import userPage from '@/views/userPage/userPage.vue'
 import $ from 'jquery';
 import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
-import { Document, Menu as IconMenu, User, Setting, Close, Check } from '@element-plus/icons-vue'
+import { Menu as IconMenu, User, Setting, Close, Check } from '@element-plus/icons-vue'
 import {BookMarkMutations} from "@/store/bookmark";
 import {Tabs} from "ant-design-vue";
 import {TabMutations} from "@/store/tab";
@@ -99,11 +101,15 @@ export default {
     const store = useStore();
     return{
       settingVisible: false,
+      userVisible: false,
       imgStyle: computed(() => store.state.settings.imgStyle),
       backgroungImage: computed(() => store.state.settings.backgroundImg),
       tabs: computed(() => store.state.tab.Tabs),
       pageShadow: 0,
       settingUploadSuccess: 0
+      userId: computed( ()=> store.state.settings.userId),
+      isSettingUploading: false,
+      store
     }
   },
   methods:{
@@ -179,6 +185,13 @@ export default {
         $("#setting-page").removeClass("slide_in").addClass("slide_out");
       }
     },
+    userVisible(newVal,oldVal){
+      if (newVal) {
+        $("#user-page").removeClass("slide_out").addClass("slide_in");
+      } else {
+        $("#user-page").removeClass("slide_in").addClass("slide_out");
+      }
+    },
     backgroungImage(newVal, oldVal){
       if(newVal !== ""){
         $("#wallpaper").addClass("backgroundImg");
@@ -196,15 +209,17 @@ export default {
     const store = useStore()
     const { t } = useI18n()
 
+    const isCollapse = ref(true)
     const menu1 = ref(t('home.MainTab'))
     let page = 1
-    const tabs =  computed(() => store.state.tab.Tabs)
 
     const handleScroll = () => {
       if (document.getElementById('main').scrollTop === 0) {
+        page = 1
         document.getElementById('menu1').click()
       }
-      if (document.getElementById('main').scrollTop === document.getElementById('main').clientHeight+16) {
+      if (document.getElementById('main').scrollTop > document.getElementById('main').clientHeight) {
+        page = 2
         document.getElementById('menu2').click()
       }
     }
@@ -215,48 +230,29 @@ export default {
       page = sec
     }
 
-    const removeTab = (targetName) => {
-      let activeName = page
-      if (activeName === targetName) {
-        tabs.value.forEach((tab, index) => {
-          if (tab.name === targetName) {
-            const nextTab = tabs[index + 1] || tabs[index - 1]
-            if (nextTab) {
-              activeName = nextTab.name
-            }
-          }
-        })
-      }
-      console.log(activeName)
-      tabs.value = tabs.value.filter((tab) => tab.name !== targetName)
-    }
-
-    onMounted(()=>{
+    onMounted(() => {
+      window.addEventListener('scroll', handleScroll)
       if(store.state.settings.backgroundImg !== ""){
         $("#wallpaper").addClass("backgroundImg");
       } else {
         $("#wallpaper").removeClass("backgroundImg");
       }
     })
-
-    onMounted(() => {
-      window.addEventListener('scroll', handleScroll)
-    })
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', handleScroll)
     })
+
     return {
       page,
       menu1,
+      isCollapse,
       handleScroll,
       scroll,
       removeTab,
-      store,
 
       fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
       searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
       fontColor: computed(() => store.state.settings.buttonColor.hex),
-      userId: computed(() => store.state.settings.userId)
     }
   },
   components:{
@@ -285,18 +281,19 @@ export default {
     justify-content: center; /* 将内容在水平方向上居中对齐 */
     align-items: center; /* 将内容在垂直方向上居中对齐 */
     row-gap: 42px; /* 将每个子元素之间的间距设置为 42 像素 */
+    z-index: 0;
   }
 
   #wallpaper{
     display: flex;
-    //position: fixed;
+    /* position: fixed; */
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 0;
+    z-index: -100;
   }
 
   #setting-background {
@@ -314,6 +311,16 @@ export default {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+  }
+
+  #setting-background {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    transition: all 0.3s linear;
+    background-color: v-bind("'rgba(0,0,0,' + pageShadow +')'");
   }
 
   .sec1 {
@@ -334,41 +341,65 @@ export default {
     scroll-snap-align: start; /* 滚动时该元素的开始位置将与滚动容器的开始位置对齐 */
   }
 
-  .el-tabs {
+  .el-menu-left {
     position: fixed;
     top: 40%;
     left: 1%;
     z-index: 10;
 
-    .custom-tabs-label .el-icon {
-      vertical-align: middle;
-    }
-    .custom-tabs-label span {
-      vertical-align: middle;
-      margin-left: 4px;
-    }
+    width: 50px;
+  }
+
+  .el-menu-top {
+    position: fixed;
+    top: 0%;
+    width: 100%;
   }
 
   @import '@/font/font.css';
   body {
     font-family: serif;
   }
-  .temp{
+  .entries{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     font-family: 'SmileySans';
     justify-content: space-around;
     position: fixed;
     top: 5%;
-    left: 90%;
+    right: 5%;
     z-index: 0;
+  }
+
+  #user-page {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: -40%;
+    left: 35%;
+    transform: scale(0.1);
+    z-index: -100;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  #user-page.slide_in{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) scale(1);
+    z-index: 100;
+    opacity: 1;
+  }
+
+  #user-page.slide_out{
+    opacity: 0;
   }
 
   #setting-page{
     width: 100%;
     height: 100%;
     position: fixed;
-    top: -30%;
+    top: -40%;
     left: 40%;
     transform: scale(0.1);
     z-index: -100;

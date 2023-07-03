@@ -70,7 +70,6 @@ export default {
         textIcon: "文字图标",
         iconURL:"图标URL",
 
-        updateSuccess:"保存成功"
     },
     other: {
         setting: "其他设置",
