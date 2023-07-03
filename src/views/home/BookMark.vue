@@ -23,10 +23,10 @@
             draggable="true"
             @click="openPage(item.url)"
             @contextmenu.prevent.stop="openEditStatus"
-            @dragstart="onDragIcon(DragType.start, index, userName)"
-            @dragenter="onDragIcon(DragType.enter, index, userName)"
+            @dragstart="onDragIcon(DragType.start, index)"
+            @dragenter="onDragIcon(DragType.enter, index)"
             @dragover.prevent
-            @dragend="onDragIcon(DragType.end, index, userName)"
+            @dragend="onDragIcon(DragType.end, index)"
         >
           <!-- 组件过渡动画，当编辑状态打开时，出现删除按钮 -->
           <transition name="scale">
@@ -34,7 +34,7 @@
             <sup
                 v-show="data.editStatus"
                 class="bubble-delete"
-                @click.stop="deleteBookMark(index, userName)"
+                @click.stop="deleteBookMark(index)"
             ></sup>
           </transition>
         </el-card>
@@ -146,7 +146,7 @@
    */
   const bookMarkSetting = computed(() => state.setting.bookMark)
   const bookMarks = computed<BookMarks>(() => getters[BookMarkGetters.getCurrentBookMarks])
-  const userId = computed(() => state.settings.userId)
+  const userId = computed(() => state.settings.userId).value
 
   // 定义了三个响应式对象：data、bookMark和rules
   const data = reactive({
@@ -180,8 +180,7 @@
   }
 
   // 删除
-  function deleteBookMark(index: number, userId: string) {
-    console.log(index)
+  function deleteBookMark(index: number) {
     commit(BookMarkMutations.deleteBookMark, { index: index, userId: userId })
   }
 
@@ -207,7 +206,7 @@
   }
 
   // 拖拽
-  function onDragIcon(type: DragType, index: number, userId: string) {
+  function onDragIcon(type: DragType, index: number) {
     const sortData: SortData = {
       from: -1,
       to: -1

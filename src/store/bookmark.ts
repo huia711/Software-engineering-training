@@ -99,7 +99,6 @@ export default createStoreModule<BookMarkState>({
      */
     [BookMarkMutations.addBookMark]: (state, payload: { data: BookMarkItem, userId: string }) => {
       const { data, userId } = payload
-      console.log(userId)
       state.bookMarks.push(data)
       saveBookMarkState(state, userId)
     },
@@ -110,7 +109,6 @@ export default createStoreModule<BookMarkState>({
      */
     [BookMarkMutations.updateBookMark]: (state, payload: { data: BookMarkItemVo, userId: string }) => {
       const { data, userId } = payload
-      console.log(userId)
       state.bookMarks[data.index] = data
       saveBookMarkState(state, userId)
     },
@@ -122,7 +120,6 @@ export default createStoreModule<BookMarkState>({
      */
     [BookMarkMutations.deleteBookMark]: (state, payload: { index: number, userId: string }) => {
       const { index, userId } = payload
-      console.log(userId)
       state.bookMarks.splice(index, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
       saveBookMarkState(state, userId)
     },
@@ -198,7 +195,7 @@ export default createStoreModule<BookMarkState>({
       //   })
       // )
 
-      console.log("load browser top-sites:", `${Date.now() - now}ms`)
+      // console.log("load browser top-sites:", `${Date.now() - now}ms`)
       // commit(BookMarkMutations.updateBookMarks, customBookMarks.concat(bookMarks))
       commit(BookMarkMutations.editLastUpdateTime, now)
     }
