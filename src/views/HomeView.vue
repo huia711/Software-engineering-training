@@ -117,7 +117,6 @@ import $ from 'jquery';
 import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
 import {Check, Close, Document, Menu as IconMenu, Setting, User} from '@element-plus/icons-vue'
-import {BookMarkMutations} from "@/store/bookmark";
 import axios from "@/plugins/axios";
 
 export default {

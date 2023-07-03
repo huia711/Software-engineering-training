@@ -1,9 +1,10 @@
 import {createStoreModule} from "./index";
 import {
     ImgStyle,
-    PageColorStyle,
+    PageColorStyle, SearchEngineData,
     TempPageColorStyle
 } from "@/enum-interface"
+import {SearchGetters} from "@/store/search";
 
 export interface SettingsState {
     imgStyle: ImgStyle

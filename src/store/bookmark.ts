@@ -9,7 +9,6 @@ import {debounce} from "@/utils/async"
 import axios from "@/plugins/axios";
 import {ElMessage} from "element-plus";
 import {useI18n} from "vue-i18n";
-
 // import { verifyImageUrl } from "@/utils/file"
 
 /**
@@ -26,11 +25,6 @@ export interface BookMarkItemVo extends BookMarkItem {
   index: number
 }
 
-// getter
-export enum BookMarkGetters {
-  getCurrentBookMarks = "GET_CURRENT_BOOK_MARK"
-}
-
 // mutations
 export enum BookMarkMutations {
   addBookMark = "ADD_BOOK_MARK",
@@ -39,6 +33,11 @@ export enum BookMarkMutations {
   sortBookMarks = "SORT_BOOK_MARKS",
   updateBookMarks = "UPDATE_BOOK_MARKS",
   editLastUpdateTime = "EDIT_LAST_UPDATE_TIME"
+}
+
+// getter
+export enum BookMarkGetters {
+  getCurrentBookMarks = "GET_CURRENT_BOOK_MARK"
 }
 
 // action
@@ -64,16 +63,15 @@ export default createStoreModule<BookMarkState>({
   state() {
     // 设置默认状态值
     const defaultState: BookMarkState = {
+
       // 创建一个数组保存网站
       bookMarks: [],
       lastUpdateTime: undefined
     }
 
     // 从本地存储中读取
-    const bookMarksData = JSON.parse(localStorage[BOOK_MARK_STORAGE] ?? "[]")
-    // console.log(bookMarksData)
-    // 将本地存储中读取到的合并到默认状态中
-    copy(bookMarksData, defaultState, true)
+    const topSitesData = JSON.parse(localStorage[BOOK_MARK_STORAGE] ?? "[]")
+    copy(topSitesData, defaultState, true)
 
     return defaultState
   },
@@ -99,18 +97,20 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param data
      */
-    [BookMarkMutations.addBookMark]: (state, data: BookMarkItem) => {
+    [BookMarkMutations.addBookMark]: (state, payload: { data: BookMarkItem, userName: string }) => {
+      const { data, userName } = payload
       state.bookMarks.push(data)
-      saveBookMarkState(state)
+      saveBookMarkState(state, userName)
     },
     /**
      * 更新单个导航
      * @param state
      * @param data
      */
-    [BookMarkMutations.updateBookMark]: (state, data: BookMarkItemVo) => {
+    [BookMarkMutations.updateBookMark]: (state, payload: { data: BookMarkItemVo, userName: string }) => {
+      const { data, userName } = payload
       state.bookMarks[data.index] = data
-      saveBookMarkState(state)
+      saveBookMarkState(state, userName)
     },
 
     /**
@@ -118,9 +118,10 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param index
      */
-    [BookMarkMutations.deleteBookMark]: (state, index: number) => {
+    [BookMarkMutations.deleteBookMark]: (state, payload: { index: number, userName: string }) => {
+      const { index, userName } = payload
       state.bookMarks.splice(index, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
-      saveBookMarkState(state)
+      saveBookMarkState(state, userName)
     },
 
     /**
@@ -128,13 +129,14 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param sort
      */
-    [BookMarkMutations.sortBookMarks]: (state, sort: SortData) => {
+    [BookMarkMutations.sortBookMarks]: (state, payload: { sort: SortData, userName: string }) => {
+      const { sort, userName } = payload
       const bookMarks = state.bookMarks
       const from = bookMarks[sort.from]
 
       bookMarks.splice(sort.from, 1) // 移除 from 索引位置的元素
       bookMarks.splice(sort.to, 0, from) // 将已经移除的元素 from 插入到目标位置 to
-      saveBookMarkState(state)
+      saveBookMarkState(state, userName)
     },
 
     /**
@@ -142,9 +144,10 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param topSites
      */
-    [BookMarkMutations.updateBookMarks]: (state, bookMarks: BookMarks) => {
+    [BookMarkMutations.updateBookMarks]: (state, payload: { bookMarks: BookMarks, userName: string }) => {
+      const { bookMarks, userName } = payload
       state.bookMarks = bookMarks
-      saveBookMarkState(state)
+      saveBookMarkState(state, userName)
     },
 
     /**
@@ -152,9 +155,10 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param newTime
      */
-    [BookMarkMutations.editLastUpdateTime]: (state, newTime: number) => {
+    [BookMarkMutations.editLastUpdateTime]: (state, payload: { newTime: number, userName: string }) => {
+      const { newTime, userName } = payload
       state.lastUpdateTime = newTime
-      saveBookMarkState(state)
+      saveBookMarkState(state, userName)
     }
   },
   actions: {
@@ -201,7 +205,7 @@ export default createStoreModule<BookMarkState>({
 /**
  * 保存数据节流防抖
  */
-const saveBookMarkState = debounce((data: BookMarkState) => {
+const saveBookMarkState = debounce((data: BookMarkState, userName: string) => {
   const settingJson = JSON.stringify(data)
   localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
 
@@ -210,16 +214,10 @@ const saveBookMarkState = debounce((data: BookMarkState) => {
    */
   try {
     console.log(data.bookMarks)
-    // data.bookMarks.push({title: string,
-    // url: string,
-    // icon?: string,
-    // textIcon: boolean,
-    // custom: boolean})
-    axios.post('http://localhost:2020/user/newURL/', data.bookMarks).then(response=> {
-      const { t } = useI18n()
+    axios.post('http://localhost:2020/user/newURL/'+userName, data.bookMarks).then(response=> {
       if (response.data.code === 200) {
         ElMessage({
-          message: t("bookmark.updateSuccess"),
+          message: "bookmark.updateSuccess",
           type: "success",
         })
       }
@@ -233,10 +231,3 @@ const saveBookMarkState = debounce((data: BookMarkState) => {
     console.log(error)
   }
 }, 250)
-
-// /**
-//  * 上传新标签页
-//  */
-// export function updateBookMark(data: BookMarkState) {
-//
-// }

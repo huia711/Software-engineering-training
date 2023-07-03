@@ -37,7 +37,6 @@ import { useStore } from '@/store';
 import $ from 'jquery'
 import axios from "@/plugins/axios"
 import { mapMutations } from 'vuex';
-import {saveBookMarkState} from "@/store/bookmark";
 
 export default{
     setup(){

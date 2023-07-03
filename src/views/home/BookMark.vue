@@ -23,10 +23,10 @@
             draggable="true"
             @click="openPage(item.url)"
             @contextmenu.prevent.stop="openEditStatus"
-            @dragstart="onDragIcon(DragType.start, index)"
-            @dragenter="onDragIcon(DragType.enter, index)"
+            @dragstart="onDragIcon(DragType.start, index, userName)"
+            @dragenter="onDragIcon(DragType.enter, index, userName)"
             @dragover.prevent
-            @dragend="onDragIcon(DragType.end, index)"
+            @dragend="onDragIcon(DragType.end, index, userName)"
         >
           <!-- 组件过渡动画，当编辑状态打开时，出现删除按钮 -->
           <transition name="scale">
@@ -34,7 +34,7 @@
             <sup
                 v-show="data.editStatus"
                 class="bubble-delete"
-                @click.stop="deleteBookMark(index)"
+                @click.stop="deleteBookMark(index, userName)"
             ></sup>
           </transition>
         </el-card>
@@ -124,13 +124,14 @@
    */
   import { computed, onBeforeMount, reactive, ref } from "vue"
   import { useStore } from "@/store"
-  import { BookMarkActions, BookMarkGetters, BookMarkMutations } from "@/store/bookmark"
+  import {BookMarkActions, BookMarkGetters, BookMarkMutations} from "@/store/bookmark"
 
   // 外部导入
   import { DragType, OpenPageTarget, SortData, BookMarkItem, BookMarks } from "@/enum-interface"
   import { useI18n } from "vue-i18n"
   import { Plus } from "@element-plus/icons-vue";
   import type { FormInstance } from 'element-plus'
+
   // import { getFavicon } from "@/plugins/extension"
 
   /**
@@ -145,6 +146,7 @@
    */
   const bookMarkSetting = computed(() => state.setting.bookMark)
   const bookMarks = computed<BookMarks>(() => getters[BookMarkGetters.getCurrentBookMarks])
+  const userName = computed(() => state.settings.userName)
 
   // 定义了三个响应式对象：data、bookMark和rules
   const data = reactive({
@@ -178,8 +180,9 @@
   }
 
   // 删除
-  function deleteBookMark(index: number) {
-    commit(BookMarkMutations.deleteBookMark, index)
+  function deleteBookMark(index: number, userName: string) {
+    console.log(index)
+    commit(BookMarkMutations.deleteBookMark, { index: index, userName: userName })
   }
 
   // 进入编辑状态
@@ -204,7 +207,7 @@
   }
 
   // 拖拽
-  function onDragIcon(type: DragType, index: number) {
+  function onDragIcon(type: DragType, index: number, userName: string) {
     const sortData: SortData = {
       from: -1,
       to: -1
@@ -226,7 +229,7 @@
         sortData.to = index
 
         // 调用好的 mutations 方法进行排序
-        commit(BookMarkMutations.sortBookMarks, sortData)
+        commit(BookMarkMutations.sortBookMarks, { sort: sortData, userName: userName })
         data.currentDrag = index // 更新当前拖拽项位置
         return
 
@@ -251,7 +254,7 @@
           custom: true,
           icon
         }
-        commit(BookMarkMutations.addBookMark, customData)
+        commit(BookMarkMutations.addBookMark, { data: customData, userName: userName })
 
         // 重置表单数据并关闭添加网站对话框
         formEl.resetFields()
