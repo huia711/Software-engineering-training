@@ -1,5 +1,6 @@
 <template>
   <div id="wallpaper">
+  <div id="setting-background">
   <main id="main" class="main" @scroll="handleScroll">
     <!-- 背景 -->
 
@@ -66,6 +67,7 @@
           />
         </div>
   </main>
+  </div>
   </div>
 </template>
 
@@ -290,6 +292,16 @@ export default {
     right: 0;
     bottom: 0;
     z-index: 0;
+  }
+
+  #setting-background {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    transition: all 0.3s linear;
+    background-color: v-bind("'rgba(0,0,0,' + pageShadow +')'");
   }
 
   #wallpaper.backgroundImg {
