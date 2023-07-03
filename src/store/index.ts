@@ -9,7 +9,6 @@ import search, { SearchState } from './search'
 import setting, { SettingState } from './setting'
 import bookMark, { BookMarkState } from './bookmark'
 import settings, { SettingsState } from './settings'
-import tab, { TabState } from  './tab'
 
 /**
  * 自定义类型（type）的定义
@@ -19,8 +18,7 @@ export type RootState = {
   search: SearchState;
   setting: SettingState;
   bookMark: BookMarkState;
-  settings: SettingsState;
-  tab: TabState;
+  settings: SettingsState
 };
 
 /**
@@ -36,8 +34,7 @@ const store = createStore<RootState>({
     search,
     setting,
     bookMark,
-    settings,
-    tab
+    settings
   },
 });
 

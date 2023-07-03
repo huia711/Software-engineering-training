@@ -1,68 +1,65 @@
 <template>
+  <!-- 背景 -->
   <div id="wallpaper">
-  <main id="main" class="main" @scroll="handleScroll">
-    <!-- 背景 -->
+    <div id="setting-background">
+      <main id="main" class="main" @scroll="handleScroll">
 
-    <section class="sec1" id="sec1">
-      <!-- 搜索框 -->
-      <search class="search" :value="searchText"/>
-      <BookMark/>
-    </section>
+        <section class="sec1" id="sec1">
+          <!-- 搜索框 -->
+          <search class="search" :value="searchText"/>
+          <BookMark/>
+        </section>
 
-    <section class="sec2" id="sec2">
-      <BookMark/>
-    </section>
+        <section class="sec2" id="sec2">
+          <BookMark/>
+        </section>
 
-    <!-- 设置标签页 -->
-    <el-tabs
-        v-model="page"
-        type="border-card"
-        closable
-        class="el-tabs"
-        tab-position="left"
-        @tab-remove="removeTab"
-    >
-      <el-tab-pane
-          v-for="item in tabs"
-          :key="item.num"
-          :label="item.title"
-          :name="item.title"
-          @click="scroll(item.num)"
-      >
-        <template #label>
-          <span class="custom-tabs-label">
-            <el-icon><IconMenu /></el-icon>
-            <span>{{ item.title }}</span>
-          </span>
-        </template>
-      </el-tab-pane>
-    </el-tabs>
+        <!-- 设置目录 -->
+        <el-menu
+            :default-active = page.toString()
+            class="el-menu-left"
+            :collapse="isCollapse"
+        >
+          <el-menu-item index="1" id="menu1" @click="scroll('1')">
+            <el-icon><IconMenu/></el-icon>
+            <template #title> {{menu1}} </template>
+          </el-menu-item>
 
-    <div class="temp">
-      <router-link to="/register" style="text-decoration: none; color: black;">
-        <modernButton
-          :custom-button-style="imgStyle"
-          srcPath="img/userHead.png"
-          textUnderButton="User"
-        />
-      </router-link>
-      
-      <modernButton
-          id="setting-button"
-          :custom-button-style="imgStyle"
-          srcPath="img/setting.png"
-          @buttonClicked="settingVisibleState(true)"
-          textUnderButton="settings"
-      />
+          <el-menu-item index="2" id="menu2" @click="scroll('2')">
+            <el-icon><Document/></el-icon>
+            <template #title>Navigator Four</template>
+          </el-menu-item>
+        </el-menu>
+
+        <div class="entries">
+          <div @click="userPageClicked"><el-button round><el-icon><User /></el-icon></el-button></div>
+          <div @click="settingVisibleState">
+            <el-button round :loading="isSettingUploading">
+              <el-icon v-show="settingUploadSuccess !== 0">
+                <Close v-show="settingUploadSuccess === -1"/>
+                <Check v-show="settingUploadSuccess === 1"/>
+              </el-icon>
+              <el-icon>
+                <Setting />
+              </el-icon>
+            </el-button>
+          </div>
+        </div>
+
+        <div id="user-page">
+          <userPage 
+            v-click-outside="handleClickOutsideUserPage"
+            @pageHide="handleClickOutsideUserPage"
+          />
+        </div>
+
+        <div id="setting-page">
+          <settingPage
+              v-click-outside="handleClickOutsideSettingPage"
+          />
+        </div>
+      </main>
     </div>
-
-    <div id="setting-page">
-      <settingPage
-          id="settingMainPage"
-          v-click-outside="handleClickOutside"
-      />
-    </div>
-  </main>
   </div>
 </template>
 
@@ -74,36 +71,54 @@
 import {computed, onBeforeUnmount, onMounted, ref} from "vue"
 import { useStore } from "@/store"
 import { useRoute } from "vue-router"
+import axios from "@/plugins/axios"
 // 导入组件Component
 import Search from "@/views/home/IndexSearch.vue"
 import settingPage from '@/views/settingPage/settingPage.vue'
-import modernButton from '@/components/basis/modernButton.vue'
+import userPage from "./userPage/userPage.vue"
 import BookMark from '@/views/home/BookMark.vue'
 // 外部导入
 import $ from 'jquery';
 import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
-import { Document, Menu as IconMenu } from '@element-plus/icons-vue'
-import {BookMarkMutations} from "@/store/bookmark";
-import {Tabs} from "ant-design-vue";
-import {TabMutations} from "@/store/tab";
+import { Document, Menu as IconMenu, Setting, User, Close, Check } from '@element-plus/icons-vue'
 
 export default {
   data(){
     const store = useStore();
     return{
       settingVisible: false,
+      userVisible: false,
       imgStyle: computed(() => store.state.settings.imgStyle),
       backgroungImage: computed(() => store.state.settings.backgroundImg),
-      tabs: computed(() => store.state.tab.Tabs)
+      userId: computed( ()=> store.state.settings.userId),
+      pageShadow: 0,
+      isSettingUploading: false,
+      settingUploadSuccess: 0,
+      store
     }
   },
   methods:{
-    ...mapMutations(['confirmSettings']),
-    settingVisibleState (stat) {
-      this.settingVisible = stat
+    ...mapMutations(['confirmPageColorStyle']),
+    userPageClicked () {
+      if(this.userId !== ""){
+        // 个人页面
+        this.userVisible = true
+        this.pageShadow = 0.6
+      } else {
+        this.$router.push('/register')
+      }
     },
-    handleClickOutside(){
+    settingVisibleState () {
+      this.settingVisible = true
+      this.pageShadow = 0.6
+      this.settingUploadSuccess = 0
+    },
+    handleClickOutsideUserPage(){
+      this.userVisible = false
+      this.pageShadow = 0
+    },
+    handleClickOutsideSettingPage(){
       this.settingVisible = false
       this.pageShadow = 0
       this.confirmPageColorStyle()
@@ -156,6 +171,13 @@ export default {
         $("#setting-page").removeClass("slide_in").addClass("slide_out");
       }
     },
+    userVisible(newVal,oldVal){
+      if (newVal) {
+        $("#user-page").removeClass("slide_out").addClass("slide_in");
+      } else {
+        $("#user-page").removeClass("slide_in").addClass("slide_out");
+      }
+    },
     backgroungImage(newVal, oldVal){
       if(newVal !== ""){
         $("#wallpaper").addClass("backgroundImg");
@@ -173,15 +195,17 @@ export default {
     const store = useStore()
     const { t } = useI18n()
 
+    const isCollapse = ref(true)
     const menu1 = ref(t('home.MainTab'))
     let page = 1
-    const tabs =  computed(() => store.state.tab.Tabs)
 
     const handleScroll = () => {
       if (document.getElementById('main').scrollTop === 0) {
+        page = 1
         document.getElementById('menu1').click()
       }
-      if (document.getElementById('main').scrollTop === document.getElementById('main').clientHeight+16) {
+      if (document.getElementById('main').scrollTop > document.getElementById('main').clientHeight) {
+        page = 2
         document.getElementById('menu2').click()
       }
     }
@@ -192,54 +216,40 @@ export default {
       page = sec
     }
 
-    const removeTab = (targetName) => {
-      let activeName = page
-      if (activeName === targetName) {
-        tabs.value.forEach((tab, index) => {
-          if (tab.name === targetName) {
-            const nextTab = tabs[index + 1] || tabs[index - 1]
-            if (nextTab) {
-              activeName = nextTab.name
-            }
-          }
-        })
-      }
-      console.log(activeName)
-      tabs.value = tabs.value.filter((tab) => tab.name !== targetName)
-    }
-
-    onMounted(()=>{
+    onMounted(() => {
+      window.addEventListener('scroll', handleScroll)
       if(store.state.settings.backgroundImg !== ""){
         $("#wallpaper").addClass("backgroundImg");
       } else {
         $("#wallpaper").removeClass("backgroundImg");
       }
     })
-
-    onMounted(() => {
-      window.addEventListener('scroll', handleScroll)
-    })
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', handleScroll)
     })
+
     return {
       page,
       menu1,
+      isCollapse,
       handleScroll,
       scroll,
-      removeTab,
 
       fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
       searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
-      fontColor: computed(() => store.state.settings.buttonColor.hex)
     }
   },
   components:{
     Search,
-    modernButton,
     settingPage,
+    userPage,
     BookMark,
     IconMenu,
+    Document,
+    Setting,
+    Close,
+    Check,
+    User
   }
 }
 
@@ -256,18 +266,19 @@ export default {
     justify-content: center; /* 将内容在水平方向上居中对齐 */
     align-items: center; /* 将内容在垂直方向上居中对齐 */
     row-gap: 42px; /* 将每个子元素之间的间距设置为 42 像素 */
+    z-index: 0;
   }
 
   #wallpaper{
     display: flex;
-    //position: fixed;
+    /* position: fixed; */
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 0;
+    z-index: -100;
   }
 
   #wallpaper.backgroundImg {
@@ -275,6 +286,16 @@ export default {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+  }
+
+  #setting-background {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    transition: all 0.3s linear;
+    background-color: v-bind("'rgba(0,0,0,' + pageShadow +')'");
   }
 
   .sec1 {
@@ -295,41 +316,65 @@ export default {
     scroll-snap-align: start; /* 滚动时该元素的开始位置将与滚动容器的开始位置对齐 */
   }
 
-  .el-tabs {
+  .el-menu-left {
     position: fixed;
     top: 40%;
     left: 1%;
     z-index: 10;
 
-    .custom-tabs-label .el-icon {
-      vertical-align: middle;
-    }
-    .custom-tabs-label span {
-      vertical-align: middle;
-      margin-left: 4px;
-    }
+    width: 50px;
+  }
+
+  .el-menu-top {
+    position: fixed;
+    top: 0%;
+    width: 100%;
   }
 
   @import '@/font/font.css';
   body {
     font-family: serif;
   }
-  .temp{
+  .entries{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     font-family: 'SmileySans';
     justify-content: space-around;
     position: fixed;
     top: 5%;
-    left: 90%;
+    right: 5%;
     z-index: 0;
+  }
+
+  #user-page {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: -40%;
+    left: 35%;
+    transform: scale(0.1);
+    z-index: -100;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  #user-page.slide_in{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) scale(1);
+    z-index: 100;
+    opacity: 1;
+  }
+
+  #user-page.slide_out{
+    opacity: 0;
   }
 
   #setting-page{
     width: 100%;
     height: 100%;
     position: fixed;
-    top: -30%;
+    top: -40%;
     left: 40%;
     transform: scale(0.1);
     z-index: -100;
