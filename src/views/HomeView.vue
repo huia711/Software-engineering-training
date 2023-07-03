@@ -38,30 +38,33 @@
       </el-tab-pane>
     </el-tabs>
 
-    <div class="temp">
-      <router-link to="/register" style="text-decoration: none; color: black;">
-        <modernButton
-          :custom-button-style="imgStyle"
-          srcPath="img/userHead.png"
-          textUnderButton="User"
-        />
-      </router-link>
-      
-      <modernButton
-          id="setting-button"
-          :custom-button-style="imgStyle"
-          srcPath="img/setting.png"
-          @buttonClicked="settingVisibleState(true)"
-          textUnderButton="settings"
-      />
-    </div>
+    <div class="entries">
+          <div @click="userPageClicked"><el-button round><el-icon><User /></el-icon></el-button></div>
+          <div @click="settingVisibleState">
+            <el-button round :loading="isSettingUploading">
+              <el-icon v-show="settingUploadSuccess !== 0">
+                <Close v-show="settingUploadSuccess === -1"/>
+                <Check v-show="settingUploadSuccess === 1"/>
+              </el-icon>
+              <el-icon>
+                <Setting />
+              </el-icon>
+            </el-button>
+          </div>
+        </div>
 
-    <div id="setting-page">
-      <settingPage
-          id="settingMainPage"
-          v-click-outside="handleClickOutside"
-      />
-    </div>
+        <div id="user-page">
+          <userPage 
+            v-click-outside="handleClickOutsideUserPage"
+            @pageHide="handleClickOutsideUserPage"
+          />
+        </div>
+
+        <div id="setting-page">
+          <settingPage
+              v-click-outside="handleClickOutsideSettingPage"
+          />
+        </div>
   </main>
   </div>
 </template>
