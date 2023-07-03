@@ -97,6 +97,7 @@ export default{
                         "password" : this.passwd,
                         "confirmPassword": this.confPasswd
                     }
+                    console.log(data)
                     try {
                         axios.post('http://localhost:2020/user/login', data).then(response=>{
                             if(response.data.code === 200){
