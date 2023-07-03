@@ -80,13 +80,12 @@ import { useRoute } from "vue-router"
 // 导入组件Component
 import Search from "@/views/home/IndexSearch.vue"
 import settingPage from '@/views/settingPage/settingPage.vue'
-import modernButton from '@/components/basis/modernButton.vue'
 import BookMark from '@/views/home/BookMark.vue'
 // 外部导入
 import $ from 'jquery';
 import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
-import { Document, Menu as IconMenu } from '@element-plus/icons-vue'
+import { Document, Menu as IconMenu, User, Setting, Close, Check } from '@element-plus/icons-vue'
 import {BookMarkMutations} from "@/store/bookmark";
 import {Tabs} from "ant-design-vue";
 import {TabMutations} from "@/store/tab";
@@ -240,10 +239,13 @@ export default {
   },
   components:{
     Search,
-    modernButton,
     settingPage,
     BookMark,
     IconMenu,
+    Setting,
+    User,
+    Close,
+    Check
   }
 }
 
@@ -350,6 +352,41 @@ export default {
   }
 
   #setting-page.slide_out{
+    opacity: 0;
+  }
+
+  .entries{
+    display: flex;
+    flex-direction: row;
+    font-family: 'SmileySans';
+    justify-content: space-around;
+    position: fixed;
+    top: 5%;
+    right: 5%;
+    z-index: 0;
+  }
+
+  #user-page {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: -40%;
+    left: 35%;
+    transform: scale(0.1);
+    z-index: -100;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  #user-page.slide_in{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) scale(1);
+    z-index: 100;
+    opacity: 1;
+  }
+
+  #user-page.slide_out{
     opacity: 0;
   }
 </style>
