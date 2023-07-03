@@ -81,6 +81,7 @@ import { useRoute } from "vue-router"
 import Search from "@/views/home/IndexSearch.vue"
 import settingPage from '@/views/settingPage/settingPage.vue'
 import BookMark from '@/views/home/BookMark.vue'
+import userPage from '@/views/userPage/userPage.vue'
 // 外部导入
 import $ from 'jquery';
 import { mapMutations } from "vuex";
@@ -240,6 +241,7 @@ export default {
   components:{
     Search,
     settingPage,
+    userPage,
     BookMark,
     IconMenu,
     Setting,
