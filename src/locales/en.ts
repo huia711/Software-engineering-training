@@ -68,7 +68,9 @@ export default {
     OK: "OK",
     cancel: "Cancel",
     textIcon: "Text icon",
-    iconURL:"Icon URL",
+    iconURL: "Icon URL",
+
+    updateSuccess: "Save successfully"
   },
   other: {
     setting: "Other Setting",

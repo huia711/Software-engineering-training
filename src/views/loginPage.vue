@@ -38,6 +38,7 @@ import { useI18n } from 'vue-i18n';
 import $ from 'jquery'
 import axios from "@/plugins/axios"
 import { mapMutations } from 'vuex';
+import {saveBookMarkState} from "@/store/bookmark";
 
 export default{
     setup(){
@@ -99,7 +100,7 @@ export default{
                         "confirmPassword": this.confPasswd
                     }
                     try {
-                        axios.post('http://localhost:2020/user/login',data).then(response=>{
+                        axios.post('http://localhost:2020/user/login', data).then(response=>{
                             if(response.data.code === 200){
                                 // 登陆成功
                                 /** 
@@ -120,6 +121,8 @@ export default{
                                  *          searchItemCount:...
                                  *          avatar:...              <= 用户头像URL，无则返回"null"
                                  *          backgroundURL:...       <= 用户背景图片URL，无则返回"null"
+                                 *
+                                 *          bookMarks:...           <= 标签页，无则返回"null"
                                  *          ...                     <= 后期可能增加的其它用户数据
                                  *      }
                                  *  ...
@@ -174,8 +177,23 @@ export default{
                                             this.setBackgroundImage(URL.createObjectURL(backgroundBlob));
                                         }
                                     })
-                                this.spinnerZIndex = false
-                                this.closePage()
+                                // 获取标签页
+                                /**
+                                 * 返回格式：
+                                 * {
+                                 *  code:...
+                                 *  data:...  <= 标签页数据
+                                 * }
+                                 */
+                                // if(response.data.data.bookMarks !== "null") {
+                                //   axios.get(response.data.data.bookMarks).then(response=>{
+                                //     let bookMark = response.data.data.image;
+                                //     saveBookMarkState(state)
+                                //   })
+                                // }
+
+                              this.spinnerZIndex = false
+                              this.closePage()
                             } else {
                                 this.spinnerZIndex = false
                                 this.warningMsg = response.data.msg

@@ -79,7 +79,6 @@
   // 监听并设置主题
   watch(() => currentTheme.value, (newValue, oldValue) => {
     if (newValue !== oldValue && oldValue !== undefined) {
-      console.log("success")
       toggle()
     }
   }, {
@@ -89,7 +88,7 @@
   })
 
   watch(() => isDark.value, (newValue, oldValue) => {
-    console.log(newValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value)
+    // console.log(newValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value)
     if (oldValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value) {
       store.commit(SettingMutations.updateThemeMode, newValue ? ThemeMode.Dark : ThemeMode.Light)
     }
