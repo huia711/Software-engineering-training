@@ -15,7 +15,7 @@
         <BookMark/>
       </section>
 
-      <section class="sec2" id="sec2">
+      <section class="sec" id="sec2">
         <BookMark/>
       </section>
 
@@ -113,6 +113,7 @@ import userPage from '@/views/userPage/userPage.vue'
 import { TabMutations } from "@/store/tab"
 // 外部导入
 import $ from 'jquery';
+import Vue from 'vue';
 import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
 import {Check, Close, Document, Menu as IconMenu, Setting, User} from '@element-plus/icons-vue'
@@ -240,7 +241,7 @@ export default {
     }
 
     const scroll = (sec) => {
-      console.log("seccess")
+      console.log("success")
       const element = document.getElementById('sec'+sec)
       element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
       page = sec
@@ -261,9 +262,14 @@ export default {
       const main = document.getElementById('main')
       const newSection = document.createElement('section')
       newSection.id = "sec"+newTabName
-      newSection.innerElement = 'bookmark'
+      // 创建组件实例
+      const BookmarkComponent = Vue.extend(BookMark);
+      const bookmark = new BookmarkComponent().$mount();
+      newSection.appendChild(bookmark.$el);
+
       main.appendChild(newSection)
 
+      //
       page = newTabName
     }
 
@@ -359,7 +365,7 @@ export default {
     row-gap: 42px; /* 将每个子元素之间的间距设置为 42 像素 */
   }
 
-  .sec2 {
+  .sec {
     height: 100vh; /* 元素的高度为 viewport 的高度 */
     width: 100vw; /* 元素的宽度为 viewport 的宽度 */
     scroll-snap-align: start; /* 滚动时该元素的开始位置将与滚动容器的开始位置对齐 */
