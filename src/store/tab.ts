@@ -12,6 +12,8 @@ import { debounce } from "@/utils/async";
 // state
 export interface TabState {
     Tabs: Tabs
+    TabsAdd: Tabs
+    tabIndex: number
     lastUpdateTime?: number
 }
 
@@ -50,6 +52,8 @@ export default createStoreModule<TabState>({
                 num: 2,
                 content: 'Tab 2 content',
             }],
+            TabsAdd: [],
+            tabIndex: 2,
             lastUpdateTime: undefined
         }
 
@@ -68,8 +72,9 @@ export default createStoreModule<TabState>({
          * @param data
          */
         [TabMutations.addTab]: (state, data: TabItem) => {
-            state.Tabs.push(data)
-            saveBookMarkState(state)
+            state.TabsAdd.push(data)
+            state.tabIndex++;
+            saveTabState(state)
         },
 
         /**
@@ -78,14 +83,16 @@ export default createStoreModule<TabState>({
          * @param index
          */
         [TabMutations.deleteTab]: (state, index: number) => {
-            state.Tabs.splice(index, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
-            saveBookMarkState(state)
+            state.TabsAdd.splice(index, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
+            state.tabIndex--;
+            console.log(state.tabIndex)
+            saveTabState(state)
         }
     }
 })
 
 // 保存数据节流防抖
-const saveBookMarkState = debounce((data: TabState) => {
+const saveTabState = debounce((data: TabState) => {
     const settingJson = JSON.stringify(data)
     localStorage.setItem(TAB_STORAGE, settingJson)
 }, 250)

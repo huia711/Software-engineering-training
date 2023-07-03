@@ -1,15 +1,15 @@
 /**
  * 导入（import）
  */
-import { createStoreModule } from "./index"
+import {createStoreModule} from "./index"
 // import { getBrowserTopSites, getFavicon } from "@/plugins/extension"
-import { SortData, BookMarkItem, BookMarks } from "@/enum-interface"
-import { copy } from "@/utils/common"
-import { debounce } from "@/utils/async"
+import {BookMarkItem, BookMarks, SortData} from "@/enum-interface"
+import {copy} from "@/utils/common"
+import {debounce} from "@/utils/async"
 import axios from "@/plugins/axios";
-import {verifyImageUrl} from "@/utils/file";
 import {ElMessage} from "element-plus";
-import { useI18n } from "vue-i18n";
+import {useI18n} from "vue-i18n";
+
 // import { verifyImageUrl } from "@/utils/file"
 
 /**
@@ -71,7 +71,7 @@ export default createStoreModule<BookMarkState>({
 
     // 从本地存储中读取
     const bookMarksData = JSON.parse(localStorage[BOOK_MARK_STORAGE] ?? "[]")
-    console.log(bookMarksData)
+    // console.log(bookMarksData)
     // 将本地存储中读取到的合并到默认状态中
     copy(bookMarksData, defaultState, true)
 
@@ -209,7 +209,13 @@ const saveBookMarkState = debounce((data: BookMarkState) => {
    * 上传新标签页到服务器
    */
   try {
-    axios.post('http://localhost:2020/user/newURL', data).then(response=> {
+    console.log(data.bookMarks)
+    // data.bookMarks.push({title: string,
+    // url: string,
+    // icon?: string,
+    // textIcon: boolean,
+    // custom: boolean})
+    axios.post('http://localhost:2020/user/newURL/', data.bookMarks).then(response=> {
       const { t } = useI18n()
       if (response.data.code === 200) {
         ElMessage({
@@ -226,7 +232,6 @@ const saveBookMarkState = debounce((data: BookMarkState) => {
   } catch (error) {
     console.log(error)
   }
-
 }, 250)
 
 // /**
