@@ -87,6 +87,7 @@ import { Document, Menu as IconMenu } from '@element-plus/icons-vue'
 import {BookMarkMutations} from "@/store/bookmark";
 import {Tabs} from "ant-design-vue";
 import {TabMutations} from "@/store/tab";
+import axios from 'axios'
 
 export default {
   data(){
