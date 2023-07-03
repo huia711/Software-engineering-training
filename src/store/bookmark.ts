@@ -6,10 +6,6 @@ import { createStoreModule } from "./index"
 import { SortData, BookMarkItem, BookMarks } from "@/enum-interface"
 import { copy } from "@/utils/common"
 import { debounce } from "@/utils/async"
-import axios from "@/plugins/axios";
-import {verifyImageUrl} from "@/utils/file";
-import {ElMessage} from "element-plus";
-import { useI18n } from "vue-i18n";
 // import { verifyImageUrl } from "@/utils/file"
 
 /**
@@ -89,6 +85,7 @@ export default createStoreModule<BookMarkState>({
     [BookMarkGetters.getCurrentBookMarks]: ({ bookMarks }, _, rootState) => {
       // 从根状态中获取topSite配置对象
       const bookMarkSetting = rootState.setting.bookMark
+      console.log(bookMarkSetting)
       // 根据配置筛选出前topSiteSetting.col * topSiteSetting.row项网站数据
       return bookMarks.filter((_item, index) => index < bookMarkSetting.col * bookMarkSetting.row)
     }
@@ -168,17 +165,10 @@ export default createStoreModule<BookMarkState>({
       const customBookMarks = state.bookMarks.filter(item => item.custom)
       // const list = await getBrowserTopSites()
 
-      // if(response.data.data.backgroundURL !== "null")
-      //   axios.get(response.data.data.backgroundURL).then(response=>{
-      //     if(response.data.code === 200){
-      //       response.data.data.image
-      //     }
-      //   })
-
       // // 并行校验图标是否有效
       // const bookMarks = await Promise.all(
       //   list.map<Promise<BookMarkItem>>(async item => {
-      //     const icon = item.favicon
+      //     const icon = item.favicon || getFavicon(item.url)
       //     const verify = await verifyImageUrl(icon)
       //
       //     return {
@@ -198,40 +188,8 @@ export default createStoreModule<BookMarkState>({
   }
 })
 
-/**
- * 保存数据节流防抖
- */
+// 保存数据节流防抖
 const saveBookMarkState = debounce((data: BookMarkState) => {
   const settingJson = JSON.stringify(data)
   localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
-
-  /**
-   * 上传新标签页到服务器
-   */
-  try {
-    axios.post('http://localhost:2020/user/newURL', data).then(response=> {
-      const { t } = useI18n()
-      if (response.data.code === 200) {
-        ElMessage({
-          message: t("bookmark.updateSuccess"),
-          type: "success",
-        })
-      }
-    },(error)=>{
-      ElMessage({
-        message: "无法连接服务器",
-        type: 'warning',
-      })
-    })
-  } catch (error) {
-    console.log(error)
-  }
-
 }, 250)
-
-// /**
-//  * 上传新标签页
-//  */
-// export function updateBookMark(data: BookMarkState) {
-//
-// }
