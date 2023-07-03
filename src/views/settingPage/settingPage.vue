@@ -7,7 +7,7 @@
                   <ul class="listStyle">
                       <li v-for="(option,index) of options" :key="index">
                           <modernButton
-                              :buttonText="option"
+                              :buttonText="t(option)"
                               :customButtonStyle="curSelected===index ? buttonSelectedStyle : buttonNotSelectedStyle"
                               :autoCalculation="index !== curSelected"
                               @buttonClicked="buttonClick(index)"
@@ -19,9 +19,8 @@
                   <!-- 右侧具体内容 -->
                   <basicSettings v-show="curSelected === 0" />
                   <backgroundPicture v-show="curSelected === 1" />
-                  <privacyPage v-show="curSelected === 2" />
-                  <advancePage v-show="curSelected === 3" />
-                  <aboutPage v-show="curSelected === 4"/>
+                  <advancePage v-show="curSelected === 2" />
+                  <aboutPage v-show="curSelected === 3"/>
           </div>
       </div>
   </div>
@@ -32,26 +31,28 @@ import modernButton from '@/components/basis/modernButton.vue'
 import basicSettings from './basicSettings.vue'
 import aboutPage from './AboutSettings.vue'
 import advancePage from './AdvanceSettings.vue'
-import privacyPage from './PrivacySettings.vue'
 import backgroundPicture from './backgroundPicture.vue'
 
 import cal from '@/utils/calculation'
 import { useStore } from '@/store'
 import { mapMutations } from 'vuex'
 import { computed } from '@vue/reactivity'
+import { useI18n } from 'vue-i18n'
 
 export default{
     setup(){
         const store = useStore();
+        const {t} = useI18n();
         return{
             pageColorStyle: computed(() => store.state.settings.pageColorStyle),
             buttonColor: computed(()=>store.state.settings.pageColorStyle.buttonColor.hex),
+            t
         }
     },
     data(){
         return{
             colorStyle: computed(()=>cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.backgroundColor.hex), this.pageColorStyle.backgroundColor.alpha)),
-            options:["通 用","壁 纸","隐 私","高 级","关 于"],
+            options:["settingPage.common.title","settingPage.wallpaper.title","settingPage.advance.title","settingPage.about.title"],
             curSelected: 0,
             curOn: -1,
             buttonSelectedStyle:{
@@ -59,6 +60,7 @@ export default{
                 borderRadius:"5px",
                 backgroundColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex), this.pageColorStyle.buttonColor.alpha),
                 outlineColor:"transparent",
+                fontColor:this.pageColorStyle.fontColor,
                 cursor:"pointer",
                 wordSpacing:"6px",
                 width:"150px",
@@ -72,6 +74,7 @@ export default{
                 backgroundColor: "transparent",
                 onColor: cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.buttonColor.hex), 0.15),
                 outlineColor:"transparent",
+                fontColor:this.pageColorStyle.fontColor,
                 cursor:"pointer",
                 wordSpacing:"6px",
                 width:"150px",
@@ -94,13 +97,16 @@ export default{
         pageColorStyle(newVal, oldVal){
             this.buttonSelectedStyle.backgroundColor = cal.rgbaTextSpawn(cal.hexToRgb(newVal.buttonColor.hex), newVal.buttonColor.alpha)
             this.buttonNotSelectedStyle.onColor = cal.rgbaTextSpawn(cal.hexToRgb(newVal.buttonColor.hex), 0.15)
+        },
+        'pageColorStyle.fontColor'(newVal){
+            this.buttonSelectedStyle.fontColor = newVal
+            this.buttonNotSelectedStyle.fontColor = newVal
         }
     },
     components:{
         modernButton,
         basicSettings,
         aboutPage,
-        privacyPage,
         advancePage,
         backgroundPicture
     }
@@ -117,7 +123,7 @@ export default{
   align-items: center;
   background-size: cover;
   background-attachment: scroll;
-  font-family: SmileySans,serif;
+  font-family: serif;
 }
 
 .global{

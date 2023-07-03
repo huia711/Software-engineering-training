@@ -105,7 +105,47 @@ export default {
     },
     handleClickOutside(){
       this.settingVisible = false
-      this.confirmSettings()
+      this.pageShadow = 0
+      this.confirmPageColorStyle()
+      if(this.store.state.settings.userId !== ""){
+        this.isSettingUploading = true
+        let data = {
+          "Id": this.store.state.settings.userId,
+          "backgroundColor": this.store.state.settings.pageColorStyle.backgroundColor.hex,
+          "backgroundAlpha": this.store.state.settings.pageColorStyle.backgroundColor.alpha,
+          "buttonColor": this.store.state.settings.pageColorStyle.buttonColor.hex,
+          "buttonAlpha": this.store.state.settings.pageColorStyle.buttonColor.alpha,
+          "customBackgroungColor": this.store.state.settings.pageColorStyle.customBackgroundColor,
+          "customButtonColor": this.store.state.settings.pageColorStyle.customButtonColor,
+          "presetColor": this.store.state.settings.pageColorStyle.presetColor,
+          "fontColor": this.store.state.settings.pageColorStyle.fontColor,
+          "searchItemCount": this.store.state.settings.searchItemCount
+        }
+        axios.post('http://localhost:2020/user/settings', data).then(response=>{
+          if(response.data.code === 400){
+            // 同步失败
+            this.settingUploadSuccess = -1
+            setTimeout(()=>{
+              this.settingUploadSuccess = 0
+            },5000)
+          } else {
+            this.settingUploadSuccess = 1
+          }
+          this.isSettingUploading = false
+        },error=>{
+          this.settingUploadSuccess = -1
+          this.isSettingUploading = false
+          console.log("ERROR:",error.message)
+          setTimeout(()=>{
+            this.settingUploadSuccess = 0
+          },5000)
+        })
+      } else {
+        this.settingUploadSuccess = -1
+        setTimeout(()=>{
+          this.settingUploadSuccess = 0
+        },5000)
+      }
     }
   },
   watch:{
@@ -150,7 +190,6 @@ export default {
       const element = document.getElementById('sec'+sec)
       element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
       page = sec
-      console.log("page"+page)
     }
 
     const removeTab = (targetName) => {
@@ -273,7 +312,7 @@ export default {
 
   @import '@/font/font.css';
   body {
-    font-family: SmileySans,serif;
+    font-family: serif;
   }
   .temp{
     display: flex;

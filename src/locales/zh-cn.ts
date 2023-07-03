@@ -92,6 +92,112 @@ export default {
     popup: {
         bookmark: "首页导航",
         searchHistory: "搜索历史"
+    },
+    elDialog: {
+        messages:{
+            warningTitle: "警告",
+            deleteSuccess: "删除成功",
+            deleteWarning: "确认删除账号？（账号将永久消失！）",
+        },
+        errorMessages:{
+            title: "错误",
+            errorTypes:{
+                uploadFailure: "上传失败:",
+                fetchFailure: "获取失败:",
+                deleteFailure: "删除失败:",
+                notLogined: "账号未登录！",
+                noImageClipped: "请选择截图区域！",
+                noCanvas: "无法处理图片！",
+                blankName: "新昵称不能为空！",
+                repeatName: "新昵称不能与原名相同！",
+                blankOldPassword: "原密码不能为空！",
+                blankNewPassword: "新密码不能为空！",
+                wrongPassword: "原密码错误！",
+                passwordNotEqual: "两次输入的密码不一致！"
+            }
+        },
+        buttons:{
+            confirm: "确定",
+            cancle: "取消"
+        }
+    },
+    loginPage: {
+        login:"登录",
+        register: "注册",
+        account: "账号：",
+        password: "密码：",
+        username: "昵称：",
+        confirmPassword: "确认密码：",
+        warnings:{
+            loginNotComplete: "账号或密码不能为空",
+            registerNotComplete: "用户昵称与密码不能为空",
+            serverUnreachable: "无法连接服务器",
+            passwordNotEqual: "两次输入的密码不一致"
+        }
+    },
+    userPage:{
+        username: "用户名：",
+        password: "密码：······",
+        logout: "退出登录",
+        deleteAccount: "删除账号",
+        imageClip:{
+            clipWindow: "截取头像",
+            upload: "上传图片",
+            preview: "预览",
+            close: "关闭"
+        },
+        editName:{
+            edit: "修改昵称：",
+            confirm: "确认修改",
+            cancle: "取消"
+        },
+        editPassword:{
+            oldPassword: "旧密码：",
+            newPassword: "新密码：",
+            confirmPassword: "确认密码：",
+            confirm: "确认修改",
+            cancle: "取消"
+        }
+    },
+    settingPage: {
+        common: {
+            title: "通用",
+            settings: {
+                theme:{
+                    title: "主题颜色",
+                    customizedBackgroundColor: "自定义背景颜色",
+                    customizedButtonColor: "自定义按钮颜色",
+                    fontColor: "字体颜色",
+                    presetColor: "预设主题颜色",
+                    preview: "预览",
+                    dayMode: "白天模式",
+                    nightMode: "夜间模式"
+                },
+                lang: {
+                    title: "语言设置"
+                }
+            }
+        },
+        wallpaper: {
+            title: "壁纸",
+            reload: "重新加载",
+            webImages: "网络图片",
+            uploadImages: {
+                title: "上传图片",
+                tips: "点击选择本地图片文件",
+                links: "您也可在此输入图片链接"
+            },
+            confirm: "确认上传"
+        },
+        advance: {
+            title: "搜索",
+            maxSearchCount: "最大搜索结果数量",
+        },
+        about: {
+            title: "关于",
+            author: "软件中级实训制作组",
+            rights: "2023 版权所有",
+        }
     }
 };
 

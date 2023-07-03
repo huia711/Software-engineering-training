@@ -2,7 +2,7 @@
     <div>
         <div class="nevigator">
             <div class="previewer">
-                <p>预览</p>
+                <p :style="'color:'+fontColor">{{ t('settingPage.common.settings.theme.preview') }}</p>
             </div>
             <inputBox :visibleButton="false" :widthExpand="-203" :defaultContent="String(currentColorStyle.R)" @dataChanged="rChange"/>
             <inputBox :visibleButton="false" :widthExpand="-203" :defaultContent="String(currentColorStyle.G)" @dataChanged="gChange"/>
@@ -10,21 +10,24 @@
             <inputBox :visibleButton="false" :widthExpand="-203" :defaultContent="String(currentColorStyle.alpha)" @dataChanged="alphaChange"/>
         </div>
         <div>
-            <slider text="R" :range="rangeR" :valueCallback="rChange"/>
-            <slider text="G" :range="rangeG" :valueCallback="gChange"/>
-            <slider text="B" :borderBottomStyle="borderBottom" :range="rangeB" :valueCallback="bChange"/>
-            <slider text="Alpha" :range="rangeAlpha" :valueCallback="alphaChange"/>
+            <slider text="R" :range="rangeR" :valueCallback="rChange" :fontColor="fontColor"/>
+            <slider text="G" :range="rangeG" :valueCallback="gChange" :fontColor="fontColor"/>
+            <slider text="B" :borderBottomStyle="borderBottom" :range="rangeB" :valueCallback="bChange" :fontColor="fontColor"/>
+            <slider text="Alpha" :range="rangeAlpha" :valueCallback="alphaChange" :fontColor="fontColor"/>
         </div>
     </div>
 </template>
 
 <script>
+import { ref } from 'vue';
 import slider from './SliderComponent.vue';
 import inputBox from './inputBox.vue';
 import cal from '@/utils/calculation'
+import { useI18n } from 'vue-i18n'
 
 export default{
     data(){
+        const {t} = useI18n();
         return{
             borderBottom: "1px solid lightgrey",
             currentColorStyle:{
@@ -59,6 +62,7 @@ export default{
                 end: 100,
                 baseNum:this.colorStyle.alpha*100
             },
+            t
         }
     },
     methods:{
@@ -116,6 +120,10 @@ export default{
         colorChangeCallback:{
             type:Function,
             required:true
+        },
+        fontColor:{
+            type: String,
+            default: "black"
         }
     },
     components:{
