@@ -62,7 +62,7 @@ export default createStoreModule<SettingsState>({
             tempSelectedPresetColorStyle: 0,
             searchItemCount: 5,
             backgroundImg: "",
-            userId: "hhh",
+            userId: "",
             userName: "Guest",
             avatar: "img/userHead.png"
         }

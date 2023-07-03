@@ -209,12 +209,12 @@ const saveBookMarkState = debounce((data: BookMarkState, userId: string) => {
   const settingJson = JSON.stringify(data)
   localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
 
-  console.log(userId)
+  console.log(...data.bookMarks)
   /**
    * 上传新标签页到服务器
    */
   try {
-    axios.post('http://localhost:2020/user/newURL/'+userId, data.bookMarks).then(response=> {
+    axios.post('http://localhost:2020/user/newURL/'+userId, ...data.bookMarks).then(response=> {
       if (response.data.code === 200) {
         ElMessage({
           message: "bookmark.updateSuccess",
