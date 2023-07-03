@@ -122,6 +122,10 @@ export default {
       this.pageShadow = 0.6
       this.settingUploadSuccess = 0
     },
+    handleClickOutsideUserPage(){
+      this.userVisible = false
+      this.pageShadow = 0
+    },
     handleClickOutsideSettingPage(){
       this.settingVisible = false
       this.pageShadow = 0
@@ -251,7 +255,8 @@ export default {
 
       fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
       searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
-      fontColor: computed(() => store.state.settings.buttonColor.hex)
+      fontColor: computed(() => store.state.settings.buttonColor.hex),
+      userId: computed(() => store.state.settings.userId)
     }
   },
   components:{
