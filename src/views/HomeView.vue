@@ -99,15 +99,28 @@ export default {
       settingVisible: false,
       imgStyle: computed(() => store.state.settings.imgStyle),
       backgroungImage: computed(() => store.state.settings.backgroundImg),
-      tabs: computed(() => store.state.tab.Tabs)
+      tabs: computed(() => store.state.tab.Tabs),
+      pageShadow: 0,
+      settingUploadSuccess: 0
     }
   },
   methods:{
-    ...mapMutations(['confirmSettings']),
-    settingVisibleState (stat) {
-      this.settingVisible = stat
+    ...mapMutations(['confirmPageColorStyle']),
+    userPageClicked () {
+      if(this.userId !== ""){
+        // 个人页面
+        this.userVisible = true
+        this.pageShadow = 0.6
+      } else {
+        this.$router.push('/register')
+      }
     },
-    handleClickOutside(){
+    settingVisibleState () {
+      this.settingVisible = true
+      this.pageShadow = 0.6
+      this.settingUploadSuccess = 0
+    },
+    handleClickOutsideSettingPage(){
       this.settingVisible = false
       this.pageShadow = 0
       this.confirmPageColorStyle()
@@ -232,6 +245,7 @@ export default {
       handleScroll,
       scroll,
       removeTab,
+      store,
 
       fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
       searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
