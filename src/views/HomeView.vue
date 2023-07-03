@@ -1,37 +1,46 @@
 <template>
   <!-- 背景 -->
   <div id="wallpaper">
-    <div id="setting-background">
-      <main id="main" class="main" @scroll="handleScroll">
+  <div id="setting-background">
+  <main id="main" class="main" @scroll="handleScroll">
+    <!-- 背景 -->
 
-        <section class="sec1" id="sec1">
-          <!-- 搜索框 -->
-          <search class="search" :value="searchText"/>
-          <BookMark/>
-        </section>
+    <section class="sec1" id="sec1">
+      <!-- 搜索框 -->
+      <search class="search" :value="searchText"/>
+      <BookMark/>
+    </section>
 
-        <section class="sec2" id="sec2">
-          <BookMark/>
-        </section>
+    <section class="sec2" id="sec2">
+      <BookMark/>
+    </section>
 
-        <!-- 设置目录 -->
-        <el-menu
-            :default-active = page.toString()
-            class="el-menu-left"
-            :collapse="isCollapse"
-        >
-          <el-menu-item index="1" id="menu1" @click="scroll('1')">
-            <el-icon><IconMenu/></el-icon>
-            <template #title> {{menu1}} </template>
-          </el-menu-item>
+    <!-- 设置标签页 -->
+    <el-tabs
+        v-model="page"
+        type="border-card"
+        closable
+        class="el-tabs"
+        tab-position="left"
+        @tab-remove="removeTab"
+    >
+      <el-tab-pane
+          v-for="item in tabs"
+          :key="item.num"
+          :label="item.title"
+          :name="item.title"
+          @click="scroll(item.num)"
+      >
+        <template #label>
+          <span class="custom-tabs-label">
+            <el-icon><IconMenu /></el-icon>
+            <span>{{ item.title }}</span>
+          </span>
+        </template>
+      </el-tab-pane>
+    </el-tabs>
 
-          <el-menu-item index="2" id="menu2" @click="scroll('2')">
-            <el-icon><Document/></el-icon>
-            <template #title>Navigator Four</template>
-          </el-menu-item>
-        </el-menu>
-
-        <div class="entries">
+    <div class="entries">
           <div @click="userPageClicked"><el-button round><el-icon><User /></el-icon></el-button></div>
           <div @click="settingVisibleState">
             <el-button round :loading="isSettingUploading">
@@ -58,8 +67,8 @@
               v-click-outside="handleClickOutsideSettingPage"
           />
         </div>
-      </main>
-    </div>
+  </main>
+  </div>
   </div>
 </template>
 
@@ -75,13 +84,17 @@ import axios from "@/plugins/axios"
 // 导入组件Component
 import Search from "@/views/home/IndexSearch.vue"
 import settingPage from '@/views/settingPage/settingPage.vue'
-import userPage from "./userPage/userPage.vue"
 import BookMark from '@/views/home/BookMark.vue'
+import userPage from '@/views/userPage/userPage.vue'
 // 外部导入
 import $ from 'jquery';
 import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
-import { Document, Menu as IconMenu, Setting, User, Close, Check } from '@element-plus/icons-vue'
+import { Menu as IconMenu, User, Setting, Close, Check } from '@element-plus/icons-vue'
+import {BookMarkMutations} from "@/store/bookmark";
+import {Tabs} from "ant-design-vue";
+import {TabMutations} from "@/store/tab";
+import axios from 'axios'
 
 export default {
   data(){
@@ -91,10 +104,11 @@ export default {
       userVisible: false,
       imgStyle: computed(() => store.state.settings.imgStyle),
       backgroungImage: computed(() => store.state.settings.backgroundImg),
-      userId: computed( ()=> store.state.settings.userId),
+      tabs: computed(() => store.state.tab.Tabs),
       pageShadow: 0,
+      settingUploadSuccess: 0
+      userId: computed( ()=> store.state.settings.userId),
       isSettingUploading: false,
-      settingUploadSuccess: 0,
       store
     }
   },
@@ -234,9 +248,11 @@ export default {
       isCollapse,
       handleScroll,
       scroll,
+      removeTab,
 
       fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
       searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数
+      fontColor: computed(() => store.state.settings.buttonColor.hex),
     }
   },
   components:{
@@ -245,11 +261,10 @@ export default {
     userPage,
     BookMark,
     IconMenu,
-    Document,
     Setting,
+    User,
     Close,
-    Check,
-    User
+    Check
   }
 }
 
@@ -279,6 +294,16 @@ export default {
     right: 0;
     bottom: 0;
     z-index: -100;
+  }
+
+  #setting-background {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    transition: all 0.3s linear;
+    background-color: v-bind("'rgba(0,0,0,' + pageShadow +')'");
   }
 
   #wallpaper.backgroundImg {
@@ -391,6 +416,41 @@ export default {
   }
 
   #setting-page.slide_out{
+    opacity: 0;
+  }
+
+  .entries{
+    display: flex;
+    flex-direction: row;
+    font-family: 'SmileySans';
+    justify-content: space-around;
+    position: fixed;
+    top: 5%;
+    right: 5%;
+    z-index: 0;
+  }
+
+  #user-page {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: -40%;
+    left: 35%;
+    transform: scale(0.1);
+    z-index: -100;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  #user-page.slide_in{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) scale(1);
+    z-index: 100;
+    opacity: 1;
+  }
+
+  #user-page.slide_out{
     opacity: 0;
   }
 </style>
