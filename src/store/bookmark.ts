@@ -113,7 +113,11 @@ export default createStoreModule<BookMarkState>({
       state.bookMarks[data.index] = data
       saveBookMarkState(state, userId)
     },
-
+    updateBookMark (state, payload: { data: BookMarkItemVo, userId: string }) {
+      const { data, userId } = payload
+      state.bookMarks[data.index] = data
+      saveBookMarkState(state, userId)
+    },
     /**
      * 删除导航
      * @param state
@@ -163,22 +167,22 @@ export default createStoreModule<BookMarkState>({
       saveBookMarkState(state, userId)
     }
   },
-  // actions: {
-  //   /**
-  //    * 同步浏览器导航
-  //    * 从浏览器获取最近浏览
-  //    * @param param0
-  //    */
-  //   [BookMarkActions.syncBrowserBookMarks]: async ({ state, commit }) => {
-  //     const now = Date.now()
-  //     // 找出自定义标签
-  //     const customBookMarks = state.bookMarks.filter(item => item.custom)
-  //     commit(BookMarkMutations.updateBookMarks, customBookMarks.concat(customBookMarks))
-  //
-  //     console.log("load browser top-sites:", `${Date.now() - now}ms`)
-  //     commit(BookMarkMutations.editLastUpdateTime, now)
-  //   }
-  // }
+  actions: {
+    /**
+     * 同步浏览器导航
+     * 从浏览器获取最近浏览
+     * @param param0
+     */
+    [BookMarkActions.syncBrowserBookMarks]: async ({ state, commit }) => {
+      const now = Date.now()
+      // 找出自定义标签
+      const customBookMarks = state.bookMarks.filter(item => item.custom)
+      commit(BookMarkMutations.updateBookMarks, customBookMarks.concat(customBookMarks))
+
+      console.log("load browser top-sites:", `${Date.now() - now}ms`)
+      commit(BookMarkMutations.editLastUpdateTime, now)
+    }
+  }
 })
 
 /**

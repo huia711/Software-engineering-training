@@ -84,7 +84,7 @@ export default{
         }
     },
     methods:{
-        ...mapMutations(['setUserName','setUserId','setAvatar','initSettings','setBackgroundImage'],['updateBookMarks']),
+        ...mapMutations(['setUserName','setUserId','setAvatar','initSettings','setBackgroundImage','updateBookMarks']),
         loginButtonClicked(){
             if(this.registerMode === false){
                 if(this.account === "" || this.passwd === "")

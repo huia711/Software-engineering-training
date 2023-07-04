@@ -24,7 +24,7 @@
 
       <!-- 设置标签页 -->
       <el-tabs
-          v-model="page"
+          v-model=pageNow
           type="card"
           class="el-tabs"
           tab-position="left"
