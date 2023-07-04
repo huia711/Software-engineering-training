@@ -196,7 +196,7 @@ export default{
                                   custom = response.data.data.custom.split(' ')
 
                                   // 遍历5个数组，初始化bookmark
-                                  for(let i = 0; i < title.length; i++) {
+                                  for(let i = 0; i < title.length -1; i++) {
                                     const bookMark = {
                                       title: title[i],
                                       url: url[i],
