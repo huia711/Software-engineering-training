@@ -85,7 +85,7 @@ async function loadWebPicture(){
       const imageURLs = String(response.data.data.url).split(',')
       const imageDescriptions = String(response.data.data.description).split(',')
       var i = 0
-      for(i = 0; i < imageURLs.length; i++){
+      for(i = 0; i < imageURLs.length - 1; i++){
         // 根据URL数组从服务器获取图片数据
         let description = imageDescriptions[i]??''
         axios.get(imageURLs[i]).then(response=>{
