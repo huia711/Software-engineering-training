@@ -8,7 +8,7 @@
         <!-- 搜索框 -->
         <search :value="searchText"/>
         <div style="margin-bottom: 20px">
-          <el-button size="small" @click="addTab(editableTabsValue)">
+          <el-button size="small" @click="addTab(page)">
             add tab
           </el-button>
         </div>
