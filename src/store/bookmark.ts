@@ -33,7 +33,8 @@ export enum BookMarkMutations {
   deleteBookMark = "DELETE_BOOK_MARK",
   sortBookMarks = "SORT_BOOK_MARKS",
   updateBookMarks = "UPDATE_BOOK_MARKS",
-  editLastUpdateTime = "EDIT_LAST_UPDATE_TIME"
+  editLastUpdateTime = "EDIT_LAST_UPDATE_TIME",
+  updatePageNow = "UPDATE_PAGE_NOW"
 }
 
 // getter
@@ -113,11 +114,6 @@ export default createStoreModule<BookMarkState>({
       state.bookMarks[data.index] = data
       saveBookMarkState(state, userId)
     },
-    updateBookMark (state, payload: { data: BookMarkItemVo, userId: string }) {
-      const { data, userId } = payload
-      state.bookMarks[data.index] = data
-      saveBookMarkState(state, userId)
-    },
     /**
      * 删除导航
      * @param state
@@ -149,7 +145,14 @@ export default createStoreModule<BookMarkState>({
      * @param state
      * @param topSites
      */
-    [BookMarkMutations.updateBookMarks]: (state, bookMarks: BookMarks) => {
+    // [BookMarkMutations.updateBookMarks]: (state, bookMarks: BookMarks) => {
+    //   state.bookMarks = bookMarks
+    //   // save
+    //   const settingJson = JSON.stringify(state)
+    //   localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
+    // },
+
+    updateBookMarks (state, bookMarks: any) {
       state.bookMarks = bookMarks
       // save
       const settingJson = JSON.stringify(state)
@@ -165,6 +168,13 @@ export default createStoreModule<BookMarkState>({
       const { newTime, userId } = payload
       state.lastUpdateTime = newTime
       saveBookMarkState(state, userId)
+    },
+
+    /**
+     * 更新页面
+     */
+    [BookMarkMutations.updatePageNow]: (state, pageNow: number) => {
+      state.pageNow = pageNow
     }
   },
   actions: {

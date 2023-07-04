@@ -121,6 +121,7 @@ import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
 import {Check, Close, Document, Menu as IconMenu, Setting, User} from '@element-plus/icons-vue'
 import axios from "@/plugins/axios";
+import { BookMarkMutations } from "@/store/bookmark";
 
 export default {
   data(){
@@ -229,7 +230,11 @@ export default {
     const { t } = useI18n()
 
     const menu1 = ref(t('home.MainTab'))
-    const pageNow = computed(() => store.state.bookMark.pageNow)
+
+    const pageNow = computed({
+      get: () => store.state.bookMark.pageNow,
+      set: pageNow => store.commit(BookMarkMutations.updatePageNow, pageNow)
+    })
     const tabs =  computed(() => store.state.tab.Tabs)
     const tabsAdd = computed(() => store.state.tab.TabsAdd)
     let tabIndex = computed(() => store.state.tab.tabIndex)
@@ -277,6 +282,7 @@ export default {
       commit(TabMutations.deleteTab, targetName)
     }
 
+    // 钩子
     onMounted(()=>{
       if(store.state.settings.backgroundImg !== ""){
         $("#wallpaper").addClass("backgroundImg");
