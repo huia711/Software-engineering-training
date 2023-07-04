@@ -146,8 +146,8 @@
     if (isEmpty(queryString)) {
       results = searchSuggestion.value
     } else {
-      // // 获得api搜索建议
-      // const suggestion: string[] = dispatch(SearchActions.getSuggestion, queryString)
+      // 获得api搜索建议
+      const suggestion: string[] = dispatch(SearchActions.getSuggestion, queryString)
       // searchSuggestion.value = suggestion.map((item) => {
       //   return {
       //     title: '',

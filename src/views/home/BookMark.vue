@@ -271,20 +271,20 @@
     data.showAddModal = false
   }
 
-  // 初始化应用程序
-  // init：检查应用程序内存储的数据中是否包含已有的顶部网站更新时间信息，如果没有，则调用TopSiteActions.syncBrowserTopSites异步函数从浏览器API中同步顶部网站数据。
-  async function init() {
-    if (!state.bookMark.lastUpdateTime) {
-      await dispatch(BookMarkActions.syncBrowserBookMarks)
-    }
-  }
-
-  /**
-   * 生命周期函数onBeforeMount
-   */
-  // onBeforeMount：生命周期函数之一，组件的实例被创建后，mounted生命周期函数被调用之前
-  // 组件挂载前执行，以确保在组件渲染前先初始化顶部网站数据
-  onBeforeMount(init)
+  // // 初始化应用程序
+  // // init：检查应用程序内存储的数据中是否包含已有的顶部网站更新时间信息，如果没有，则调用TopSiteActions.syncBrowserTopSites异步函数从浏览器API中同步顶部网站数据。
+  // async function init() {
+  //   if (!state.bookMark.lastUpdateTime) {
+  //     await dispatch(BookMarkActions.syncBrowserBookMarks)
+  //   }
+  // }
+  //
+  // /**
+  //  * 生命周期函数onBeforeMount
+  //  */
+  // // onBeforeMount：生命周期函数之一，组件的实例被创建后，mounted生命周期函数被调用之前
+  // // 组件挂载前执行，以确保在组件渲染前先初始化顶部网站数据
+  // onBeforeMount(init)
 </script>
 
 <style lang="less">

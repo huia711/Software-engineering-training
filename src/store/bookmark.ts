@@ -72,7 +72,6 @@ export default createStoreModule<BookMarkState>({
     // 从本地存储中读取
     const topSitesData = JSON.parse(localStorage[BOOK_MARK_STORAGE] ?? "[]")
     copy(topSitesData, defaultState, true)
-
     return defaultState
   },
 
@@ -140,14 +139,15 @@ export default createStoreModule<BookMarkState>({
     },
 
     /**
-     * 更新导航栏
+     * （从服务端）更新导航栏
      * @param state
      * @param topSites
      */
-    [BookMarkMutations.updateBookMarks]: (state, payload: { bookMarks: BookMarks, userId: string }) => {
-      const { bookMarks, userId } = payload
+    [BookMarkMutations.updateBookMarks]: (state, bookMarks: BookMarks) => {
       state.bookMarks = bookMarks
-      saveBookMarkState(state, userId)
+      // save
+      const settingJson = JSON.stringify(state)
+      localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
     },
 
     /**
@@ -161,45 +161,22 @@ export default createStoreModule<BookMarkState>({
       saveBookMarkState(state, userId)
     }
   },
-  actions: {
-    /**
-     * 同步浏览器导航
-     * 从浏览器获取最近浏览
-     * @param param0
-     */
-    [BookMarkActions.syncBrowserBookMarks]: async ({ state, commit }) => {
-      const now = Date.now()
-      const customBookMarks = state.bookMarks.filter(item => item.custom)
-      // const list = await getBrowserTopSites()
-
-      // if(response.data.data.backgroundURL !== "null")
-      //   axios.get(response.data.data.backgroundURL).then(response=>{
-      //     if(response.data.code === 200){
-      //       response.data.data.image
-      //     }
-      //   })
-
-      // // 并行校验图标是否有效
-      // const bookMarks = await Promise.all(
-      //   list.map<Promise<BookMarkItem>>(async item => {
-      //     const icon = item.favicon
-      //     const verify = await verifyImageUrl(icon)
-      //
-      //     return {
-      //       title: item.title ?? "无标题",
-      //       url: item.url,
-      //       icon: verify ? icon : undefined,
-      //       textIcon: !verify,
-      //       custom: false
-      //     }
-      //   })
-      // )
-
-      // console.log("load browser top-sites:", `${Date.now() - now}ms`)
-      // commit(BookMarkMutations.updateBookMarks, customBookMarks.concat(bookMarks))
-      commit(BookMarkMutations.editLastUpdateTime, now)
-    }
-  }
+  // actions: {
+  //   /**
+  //    * 同步浏览器导航
+  //    * 从浏览器获取最近浏览
+  //    * @param param0
+  //    */
+  //   [BookMarkActions.syncBrowserBookMarks]: async ({ state, commit }) => {
+  //     const now = Date.now()
+  //     // 找出自定义标签
+  //     const customBookMarks = state.bookMarks.filter(item => item.custom)
+  //     commit(BookMarkMutations.updateBookMarks, customBookMarks.concat(customBookMarks))
+  //
+  //     console.log("load browser top-sites:", `${Date.now() - now}ms`)
+  //     commit(BookMarkMutations.editLastUpdateTime, now)
+  //   }
+  // }
 })
 
 /**

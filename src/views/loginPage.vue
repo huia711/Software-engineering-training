@@ -37,6 +37,8 @@ import { useStore } from '@/store';
 import $ from 'jquery'
 import axios from "@/plugins/axios"
 import { mapMutations } from 'vuex';
+import {BookMarkItem} from "@/enum-interface";
+import {BookMarkMutations} from "@/store/bookmark";
 
 export default{
     setup(){
@@ -97,7 +99,7 @@ export default{
                         "password" : this.passwd,
                         "confirmPassword": this.confPasswd
                     }
-                    console.log(JSON.stringify(data))
+                    // console.log(JSON.stringify(data))
                     try {
                         axios.post('http://localhost:2020/user/login', data).then(response=>{
                             if(response.data.code === 200){
@@ -182,12 +184,59 @@ export default{
                                  *  data:...  <= 标签页数据
                                  * }
                                  */
-                                // if(response.data.data.bookMarks !== "null") {
-                                //   axios.get(response.data.data.bookMarks).then(response=>{
-                                //     let bookMark = response.data.data.image;
-                                //     saveBookMarkState(state)
-                                //   })
-                                // }
+                                if(response.data.data.title !== "null") {
+                                  let title = []
+                                  let url = []
+                                  let icon =[]
+                                  let textIcon = []
+                                  let custom = []
+                                  let bookMarks = []
+
+                                  axios.get(response.data.data.title).then(response=>{
+                                    if(response.data.code === 200){
+                                    const str = response.data.data.title
+                                    title = str.split(' ')
+                                    }
+                                  })
+                                  axios.get(response.data.data.url).then(response=>{
+                                    if(response.data.code === 200){
+                                      const str = response.data.data.url
+                                      url = str.split(' ')
+                                    }
+                                  })
+                                  axios.get(response.data.data.icon).then(response=>{
+                                    if(response.data.code === 200){
+                                      const str = response.data.data.icon
+                                      icon = str.split(' ')
+                                    }
+                                  })
+                                  axios.get(response.data.data.textIcon).then(response=>{
+                                    if(response.data.code === 200){
+                                      const str = response.data.data.textIcon
+                                      textIcon = str.split(' ')
+                                    }
+                                  })
+                                  axios.get(response.data.data.custom).then(response=>{
+                                    if(response.data.code === 200){
+                                      const str = response.data.data.custom
+                                      custom = str.split(' ')
+                                    }
+                                  })
+
+                                  // 遍历5个数组，初始化bookmark
+                                  for(let i = 0; i < title.length; i++) {
+                                    const bookMark = {
+                                      title: title[i],
+                                      url: url[i],
+                                      icon: icon[i],
+                                      textIcon: textIcon[i],
+                                      custom: custom[i]
+                                    }
+                                    bookMarks.push(bookMark)
+                                  }
+                                  const { commit } = useStore()
+                                  commit(BookMarkMutations.updateBookMarks, bookMarks)
+                                }
 
                               this.spinnerZIndex = false
                               this.closePage()
