@@ -4,6 +4,7 @@ export interface BookMarkItem {
     icon?: string
     textIcon: boolean
     custom: boolean
+    page: number
 }
 
 export type BookMarks = Array<BookMarkItem>

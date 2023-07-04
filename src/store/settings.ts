@@ -65,6 +65,7 @@ export default createStoreModule<SettingsState>({
             userId: "",
             userName: "Guest",
             avatar: "img/userHead.png"
+
         }
 
         return defaultState

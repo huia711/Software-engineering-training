@@ -84,7 +84,7 @@ export default{
         }
     },
     methods:{
-        ...mapMutations(['setUserName','setUserId','setAvatar','initSettings','setBackgroundImage']),
+        ...mapMutations(['setUserName','setUserId','setAvatar','initSettings','setBackgroundImage','updateBookMarks']),
         loginButtonClicked(){
             if(this.registerMode === false){
                 if(this.account === "" || this.passwd === "")
@@ -191,37 +191,11 @@ export default{
                                   let textIcon = []
                                   let custom = []
                                   let bookMarks = []
-
-                                  axios.get(response.data.data.title).then(response=>{
-                                    if(response.data.code === 200){
-                                    const str = response.data.data.title
-                                    title = str.split(' ')
-                                    }
-                                  })
-                                  axios.get(response.data.data.url).then(response=>{
-                                    if(response.data.code === 200){
-                                      const str = response.data.data.url
-                                      url = str.split(' ')
-                                    }
-                                  })
-                                  axios.get(response.data.data.icon).then(response=>{
-                                    if(response.data.code === 200){
-                                      const str = response.data.data.icon
-                                      icon = str.split(' ')
-                                    }
-                                  })
-                                  axios.get(response.data.data.textIcon).then(response=>{
-                                    if(response.data.code === 200){
-                                      const str = response.data.data.textIcon
-                                      textIcon = str.split(' ')
-                                    }
-                                  })
-                                  axios.get(response.data.data.custom).then(response=>{
-                                    if(response.data.code === 200){
-                                      const str = response.data.data.custom
-                                      custom = str.split(' ')
-                                    }
-                                  })
+                                  title = response.data.data.title.split(' ')
+                                  url = response.data.data.url.split(' ')
+                                  icon = response.data.data.icon.split(' ')
+                                  textIcon = response.data.data.textIcon.split(' ')
+                                  custom = response.data.data.custom.split(' ')
 
                                   // 遍历5个数组，初始化bookmark
                                   for(let i = 0; i < title.length; i++) {
@@ -234,8 +208,7 @@ export default{
                                     }
                                     bookMarks.push(bookMark)
                                   }
-                                  const { commit } = useStore()
-                                  commit(BookMarkMutations.updateBookMarks, bookMarks)
+                                  this.updateBookMarks(bookMarks)
                                 }
 
                               this.spinnerZIndex = false

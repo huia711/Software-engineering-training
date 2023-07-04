@@ -229,7 +229,7 @@ export default {
     const { t } = useI18n()
 
     const menu1 = ref(t('home.MainTab'))
-    let page = 1
+    const page = computed(() => store.state.bookMark.page)
     const tabs =  computed(() => store.state.tab.Tabs)
     const tabsAdd = computed(() => store.state.tab.TabsAdd)
     let tabIndex = computed(() => store.state.tab.tabIndex)
@@ -247,8 +247,8 @@ export default {
       console.log("success")
       const element = document.getElementById('sec'+sec)
       element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
-      page = sec
-      console.log("page"+page)
+      page.value = sec
+      console.log("page"+page.value)
     }
 
     const addTab = (targetName) => {
@@ -270,7 +270,7 @@ export default {
       main.appendChild(newSection)
 
       //
-      page = newTabName
+      page.value = newTabName
     }
 
     const removeTab = (targetName) => {
@@ -292,7 +292,6 @@ export default {
       window.removeEventListener('scroll', handleScroll)
     })
     return {
-      page,
       menu1,
       handleScroll,
       scroll,

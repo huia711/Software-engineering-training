@@ -18,6 +18,7 @@ import {useI18n} from "vue-i18n";
 export interface BookMarkState {
   bookMarks: BookMarks
   lastUpdateTime?: number
+  pageNow: number
 }
 
 //
@@ -66,7 +67,8 @@ export default createStoreModule<BookMarkState>({
 
       // 创建一个数组保存网站
       bookMarks: [],
-      lastUpdateTime: undefined
+      lastUpdateTime: undefined,
+      pageNow: 1
     }
 
     // 从本地存储中读取
@@ -186,7 +188,7 @@ const saveBookMarkState = debounce((data: BookMarkState, userId: string) => {
   const settingJson = JSON.stringify(data)
   localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
 
-  const postData = data.bookMarks.map(item => JSON.parse(`{"title":"${item.title}", "url":"${item.url}", "icon":"${item.icon}", "textIcon":"${item.textIcon}", "custom":"${item.custom}"}`));
+  const postData = data.bookMarks.map(item => JSON.parse(`{"title":"${item.title}", "url":"${item.url}", "icon":"${item.icon}", "textIcon":"${item.textIcon}", "custom":"${item.custom}"},{"page":"${item.page}"`));
   console.log(JSON.stringify(postData))
   /**
    * 上传新标签页到服务器
