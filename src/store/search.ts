@@ -2,8 +2,10 @@
  * 导入（import）
  */
 import {createStoreModule} from "./index"
-import {HistoryItem, SearchData, SearchEngineData, SearchSuggestion,} from "@/enum-interface"
+import {HistoryItem, SearchData, SearchEngineData, SearchSuggestion, SortData,} from "@/enum-interface"
 import {getBaiduSuggestion, getBingSuggestion, getGoogleSuggestion} from "@/api/suggestion"
+import axios from "@/plugins/axios";
+import {ElMessage} from "element-plus";
 
 /**
  * 自定义类型（type）的定义
@@ -87,6 +89,11 @@ export default createStoreModule<SearchState>({
    * state
    */
   state() {
+    const newHistory: HistoryItem = {
+      engineId: '121212',
+      searchText: 'search',
+      timestamp: Date.now()
+    }
     // 设置默认状态值
     const defaultState: SearchState = {
       searchEngines: { ...searchEnginesData },
@@ -98,7 +105,8 @@ export default createStoreModule<SearchState>({
     // const searchEngines = JSON.parse(localStorage[SEARCH_ENGINES_STORAGE] ?? "{}")
     // // 将本地存储中读取到的搜索引擎列表合并到默认状态中
     // Object.assign(defaultState.searchEngines, searchEngines)
-
+    const dataJson = JSON.stringify(newHistory)
+    localStorage.setItem(SEARCH_HISTORY_STORAGE, dataJson)
     // 从本地存储中读取历史搜索记录
     const history = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
     Object.assign(defaultState.history, history)
@@ -133,18 +141,18 @@ export default createStoreModule<SearchState>({
      * @param param0
      * @param newHistory
      */
-    [SearchMutations.putHistory]: (state, newHistory: HistoryItem) => {
+    [SearchMutations.putHistory]: (state,  payload: { newHistory: HistoryItem, userID: string }) => {
+      const { newHistory, userID } = payload
       let history: Array<HistoryItem> = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
-
+      console.log(history)
       // 去重并在头添加
       history = history.filter(item => item.searchText !== newHistory.searchText)
       // 在头添加(最新的在前面）
       history.unshift(newHistory)
-
       // 将更新后的历史记录数组保存到 Vuex 状态
       state.history = history
 
-      saveSearchHistory(history)
+      saveSearchHistory(history, userID)
     },
 
     /**
@@ -152,12 +160,13 @@ export default createStoreModule<SearchState>({
      * @param param0
      * @param index
      */
-    [SearchMutations.deleteHistory]: (state, index: number) => {
+    [SearchMutations.deleteHistory]: (state, payload: { index: number, userID: string }) => {
+      const { index, userID } = payload
       const history: Array<HistoryItem> = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
       history.splice(index, 1)
 
       state.history = history
-      saveSearchHistory(history)
+      saveSearchHistory(history, userID)
     },
 
     /**
@@ -177,6 +186,18 @@ export default createStoreModule<SearchState>({
       state.history = []
       localStorage.removeItem(SEARCH_HISTORY_STORAGE)
     },
+
+    /**
+     * （从服务端）更新导航栏
+     * @param state
+     * @param history
+     */
+    updateHistory (state, history) {
+      state.history = history
+      // save
+      const settingJson = JSON.stringify(state)
+      localStorage.setItem(SEARCH_HISTORY_STORAGE, settingJson)
+    }
     //
     //   // 添加自定义搜索引擎
     //   [SearchMutations.addSearchEngine]: (state, data: SearchEngineItem) => {
@@ -196,6 +217,7 @@ export default createStoreModule<SearchState>({
     //     state.searchEngines = searchEnginesNew
     //     // saveSearchEngineData(searchEnginesNew)
     //   }
+
   },
 
   /**
@@ -278,9 +300,11 @@ export default createStoreModule<SearchState>({
 /**
  * 将搜索历史保存到本地存储
  * @param data 搜索历史数据
+ * @param userID
  */
-function saveSearchHistory(data: Array<HistoryItem>) {
+function saveSearchHistory(data: Array<HistoryItem>, userID: string) {
   const length = data.length
+  console.log(data)
 
   // 如果历史记录超过了最大值，则从末尾删除多余项
   if (length > SEARCH_HISTORY_LENGTH) {
@@ -290,5 +314,28 @@ function saveSearchHistory(data: Array<HistoryItem>) {
   // 将历史记录转换成 JSON 字符串，并保存到本地存储中
   const dataJson = JSON.stringify(data)
   localStorage.setItem(SEARCH_HISTORY_STORAGE, dataJson)
+
+  const postData = data.map(item => JSON.parse(`{"searchText":"${item.searchText}"}`));
+  console.log(JSON.stringify(postData))
+  /**
+   * 上传新标签页到服务器
+   */
+  try {
+    axios.post('http://localhost:2020/user/record/'+userID, postData).then(response=> {
+      if (response.data.code === 200) {
+        ElMessage({
+          message: "bookmark.updateSuccess",
+          type: "success",
+        })
+      }
+    },(error)=>{
+      ElMessage({
+        message: "无法连接服务器",
+        type: 'warning',
+      })
+    })
+  } catch (error) {
+    console.log(error)
+  }
 }
 
