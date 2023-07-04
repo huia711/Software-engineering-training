@@ -188,12 +188,14 @@ export default{
                                   let icon =[]
                                   let textIcon = []
                                   let custom = []
+                                  let page = []
                                   let bookMarks = []
                                   title = response.data.data.title.split(' ')
                                   url = response.data.data.url.split(' ')
                                   icon = response.data.data.icon.split(' ')
                                   textIcon = response.data.data.textIcon.split(' ')
                                   custom = response.data.data.custom.split(' ')
+                                  page = response.data.data.page.split(' ')
 
                                   // 遍历5个数组，初始化bookmark
                                   for(let i = 0; i < title.length -1; i++) {
@@ -202,7 +204,8 @@ export default{
                                       url: url[i],
                                       icon: icon[i],
                                       textIcon: Boolean(textIcon[i]),
-                                      custom: Boolean(custom[i])
+                                      custom: Boolean(custom[i]),
+                                      page: parseInt(page[i])
                                     }
                                     console.log(bookMark)
                                     bookMarks.push(bookMark)

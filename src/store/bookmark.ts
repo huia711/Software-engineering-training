@@ -147,7 +147,6 @@ export default createStoreModule<BookMarkState>({
     /**
      * （从服务端）更新导航栏
      * @param state
-     * @param topSites
      */
     // [BookMarkMutations.updateBookMarks]: (state, bookMarks: BookMarks) => {
     //   state.bookMarks = bookMarks
@@ -156,8 +155,8 @@ export default createStoreModule<BookMarkState>({
     //   localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
     // },
 
-    updateBookMarks (state, bookMarks: any) {
-      state.bookMarks = bookMarks
+    updateBookMarks (state, bookMark) {
+      state.bookMarks = bookMark
       // save
       const settingJson = JSON.stringify(state)
       localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
