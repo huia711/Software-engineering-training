@@ -203,9 +203,10 @@ export default{
                                       title: title[i],
                                       url: url[i],
                                       icon: icon[i],
-                                      textIcon: textIcon[i],
-                                      custom: custom[i]
+                                      textIcon: Boolean(textIcon[i]),
+                                      custom: Boolean(custom[i])
                                     }
+                                    console.log(bookMark)
                                     bookMarks.push(bookMark)
                                   }
                                   this.updateBookMarks(bookMarks)
