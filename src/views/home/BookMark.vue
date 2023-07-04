@@ -147,7 +147,7 @@
   const bookMarkSetting = computed(() => state.setting.bookMark)
   const bookMarks = computed<BookMarks>(() => getters[BookMarkGetters.getCurrentBookMarks])
   const userId = computed(() => state.settings.userId).value
-  const pageNow = computed(() => state.bookMark.pageNow).value
+  const pageNow = computed(() => state.bookMark.pageNow)
 
   // 定义了三个响应式对象：data、bookMark和rules
   const data = reactive({
@@ -253,8 +253,8 @@
         const customData: BookMarkItem = {
           ...bookMark,
           custom: true,
-          icon,
-          pageNow
+          icon: icon,
+          page: pageNow.value
         }
         commit(BookMarkMutations.addBookMark, { data: customData, userId: userId })
 

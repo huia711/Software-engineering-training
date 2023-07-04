@@ -91,6 +91,7 @@ export default createStoreModule<BookMarkState>({
       const bookMarkSetting = rootState.setting.bookMark
       // 根据配置筛选出前topSiteSetting.col * topSiteSetting.row项网站数据
       return bookMarks.filter((_item, index) => index < bookMarkSetting.col * bookMarkSetting.row)
+
     }
   },
   mutations: {
@@ -102,6 +103,7 @@ export default createStoreModule<BookMarkState>({
     [BookMarkMutations.addBookMark]: (state, payload: { data: BookMarkItem, userId: string }) => {
       const { data, userId } = payload
       state.bookMarks.push(data)
+      console.log(data)
       saveBookMarkState(state, userId)
     },
     /**
@@ -202,7 +204,7 @@ const saveBookMarkState = debounce((data: BookMarkState, userId: string) => {
   const settingJson = JSON.stringify(data)
   localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
 
-  const postData = data.bookMarks.map(item => JSON.parse(`{"title":"${item.title}", "url":"${item.url}", "icon":"${item.icon}", "textIcon":"${item.textIcon}", "custom":"${item.custom}"},{"page":"${item.page}"`));
+  const postData = data.bookMarks.map(item => JSON.parse(`{"title":"${item.title}", "url":"${item.url}", "icon":"${item.icon}", "textIcon":"${item.textIcon}", "custom":"${item.custom}", "page":"${item.page}"}`));
   console.log(JSON.stringify(postData))
   /**
    * 上传新标签页到服务器
