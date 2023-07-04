@@ -6,16 +6,19 @@
 
       <section class="sec1" id="sec1">
         <!-- 搜索框 -->
-        <search class="search" :value="searchText"/>
+        <search :value="searchText"/>
         <div style="margin-bottom: 20px">
-          <el-button size="small" @click="addTab(page)">
+          <el-button size="small" @click="addTab(editableTabsValue)">
             add tab
           </el-button>
         </div>
+        <!-- 书签 -->
         <BookMark/>
       </section>
 
       <section class="sec" id="sec2">
+        <div class="nouse"></div>
+        <!-- 书签 -->
         <BookMark/>
       </section>
 
@@ -102,6 +105,7 @@
  * 导入（import）
  */
 import {computed, onBeforeUnmount, onMounted, ref} from "vue"
+import Vue from 'vue'
 import { useStore } from "@/store"
 import { useRoute } from "vue-router"
 // 导入组件Component
@@ -113,7 +117,6 @@ import userPage from '@/views/userPage/userPage.vue'
 import { TabMutations } from "@/store/tab"
 // 外部导入
 import $ from 'jquery';
-import Vue from 'vue';
 import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
 import {Check, Close, Document, Menu as IconMenu, Setting, User} from '@element-plus/icons-vue'
@@ -235,7 +238,7 @@ export default {
       if (document.getElementById('main').scrollTop === 0) {
         document.getElementById('1').click()
       }
-      if (document.getElementById('main').scrollTop === document.getElementById('main').clientHeight+16) {
+      if (document.getElementById('main').scrollTop === document.getElementById('main').clientHeight) {
         document.getElementById('2').click()
       }
     }
@@ -262,10 +265,7 @@ export default {
       const main = document.getElementById('main')
       const newSection = document.createElement('section')
       newSection.id = "sec"+newTabName
-      // 创建组件实例
-      const BookmarkComponent = Vue.extend(BookMark);
-      const bookmark = new BookmarkComponent().$mount();
-      newSection.appendChild(bookmark.$el);
+      newSection.className = "sec"
 
       main.appendChild(newSection)
 
@@ -364,11 +364,19 @@ export default {
     align-items: center; /* 表示子元素应垂直居中 */
     row-gap: 42px; /* 将每个子元素之间的间距设置为 42 像素 */
   }
-
+  .nouse {
+    width: 700px;
+    height: 177.5px;
+  }
   .sec {
     height: 100vh; /* 元素的高度为 viewport 的高度 */
     width: 100vw; /* 元素的宽度为 viewport 的宽度 */
     scroll-snap-align: start; /* 滚动时该元素的开始位置将与滚动容器的开始位置对齐 */
+
+    display: flex; /* 盒类型：表示该元素应该采用 Flexbox 布局模型，使子元素能够在其中垂直或水平居中 */
+    flex-direction: column; /* 设置弹性盒 flex 容器的主轴方向为纵向，即垂直排列子元素 */
+    align-items: center; /* 表示子元素应垂直居中 */
+    row-gap: 42px; /* 将每个子元素之间的间距设置为 42 像素 */
   }
 
   .el-tabs {

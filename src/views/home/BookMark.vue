@@ -313,6 +313,8 @@
       grid-template-columns: repeat(@col, @item-size-max); //  repeat():将 @col 个固定大小的列等分在容器中。
       grid-template-rows: repeat(@row, @item-size-max);
       gap: @gap;
+
+      padding: 0;
     }
 
     // 定义图标的样式
