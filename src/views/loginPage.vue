@@ -1,7 +1,7 @@
 <template>
   <main className="base">
     <div id="wallpaper">
-      <div v-loading="spinnerZIndex" element-loading-background="rgba(0,0,0,0.6)" className="pageLayout">
+      <div v-loading="spinnerVisible" element-loading-background="rgba(0,0,0,0.6)" className="pageLayout">
         <closeButton @close="closePage"/>
         <div className="global">
           <modernButton
@@ -11,20 +11,20 @@
               :customButtonStyle="imgStyle"/>
           <div className="loginPage">
             <!-- 显示登录/注册界面 -->
-            <p v-show="registerMode" className="inputBoxs">昵称：
+            <p v-show="registerMode" className="inputBoxs">{{ t('loginPage.userName') }}
               <inputBox :visibleButton="false" :widthExpand="32" @dataChanged="registerNameGet"/>
             </p>
-            <p v-show="!registerMode" className="inputBoxs">账号：
+            <p v-show="!registerMode" className="inputBoxs">{{ t('loginPage.account') }}
               <inputBox :visibleButton="false" :defaultContent="account" :widthExpand="32" @dataChanged="accountGet"/>
             </p>
-            <p className="inputBoxs">密码：
+            <p className="inputBoxs">{{ t('loginPage.password') }}
               <inputBox :visibleButton="true" :widthExpand="32" @dataChanged="passwdGet"/>
             </p>
-            <p v-show="registerMode" className="inputBoxs">确认密码：
+            <p v-show="registerMode" className="inputBoxs">{{ t('loginPage.confirmPassword') }}
               <inputBox :visibleButton="true" @dataChanged="confPasswdGet"/>
             </p>
-            <modernButton buttonText="登 录" :customButtonStyle="buttonStyle" @buttonClicked="loginButtonClicked"/>
-            <modernButton buttonText="注 册" :customButtonStyle="buttonStyle" @buttonClicked="regButtonClicked"/>
+            <modernButton :buttonText="t('loginPage.login')" :customButtonStyle="buttonStyle" @buttonClicked="loginButtonClicked"/>
+            <modernButton :buttonText="t('loginPage.register')" :customButtonStyle="buttonStyle" @buttonClicked="regButtonClicked"/>
             <p style="color: red;height: 20px;">{{ warningMsg }}</p>
           </div>
         </div>
@@ -39,23 +39,28 @@
 import modernButton from '@/components/basis/modernButton.vue';
 import inputBox from '@/components/basis/inputBox.vue';
 import closeButton from '@/components/basis/closeButton.vue';
-import {computed} from '@vue/reactivity';
+import { computed } from '@vue/reactivity';
 import cal from '@/utils/calculation';
-import {useStore} from '@/store';
+import { useStore } from '@/store';
+import { useI18n } from 'vue-i18n'
 import $ from 'jquery'
 import axios from "@/plugins/axios"
-import {mapMutations} from 'vuex';
+import { mapMutations } from 'vuex';
+import { SettingMutations } from '@/store/setting';
+import { LanguageType, OpenPageTarget, SearchSuggestion } from '@/enum-interface';
 
 export default {
   setup() {
     const store = useStore();
+    const {t} = useI18n();
     return {
       pageColorStyle: computed(() => store.state.settings.pageColorStyle),
       backgroundImg: computed(() => store.state.settings.backgroundImg),
       imgStyle: computed(() => store.state.settings.imgStyle),
       userName: computed(() => store.state.settings.userName),
       userHeadImgPath: computed(() => store.state.settings.avatar),
-      store
+      store,
+      t
     }
   },
   mounted() {
@@ -73,7 +78,7 @@ export default {
       warningMsg: "",
       registerName: "",
       registerMode: false,
-      spinnerZIndex: false,
+      spinnerVisible: false,
       colorStyle: cal.hexToRgb(this.pageColorStyle.backgroundColor.hex),
       buttonColorStyle: cal.hexToRgb(this.pageColorStyle.buttonColor.hex),
       buttonStyle: {
@@ -90,14 +95,14 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setUserName', 'setUserId', 'setAvatar', 'initSettings', 'setBackgroundImage', 'updateBookMarks', 'updateHistory']),
+    ...mapMutations(['setUserName', 'setUserId', 'setAvatar', 'initSettings', 'setBackgroundImage', 'updateBookMarks', 'updateHistory','setUserPassword']),
     loginButtonClicked() {
       if (this.registerMode === false) {
         if (this.account === "" || this.passwd === "")
-          this.warningMsg = "账号或密码不能为空!"
+          this.warningMsg = this.t('loginPage.warnings.loginNotComplete')
         else {
           this.warningMsg = ""
-          this.spinnerZIndex = true
+          this.spinnerVisible = true
           // 登录方法
           let data = {
             "id": this.account,
@@ -124,10 +129,16 @@ export default {
                  *          customBackgroundColor:...
                  *          customButtonColor:...
                  *          presetColor:...
+                 *          fontColor:...
                  *          searchItemCount:...
                  *          avatar:...              <= 用户头像URL，无则返回"null"
                  *          backgroundURL:...       <= 用户背景图片URL，无则返回"null"
-                 *
+                 *          searchEngine:...        <= 搜索引擎
+                 *          suggestAPI:...          <= 搜索建议API
+                 *          openNewPage:...         <= 是否在新的页面打开搜索结果
+                 *          showEngineIcon:...      <= 是否显示搜索引擎图标
+                 *          showEngineList:...      <= 是否显示搜索引擎下拉列表
+                 * 
                  *          bookMarks:...           <= 标签页，无则返回"null"
                  *          record:...              <= 搜索历史，无则返回"null"
                  *          ...                     <= 后期可能增加的其它用户数据
@@ -136,10 +147,12 @@ export default {
                  * }
                  */
                 this.setUserName(response.data.data.userName)
+                this.setUserPassword(this.passwd)
                 this.setUserId(this.account)
                 // 初始化用户设置
                 this.initSettings({
                   pageColorStyle: {
+                    fontColor: response.data.data.fontColor,
                     customBackgroundColor: response.data.data.customBackgroundColor,
                     customButtonColor: response.data.data.customButtonColor,
                     presetColor: response.data.data.presetColor,
@@ -154,6 +167,50 @@ export default {
                   },
                   searchItemCount: response.data.data.searchItemCount
                 })
+                // 设置语言
+                let lang = null
+                switch(response.data.data.language){
+                  case 'English':
+                    lang = LanguageType.English;
+                    break;
+                  case 'SimplifiedChinese':
+                    lang = LanguageType.SimplifiedChinese;
+                    break;
+                  case 'TraditionalChinese':
+                    lang = LanguageType.TraditionalChinese;
+                    break;
+                  default:
+                    lang = LanguageType.Auto;
+                    break;
+                }
+                this.store.commit(SettingMutations.updateLanguage, lang)
+                // 设置搜索设置
+                let searchSettings = null
+                let suggestAPI = null
+                switch (response.data.data.suggestAPI) {
+                  case 'Baidu':
+                    suggestAPI = SearchSuggestion.baidu;
+                    break;
+                  case 'Google':
+                    suggestAPI = SearchSuggestion.google;
+                    break;
+                  case 'Bing':
+                    suggestAPI = SearchSuggestion.bing;
+                    break;
+                  default:
+                    suggestAPI = SearchSuggestion.none;
+                    break;
+                }
+                searchSettings = {
+                  currentEngine: response.data.data.searchEngine,
+                  openPageTarget: response.data.data.openNewPage === 'Blank' ? OpenPageTarget.Blank : OpenPageTarget.Self,
+                  showEngineIcon: response.data.data.showEngineIcon === 'true' ? true : false,
+                  showEngineSelect: response.data.data.showEngineList === 'true' ? true : false,
+                  searchRadius: 0,
+                  useSearchEngines: ["bing", "google", "baidu"],
+                  suggestion: suggestAPI
+                }
+                this.store.commit(SettingMutations.updateSearchSetting, searchSettings)
                 // 获取用户头像
                 /**
                  * 返回格式：
@@ -242,19 +299,19 @@ export default {
                   this.updateHistory(historys)
                 }
 
-                this.spinnerZIndex = false
+                this.spinnerVisible = false
                 this.closePage()
               } else {
-                this.spinnerZIndex = false
+                this.spinnerVisible = false
                 this.warningMsg = response.data.msg
               }
             }, (error) => {
-              this.spinnerZIndex = false
-              this.warningMsg = "无法连接服务器"
+              this.spinnerVisible = false
+              this.warningMsg = this.t('loginPage.warnings.serverUnreachable')
             })
           } catch (error) {
             console.log(error)
-            this.spinnerZIndex = false
+            this.spinnerVisible = false
           }
         }
       } else {
@@ -268,14 +325,14 @@ export default {
         this.registerMode = true
       } else {
         if (this.registerName === "" || this.passwd === "")
-          this.warningMsg = "用户昵称和密码不能为空!"
+          this.warningMsg = this.t('loginPage.warnings.registerNotComplete')
         else {
           if (this.passwd !== this.confPasswd)
-            this.warningMsg = "两次输入的密码不一致!"
+            this.warningMsg = this.t('loginPage.warnings.passwordNotEqual')
           else {
             this.warningMsg = ""
             // 注册方法
-            this.spinnerZIndex = true
+            this.spinnerVisible = true
             let data = {
               "userName": this.registerName,
               "password": this.passwd,
@@ -287,10 +344,10 @@ export default {
                 this.setUserName(this.registerName)
                 this.account = response.data.data.id
               }
-              this.spinnerZIndex = false
+              this.spinnerVisible = false
             }, error => {
-              this.spinnerZIndex = false
-              this.warningMsg = "无法连接服务器"
+              this.spinnerVisible = false
+              this.warningMsg = this.t('loginPage.warnings.serverUnreachable')
             })
           }
         }
@@ -318,7 +375,7 @@ export default {
     confirmPasswd() {
       if (this.passwd !== this.confPasswd && this.registerMode === true) {
         // 两次输入的密码不一致
-        this.warningMsg = "两次输入的密码不一致!"
+        this.warningMsg = this.t('loginPage.warnings.passwordNotEqual')
       } else {
         this.warningMsg = ""
       }

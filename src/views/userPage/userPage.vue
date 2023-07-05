@@ -35,11 +35,11 @@
         />
         <!-- 编辑昵称页面 -->
         <editName v-if="editNameWindowVisible" v-click-outside="handleClickOutsideNamePage"
-        @cancle="editNamePageVisible(false)"
+        @hidePage="editNamePageVisible(false)"
         style="display: flex; z-index: 200; position: fixed;"/>
         <!-- 编辑密码页面 -->
         <editPassword v-if="editPasswordWindowVisible" v-click-outside="handleClickOutsidePasswordPage"
-        @cancle="editPasswordPageVisible(false)"
+        @hidePage="editPasswordPageVisible(false)"
         style="display: flex; z-index: 200; position: fixed;"/>
         <!-- 提示框 -->
         <el-dialog :title="t('userPage.messages.warningTitle')" v-model="dialogVisible" width="30%">
@@ -122,7 +122,7 @@ export default{
         }
     },
     methods:{
-        ...mapMutations(['setAvatar','setUserId','setUserName']),
+        ...mapMutations(['setAvatar','setUserId','setUserName','setUserPassword']),
         openFileBrowser() {
             // 手动触发点击事件，打开文件选择框
             this.$refs.fileInput.click();
@@ -146,6 +146,7 @@ export default{
                 this.setAvatar("img/userHead.png")
                 this.setUserName("Guest")
                 this.setUserId("")
+                this.setUserPassword("")
                 this.$emit("pageHide")
             }
             else
@@ -169,6 +170,7 @@ export default{
                     // 删除成功
                     this.setUserId("")
                     this.setUserName("Guest")
+                    this.setUserPassword("")
                     this.setAvatar("img/userHead.png")
                     this.messageTitle = ""
                     this.message = this.t('elDialog.message.deleteSuccess')

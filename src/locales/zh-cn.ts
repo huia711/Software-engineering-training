@@ -121,11 +121,11 @@ export default {
         }
     },
     loginPage: {
-        login:"登录",
-        register: "注册",
+        login:"登 录",
+        register: "注 册",
         account: "账号：",
         password: "密码：",
-        username: "昵称：",
+        userName: "昵称：",
         confirmPassword: "确认密码：",
         warnings:{
             loginNotComplete: "账号或密码不能为空",
@@ -166,7 +166,7 @@ export default {
                     title: "主题颜色",
                     customizedBackgroundColor: "自定义背景颜色",
                     customizedButtonColor: "自定义按钮颜色",
-                    fontColor: "字体颜色",
+                    fontColor: "字体颜色:",
                     presetColor: "预设主题颜色",
                     preview: "预览",
                     dayMode: "白天模式",

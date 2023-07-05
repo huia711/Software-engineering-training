@@ -82,7 +82,7 @@ export default{
             this.confPasswd = newVal
         },
         cancle(){
-            this.$emit("cancle")
+            this.$emit("hidePage")
         },
         uploadPassword(){
             if(this.oldPasswd === ""){
@@ -119,6 +119,7 @@ export default{
                 if(response.data.code === 200){
                     // 修改成功
                     this.setUserPassword(this.newPasswd)
+                    this.$emit("hidePage")
                 } else {
                     // 修改失败
                     this.message = this.t('elDialog.errorMessages.errorTypes.uploadFailure') + "Reply code " + response.data.code

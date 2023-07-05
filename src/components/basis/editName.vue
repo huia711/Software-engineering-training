@@ -72,7 +72,7 @@ export default{
             this.curName = newVal
         },
         cancle(){
-            this.$emit("cancle")
+            this.$emit("hidePage")
         },
         uploadName(){
             if(this.curName === ""){
@@ -97,6 +97,7 @@ export default{
                 if(response.data.code === 200){
                     // 修改成功
                     this.setUserName(this.curName)
+                    this.$emit("hidePage")
                 } else {
                     // 修改失败
                     this.message = this.t('elDialog.errorMessages.errorTypes.uploadFailure') + "Reply code " + response.data.code

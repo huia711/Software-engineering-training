@@ -120,11 +120,11 @@ export default {
     }
   },
   loginPage: {
-    login:"登錄",
-    register: "註冊",
+    login:"登 錄",
+    register: "註 冊",
     account: "賬號：",
     password: "密碼：",
-    username: "暱稱：",
+    userName: "暱稱：",
     confirmPassword: "確認密碼：",
     warnings:{
       loginNotComplete: "賬號或密碼不能為空",
@@ -141,7 +141,7 @@ export default {
           title: "主題顏色",
           customizedBackgroundColor: "自定義背景顏色",
           customizedButtonColor: "自定義按鈕顏色",
-          fontColor: "字體顏色",
+          fontColor: "字體顏色:",
           presetColor: "預設背景顏色",
           preview: "預覽",
           dayMode: "白天模式",

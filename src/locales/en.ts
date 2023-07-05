@@ -124,11 +124,11 @@ export default {
     register: "Register",
     account: "Account:",
     password: "Password:",
-    username: "Name:",
+    userName: "Name:",
     confirmPassword: "Confirm again:",
     warnings:{
       loginNotComplete: "Complete the account and password",
-      registerNotComplete: "Complete usernmae and password",
+      registerNotComplete: "Complete user name and password",
       serverUnreachable: "Server unreachable",
       passwordNotEqual: "Passwords are not the same"
     }
@@ -165,7 +165,7 @@ export default {
           title: "Theme",
           customizedBackgroundColor: "Customized Background Color",
           customizedButtonColor: "Customized Button Color",
-          fontColor: "Font Color",
+          fontColor: "Font Color:",
           presetColor: "Preset Theme",
           preview: "Preview",
           dayMode: "Day Mode",

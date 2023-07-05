@@ -8,20 +8,7 @@ export interface ImgStyle {
 }
 
 export interface PageColorStyle {
-    customBackgroundColor: boolean;
-    customButtonColor: boolean;
-    presetColor: number;
-    backgroundColor: {
-        hex: string;
-        alpha: number;
-    };
-    buttonColor: {
-        hex: string;
-        alpha: number;
-    };
-}
-
-export interface TempPageColorStyle {
+    fontColor: string;
     customBackgroundColor: boolean;
     customButtonColor: boolean;
     presetColor: number;
