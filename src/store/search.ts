@@ -133,6 +133,7 @@ export default createStoreModule<SearchState>({
       const { newHistory, userID } = payload
       // console.log("1"+newHistory.searchText)
       let history: Array<HistoryItem> = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] || "[]") as Array<HistoryItem>
+      console.log(history)
       // 去重并在头添加
       history = history.filter(item => item?.searchText !== newHistory?.searchText)
       // 在头添加(最新的在前面）

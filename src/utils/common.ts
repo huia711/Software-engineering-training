@@ -14,6 +14,8 @@ export function matchPrefix(text: string, query: string) {
   return textNormalized.startsWith(queryNormalized);
 }
 
+export const toPixel = (px: string | number | undefined) => `${px ?? 0}px`
+
 /**
  * 校验各种类型数据是否为空
  *

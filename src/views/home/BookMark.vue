@@ -17,10 +17,10 @@
         <!--drag:监听拖拽事件 dragover:监听拖拽事件的过程中鼠标在目标元素上移动的事件-->
         <el-card
             :class="['bookmark-icon', { 'shake-active': data.shake }]"
-            :text-icon="item.textIcon"
-            :src="item.icon"
+            :body-style="{ padding: '0px' }"
             :title="item.title"
             draggable="true"
+            shadow="hover"
             @click="openPage(item.url)"
             @contextmenu.prevent.stop="openEditStatus"
             @dragstart="onDragIcon(DragType.start, index)"
@@ -28,6 +28,11 @@
             @dragover.prevent
             @dragend="onDragIcon(DragType.end, index)"
         >
+          <icon
+              :text-icon="item.textIcon"
+              :src="item.icon"
+              :title="item.title"
+          />
           <!-- 组件过渡动画，当编辑状态打开时，出现删除按钮 -->
           <transition name="scale">
             <!--上标-->
@@ -46,13 +51,14 @@
 
       <!-- 添加顶部网站图标的空白位置，如果还有空位就显示该项 -->
       <li
-          v-if="bookMarks.length < bookMarkSetting.col * bookMarkSetting.row"
+          v-if="checkPage()"
           v-show="!data.editStatus"
           class="bookmark-item"
           :title="t('bookmark.add')"
       >
         <el-card
             class="bookmark-icon"
+            shadow="hover"
             @click="data.showAddModal = true"
             textIcon
         >
@@ -131,8 +137,9 @@
   import { useI18n } from "vue-i18n"
   import { Plus } from "@element-plus/icons-vue";
   import type { FormInstance } from 'element-plus'
+  import Icon from "@/components/IconItem.vue";
 
-  // import { getFavicon } from "@/plugins/extension"
+  import { getFavicon } from "@/plugins/getIcon"
 
   /**
    * 常/变量（const/let）的定义
@@ -148,6 +155,7 @@
   const bookMarks = computed<BookMarks>(() => getters[BookMarkGetters.getCurrentBookMarks])
   const userID = computed(() => state.settings.userId).value
   const pageNow = computed(() => state.bookMark.pageNow)
+  const pageCount = computed(() => state.bookMark.pageCount)
 
   // 定义了三个响应式对象：data、bookMark和rules
   const data = reactive({
@@ -247,7 +255,7 @@
       if (valid) {
         console.log('submit!')
         // 如果设置自动获取图标，则获取该网站的图标地址
-        const icon = undefined
+        const icon = bookMark.autoIcon ? getFavicon("http://"+bookMark.url) : bookMark.icon
 
         // 创建自定义置顶网站数据并添加到置顶网站列表中
         const customData: BookMarkItem = {
@@ -274,6 +282,16 @@
     data.showAddModal = false
   }
 
+  //
+  function checkPage() {
+    if (pageNow.value === 1) {
+      return pageCount.value[pageNow.value] < 10
+    }
+    else {
+      return pageCount.value[pageNow.value] < 18
+    }
+  }
+
   // // 初始化应用程序
   // // init：检查应用程序内存储的数据中是否包含已有的顶部网站更新时间信息，如果没有，则调用TopSiteActions.syncBrowserTopSites异步函数从浏览器API中同步顶部网站数据。
   // async function init() {
@@ -295,7 +313,6 @@
   @item-size-max: 128px;
   // 设置顶部网站导航栏的列数和行数
   @col: v-bind("bookMarkSetting.col");
-  @row: v-bind("bookMarkSetting.row");
   // 设置图标之间的间距
   @gap: 42px;
   // 设置整个顶部网站导航栏的大小和背景颜色
@@ -307,14 +324,12 @@
   // 定义样式规则
   .bookmark-warp {
     // 计算整个顶部网站导航栏的高度和宽度
-    height: calc(@row * @item-size-max + (@row - 1) * @gap);
     width: calc(@col * @item-size-max + (@col - 1) * @gap);
 
     // 定义图标网格布局
     .bookmark-grid {
       display: grid;
       grid-template-columns: repeat(@col, @item-size-max); //  repeat():将 @col 个固定大小的列等分在容器中。
-      grid-template-rows: repeat(@row, @item-size-max);
       gap: @gap;
 
       padding: 0;
