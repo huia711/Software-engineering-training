@@ -17,7 +17,7 @@
                       </li>
                   </ul>
                   <!-- 右侧具体内容 -->
-                  <basicSettings v-show="curSelected === 0" />
+                  <basicSettings v-show="curSelected === 0" :isVisible="isVisible" />
                   <backgroundPicture v-show="curSelected === 1" />
                   <advancePage v-show="curSelected === 2" />
                   <aboutPage v-show="curSelected === 3"/>
@@ -92,6 +92,12 @@ export default{
         buttonOn(index){
             this.curOn = index
         },
+    },
+    props:{
+        isVisible:{
+            type: Boolean,
+            required: true,
+        }
     },
     watch:{
         pageColorStyle(newVal, oldVal){

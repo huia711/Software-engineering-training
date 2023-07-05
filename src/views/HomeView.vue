@@ -84,13 +84,7 @@
 
       <div id="setting-page">
         <settingPage
-            v-click-outside="handleClickOutsideSettingPage"
-        />
-      </div>
-
-      <div id="setting-page">
-        <settingPage
-            id="settingMainPage"
+            :is-visible="settingVisible"
             v-click-outside="handleClickOutsideSettingPage"
         />
       </div>
@@ -122,6 +116,7 @@ import { useI18n } from 'vue-i18n'
 import {Check, Close, Document, Menu as IconMenu, Setting, User} from '@element-plus/icons-vue'
 import axios from "@/plugins/axios";
 import { BookMarkMutations } from "@/store/bookmark";
+import { SearchSuggestion,OpenPageTarget, LanguageType } from "@/enum-interface"
 
 export default {
   data(){
@@ -139,7 +134,6 @@ export default {
     }
   },
   methods:{
-    ...mapMutations(['confirmPageColorStyle']),
     userPageClicked () {
       if(this.userId !== ""){
         // 个人页面
@@ -161,9 +155,38 @@ export default {
     handleClickOutsideSettingPage(){
       this.settingVisible = false
       this.pageShadow = 0
-      this.confirmPageColorStyle()
       if(this.store.state.settings.userId !== ""){
         this.isSettingUploading = true
+        let apiStr = ''
+        let langStr = ''
+        switch (this.store.state.setting.search.suggestion) {
+          case SearchSuggestion.baidu:
+            apiStr = 'Baidu';
+            break;
+          case SearchSuggestion.google:
+            apiStr = 'Google';
+            break;
+          case SearchSuggestion.bing:
+            apiStr = 'Bing';
+            break;
+          default:
+            apiStr = 'None'
+            break;
+        }
+        switch(this.store.state.setting.lang) {
+          case LanguageType.English:
+            langStr = 'English';
+            break;
+          case LanguageType.SimplifiedChinese:
+            langStr = 'SimplifiedChinese';
+            break;
+          case LanguageType.TraditionalChinese:
+            langStr = 'TraditionalChinese';
+            break;
+          default:
+            langStr = 'Auto';
+            break;
+        }
         let data = {
           "Id": this.store.state.settings.userId,
           "backgroundColor": this.store.state.settings.pageColorStyle.backgroundColor.hex,
@@ -174,7 +197,13 @@ export default {
           "customButtonColor": this.store.state.settings.pageColorStyle.customButtonColor,
           "presetColor": this.store.state.settings.pageColorStyle.presetColor,
           "fontColor": this.store.state.settings.pageColorStyle.fontColor,
-          "searchItemCount": this.store.state.settings.searchItemCount
+          "language": langStr,
+          "searchItemCount": this.store.state.settings.searchItemCount,
+          "searchEngine": this.store.state.setting.search.currentEngine,
+          "suggestAPI": apiStr,
+          "openNewPage": this.store.state.setting.search.openPageTarget === OpenPageTarget.Blank ? 'Blank' : 'Self',
+          "showEngineIcon": this.store.state.setting.search.showEngineIcon ? 'true' : 'false',
+          "showEngineList": this.store.state.setting.search.showEngineSelect ? 'true' : 'false'
         }
         axios.post('http://localhost:2020/user/settings', data).then(response=>{
           if(response.data.code === 400){

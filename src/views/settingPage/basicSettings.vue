@@ -69,7 +69,7 @@ export default{
 
         return{
             pageColorStyle: computed(()=>store.state.settings.pageColorStyle),
-            selectedPresetStyle: computed(()=>store.state.settings.tempSelectedPresetColorStyle),
+            selectedPresetStyle: computed(()=>store.state.settings.pageColorStyle.presetColor),
             t,
             theme
         }
@@ -82,6 +82,7 @@ export default{
             curSelectedPresetColorStyle: this.pageColorStyle.presetColor,
             backgroundColorStyle: this.pageColorStyle.backgroundColor,
             buttonColorStyle: this.pageColorStyle.buttonColor,
+            tempPageColorStyle: this.pageColorStyle,
             presetStyles:[
                 Object({
                 fontColor:"black",
@@ -106,7 +107,7 @@ export default{
         }
     },
     methods:{
-        ...mapMutations(['setPageColorStyle','setTempPageColorStyle','setTempSelectedPresetColorStyle','confirmPageColorStyle','setFontColor']),
+        ...mapMutations(['setPageColorStyle','setFontColor']),
         customBackgroundColorStateChange(state){
             this.curCustomBackgroundColorState = state
             if(state === false){
@@ -121,17 +122,16 @@ export default{
             else{
                 this.curPresetColorState = false
                 this.curCustomButtonColorState = true
-                this.curSelectedPresetColorStyle = -1
             }
-            this.setTempPageColorStyle(Object({
+            this.tempPageColorStyle = Object({
                 backgroundColor: this.backgroundColorStyle,
                 buttonColor: this.buttonColorStyle,
                 fontColor: this.pageColorStyle.fontColor,
                 customBackgroundColor: this.curCustomBackgroundColorState,
                 customButtonColor: this.curCustomButtonColorState,
                 presetColor: this.curSelectedPresetColorStyle
-            }))
-            this.confirmPageColorStyle()
+            })
+            this.setPageColorStyle(this.tempPageColorStyle)
         },
         customButtonColorStateChange(state){
             this.curCustomButtonColorState = state
@@ -147,17 +147,16 @@ export default{
             else{
                 this.curPresetColorState = false
                 this.curCustomBackgroundColorState = true
-                this.curSelectedPresetColorStyle = -1
             }
-            this.setTempPageColorStyle(Object({
+            this.tempPageColorStyle = Object({
                     backgroundColor: this.backgroundColorStyle,
                     buttonColor: this.buttonColorStyle,
                     fontColor: this.pageColorStyle.fontColor,
                     customBackgroundColor: this.curCustomBackgroundColorState,
                     customButtonColor: this.curCustomButtonColorState,
                     presetColor: this.curSelectedPresetColorStyle
-                }))
-            this.confirmPageColorStyle()
+                })
+            this.setPageColorStyle(this.tempPageColorStyle)
         },
         fontColorChange(){
             if(this.pageColorStyle.fontColor === "black")
@@ -176,7 +175,6 @@ export default{
             }
             else{
                 if(this.curPresetColorState === true){
-                    this.curSelectedPresetColorStyle = -1
                     this.curCustomBackgroundColorState = true
                     this.curCustomButtonColorState = true
                     this.curPresetColorState = false
@@ -185,41 +183,40 @@ export default{
         },
         backgroundColorChange(newColor){
             this.backgroundColorStyle = newColor
-            this.setTempPageColorStyle(Object({
+            this.tempPageColorStyle = Object({
                 backgroundColor: this.backgroundColorStyle,
                 buttonColor: this.buttonColorStyle,
                 fontColor: this.pageColorStyle.fontColor,
                 customBackgroundColor: this.curCustomBackgroundColorState,
                 customButtonColor: this.curCustomButtonColorState,
                 presetColor: this.curSelectedPresetColorStyle
-            }))
+            })
         },
         buttonColorChange(newColor){
             this.buttonColorStyle = newColor
-            this.setTempPageColorStyle(Object({
+            this.tempPageColorStyle = Object({
                 backgroundColor: this.backgroundColorStyle,
                 buttonColor: this.buttonColorStyle,
                 fontColor: this.pageColorStyle.fontColor,
                 customBackgroundColor: this.curCustomBackgroundColorState,
                 customButtonColor: this.curCustomButtonColorState,
                 presetColor: this.curSelectedPresetColorStyle
-            }))
+            })
         },
         presetColorChange(index){
           this.curSelectedPresetColorStyle = index
-          this.setTempSelectedPresetColorStyle(index)
           this.backgroundColorStyle = this.presetStyles[index].backgroundColor
           this.buttonColorStyle = this.presetStyles[index].buttonColor
-          this.setTempPageColorStyle(Object({
+          this.tempPageColorStyle = Object({
             backgroundColor: this.backgroundColorStyle,
             buttonColor: this.buttonColorStyle,
             fontColor: this.presetStyles[index].fontColor,
             customBackgroundColor: this.curCustomBackgroundColorState,
             customButtonColor: this.curCustomButtonColorState,
             presetColor: this.curSelectedPresetColorStyle
-          }))
+          })
+          this.setPageColorStyle(this.tempPageColorStyle)
           this.theme = index +1
-          this.confirmPageColorStyle()
         }
     },
     components:{
@@ -228,6 +225,18 @@ export default{
         blankSeparator,
         presetStyleBox,
         otherSetting
+    },
+    props:{
+        isVisible:{
+            type: Boolean,
+            required: true
+        }
+    },
+    watch:{
+        isVisible(newVal, oldVal){
+            if(newVal === false)
+                this.setPageColorStyle(this.tempPageColorStyle)
+        }
     }
 }
 </script>

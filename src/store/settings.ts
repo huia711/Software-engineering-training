@@ -2,19 +2,17 @@ import {createStoreModule} from "./index";
 import {
     ImgStyle,
     PageColorStyle, SearchEngineData,
-    TempPageColorStyle
 } from "@/enum-interface"
 import {SearchGetters} from "@/store/search";
 
 export interface SettingsState {
     imgStyle: ImgStyle
     pageColorStyle: PageColorStyle
-    tempPageColorStyle: TempPageColorStyle
     searchItemCount: number
-    tempSelectedPresetColorStyle: number
     backgroundImg: string
     userId: string
     userName: string
+    userPassword: string
     avatar: string
 }
 
@@ -34,6 +32,7 @@ export default createStoreModule<SettingsState>({
                 height: "64px",
             },
             pageColorStyle: {
+                fontColor: "black",
                 customBackgroundColor: false,
                 customButtonColor: false,
                 presetColor: 0,
@@ -46,24 +45,11 @@ export default createStoreModule<SettingsState>({
                     alpha: 0.3
                 }
             },
-            tempPageColorStyle: {
-                customBackgroundColor: false,
-                customButtonColor: false,
-                presetColor: 0,
-                backgroundColor: {
-                    hex: "#ffffff",
-                    alpha: 1
-                },
-                buttonColor: {
-                    hex: "#000000",
-                    alpha: 0.3
-                }
-            },
-            tempSelectedPresetColorStyle: 0,
             searchItemCount: 5,
             backgroundImg: "",
             userId: "",
             userName: "Guest",
+            userPassword: "",
             avatar: "img/userHead.png"
 
         }
@@ -73,6 +59,9 @@ export default createStoreModule<SettingsState>({
     mutations: {
         setPageColorStyle(state, payload:PageColorStyle) {
             state.pageColorStyle = payload;
+        },
+        setFontColor(state, payload:string) {
+            state.pageColorStyle.fontColor = payload;
         },
 
         /** 
@@ -85,7 +74,6 @@ export default createStoreModule<SettingsState>({
 
         initSettings(state, payload: any) {
             state.pageColorStyle = payload.pageColorStyle;
-            state.tempPageColorStyle = payload.pageColorStyle;
             state.searchItemCount = payload.searchItemCount;
         },
         setAvatar(state, payload:string) {
@@ -97,17 +85,11 @@ export default createStoreModule<SettingsState>({
         setUserId(state, payload:string) {
             state.userId = payload;
         },
+        setUserPassword(state, payload:string) {
+            state.userPassword = payload;
+        },
         setUserName(state, payload:string) {
             state.userName = payload;
-        },
-        setTempSelectedPresetColorStyle(state, payload:number) {
-            state.tempSelectedPresetColorStyle = payload;
-        },
-        setTempPageColorStyle(state, payload:TempPageColorStyle) {
-            state.tempPageColorStyle = payload;
-        },
-        confirmPageColorStyle(state) {
-            state.pageColorStyle = state.tempPageColorStyle;
         }
     }
 })
