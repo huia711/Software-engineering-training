@@ -18,11 +18,14 @@
                          class="input-with-select"
                          clearable
                          autofocus
+                         highlight-first-item
+                         fit-input-width
                          @keyup.enter="onSearch(inputSearch)"
                          @keydown="onSwitchEngines"
 
                          :fetch-suggestions="querySearch"
                          popper-class="my-autocomplete"
+                         @clear="commit(SearchMutations.cleanHistory)"
         >
           <!-- 搜索引擎选项卡 -->
           <template #prepend v-if="searchSetting.showEngineSelect">
@@ -35,6 +38,10 @@
           <!-- 搜索按钮 -->
           <template #append>
             <el-button :icon="Search" @click = "onSearch(inputSearch)"></el-button>
+          </template>
+
+          <template #default>
+
           </template>
         </el-autocomplete>
       </div>
@@ -51,12 +58,14 @@
   import { SettingMutations } from "@/store/setting" // 引入设置业务模块中的 Mutations
   import { ref, computed } from "vue"
   // 导入外部定义
-  import {HistoryItem, Option, SearchSetting} from "@/enum-interface" // 引入一些用于标记类型的枚举或接口类型
+  import {HistoryItem, Option, SearchSetting, SearchSuggestion} from "@/enum-interface" // 引入一些用于标记类型的枚举或接口类型
   import {isEmpty, matchPrefix} from "@/utils/common" // 引入一个工具函数用于判断一个值是否为空
   // 外部导入
   import { useI18n } from "vue-i18n"
   import { ElMessage } from "element-plus"
-  import { Search } from '@element-plus/icons-vue'
+  import {Delete, Search} from '@element-plus/icons-vue'
+  import {debounce} from "@/utils/async";
+  import axios from "@/plugins/axios";
 
   // 联想项
   interface SuggestionItem {
@@ -73,8 +82,9 @@
   // 使用 useStore 函数，获取 store 对象，并解构出需要用到的 state，getters，commit，dispatch 函数
   const { state: stateX, getters, commit, dispatch } = useStore()
   // 搜索框输入值的变量
-  let inputSearch = ref("")
   const offset = ref(100)
+  let inputSearch = ref("")
+  let Result:string[] = []
 
   /**
    * 响应式对象（reactive,computed）
@@ -83,6 +93,7 @@
   const searchWarp = ref<HTMLElement>()
   const searchEngines = computed(() => getters[SearchGetters.getUseSearchEngines])
   const searchSetting = computed(() => stateX.setting.search)
+  const userID = computed(() => stateX.settings.userId).value
 
   // 当前搜索引擎
   const currentEngine = computed({
@@ -111,6 +122,7 @@
    * 将搜索内容重定向到搜索引擎
    */
   function onSearch(search: string) {
+    // commit(SearchMutations.cleanHistory)
     if (isEmpty(search))
       ElMessage({
         title: 'Warning',
@@ -118,53 +130,109 @@
         type: 'warning',
       })
     else {
-      dispatch (SearchActions.submitSearch, search)
-
-      const newHistory: HistoryItem = {
-        engineId: searchEngines.value,
-        searchText: search,
-        timestamp: Date.now()
-      }
-      putHistory(newHistory)
+      dispatch(SearchActions.submitSearch, {search: search, userID: userID})
     }
-  }
-
-  /**
-   * 保存搜索记录
-   */
-  function putHistory(newHistory: HistoryItem) {
-    commit(SearchMutations.putHistory, newHistory)
-    console.log(newHistory)
   }
 
   /**
    * 搜索建议自动完成处理
    * 获取搜索建议数据
    */
-  const querySearch = (queryString: string, cb: any) => {
+  const querySearch = debounce(handleSearchSuggestion)
+  async function handleSearchSuggestion(queryString: string, cb: any) {
     let results
     if (isEmpty(queryString)) {
       results = searchSuggestion.value
     } else {
       // 获得api搜索建议
-      const suggestion: string[] = dispatch(SearchActions.getSuggestion, queryString)
-      // searchSuggestion.value = suggestion.map((item) => {
-      //   return {
-      //     title: '',
-      //     value: item
-      //   };
-      // })
-      results = searchSuggestion.value.filter(createFilter(queryString))
-    }
+      switch (stateX.setting.search.suggestion) {
+        case SearchSuggestion.baidu:
+          await getBaiduSuggestion(queryString)
+          break;
+        case SearchSuggestion.bing:
+          await getBingSuggestion(queryString)
+          break;
+        case SearchSuggestion.google:
+          await getGoogleSuggestion(queryString)
+          break;
+        default:
+          break;
+      }
 
+      console.log(Result)
+      const suggestionObject = []
+      Result.forEach(str => {
+        const obj = {
+          title: "",
+          value: str
+        }
+        suggestionObject.push(obj)
+      })
+
+      results = searchSuggestion.value.filter(createFilter(queryString)).concat(suggestionObject);
+      console.log(results)
+    }
     cb(results)
+  }
+
+  // 同步获取baidu搜索建议
+  async function getBaiduSuggestion(keyword: string): Promise<string[]> {
+    try {
+      await axios.get('http://localhost:2020/user/baiduSuggestion?keyword='+keyword).then(response => {
+        if (response.data.code === 200) {
+          Result = response.data.data.suggestion.s
+        }
+        return Result
+      }, (error) => {
+        ElMessage({
+          message: "无法连接服务器",
+          type: 'warning',
+        })
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  // 同步获取bing搜索建议
+  async function getBingSuggestion(keyword: string): Promise<string[]> {
+    try {
+      await axios.get('http://localhost:2020/user/bingSuggestion?keyword='+keyword).then(response => {
+        if (response.data.code === 200) {
+          Result = response.data.data.suggestion.Txt
+        }
+        return Result
+      }, (error) => {
+        ElMessage({
+          message: "无法连接服务器",
+          type: 'warning',
+        })
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  // 同步获取google搜索建议
+  async function getGoogleSuggestion(keyword: string): Promise<string[]> {
+    try {
+      await axios.get('http://localhost:2020/user/googleSuggestion?keyword='+keyword).then(response => {
+        if (response.data.code === 200) {
+          Result = response.data.data.suggestion.Txt
+        }
+        return Result
+      }, (error) => {
+        ElMessage({
+          message: "无法连接服务器",
+          type: 'warning',
+        })
+      })
+    } catch (error) {
+      console.log(error)
+    }
   }
   // filter 方法过滤 restaurants 列表，找到和查询字符串前缀匹配的项，将结果存储到 results 中
   const createFilter = (queryString: string) => {
-    return (searchSuggestion: SuggestionItem) => {
-      return (
-        matchPrefix(searchSuggestion.value, queryString)
-      )
+    return function(searchSuggestion) {
+      return matchPrefix(searchSuggestion.value, queryString)
     }
   }
 

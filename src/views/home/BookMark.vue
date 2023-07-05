@@ -146,7 +146,7 @@
    */
   const bookMarkSetting = computed(() => state.setting.bookMark)
   const bookMarks = computed<BookMarks>(() => getters[BookMarkGetters.getCurrentBookMarks])
-  const userId = computed(() => state.settings.userId).value
+  const userID = computed(() => state.settings.userId).value
   const pageNow = computed(() => state.bookMark.pageNow)
 
   // 定义了三个响应式对象：data、bookMark和rules
@@ -183,7 +183,7 @@
 
   // 删除
   function deleteBookMark(index: number) {
-    commit(BookMarkMutations.deleteBookMark, { index: index, userId: userId })
+    commit(BookMarkMutations.deleteBookMark, { index: index, userId: userID })
   }
 
   // 进入编辑状态
@@ -230,7 +230,7 @@
         sortData.to = index
 
         // 调用好的 mutations 方法进行排序
-        commit(BookMarkMutations.sortBookMarks, { sort: sortData, userId: userId })
+        commit(BookMarkMutations.sortBookMarks, { sort: sortData, userId: userID })
         data.currentDrag = index // 更新当前拖拽项位置
         return
 
@@ -256,7 +256,7 @@
           icon: icon,
           page: pageNow.value
         }
-        commit(BookMarkMutations.addBookMark, { data: customData, userId: userId })
+        commit(BookMarkMutations.addBookMark, { data: customData, userId: userID })
 
         // 重置表单数据并关闭添加网站对话框
         formEl.resetFields()

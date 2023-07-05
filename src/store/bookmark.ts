@@ -147,7 +147,7 @@ export default createStoreModule<BookMarkState>({
     /**
      * （从服务端）更新导航栏
      * @param state
-     * @param topSites
+     * @param bookMarks
      */
     // [BookMarkMutations.updateBookMarks]: (state, bookMarks: BookMarks) => {
     //   state.bookMarks = bookMarks
@@ -215,7 +215,7 @@ const saveBookMarkState = debounce((data: BookMarkState, userId: string) => {
     axios.post('http://localhost:2020/user/newURL/'+userId, postData).then(response=> {
       if (response.data.code === 200) {
         ElMessage({
-          message: "bookmark.updateSuccess",
+          message: "history.updateSuccess",
           type: "success",
         })
       }
