@@ -64,6 +64,8 @@ function getFontIcon() {
 
     /* 图片样式 */
     .img-icon {
+      height: 100%;
+      width: 100%;
       text-align: center;
       display: flex;
       justify-content: center;
