@@ -159,7 +159,6 @@
           break;
       }
 
-      console.log(Result)
       const suggestionObject = []
       Result.forEach(str => {
         const obj = {
@@ -179,7 +178,7 @@
   async function getBaiduSuggestion(keyword: string): Promise<string[]> {
     try {
       await axios.get('http://localhost:2020/user/baiduSuggestion?keyword='+keyword).then(response => {
-        if (response.data.code === 200) {
+        if (response.data.code === 200 && response.data.data.suggestion.s !== null) {
           Result = response.data.data.suggestion.s
         }
         return Result
@@ -197,7 +196,8 @@
   async function getBingSuggestion(keyword: string): Promise<string[]> {
     try {
       await axios.get('http://localhost:2020/user/bingSuggestion?keyword='+keyword).then(response => {
-        if (response.data.code === 200) {
+        console.log(response.data.data.suggestion.Txt)
+        if (response.data.code === 200 && response.data.data.suggestion.Txt !== null) {
           Result = response.data.data.suggestion.Txt
         }
         return Result
@@ -215,7 +215,7 @@
   async function getGoogleSuggestion(keyword: string): Promise<string[]> {
     try {
       await axios.get('http://localhost:2020/user/googleSuggestion?keyword='+keyword).then(response => {
-        if (response.data.code === 200) {
+        if (response.data.code === 200 && response.data.data.suggestion.Txt !== null) {
           Result = response.data.data.suggestion.Txt
         }
         return Result

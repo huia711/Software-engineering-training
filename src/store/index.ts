@@ -4,7 +4,6 @@
  */
 import type { App, InjectionKey } from 'vue'
 import { createStore, useStore as HomeUseStore, Module, Store } from 'vuex' //将导入的 useStore 方法起了一个别名 baseUseStore
-// 导入三个module的state（search，setting和bookmark）
 import search, { SearchState } from './search'
 import setting, { SettingState } from './setting'
 import bookMark, { BookMarkState } from './bookmark'

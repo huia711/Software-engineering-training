@@ -1,5 +1,4 @@
 export * from "./search"
-export * from "./setting"
 export * from "./settings"
 export * from "./bookmark"
 export * from "./tab"

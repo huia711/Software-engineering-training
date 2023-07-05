@@ -1,13 +1,14 @@
 <template>
     <div class="basis">
-        <p>搜索设置</p>
+        <p class="text">{{ t('settingPage.advance.title') }}</p>
         <blankSeparator :blankColorStyle="blankSeparatorColorStyle" height="0px 0px 20px 0px"/>
-        <slider :valueCallback="itemCountChange" :range="countRange" :textWidth="250" :maxSliderWidth="320" :width="570" text="最大显示搜索结果数量"/>
+        <slider :fontColor="fontColor" :valueCallback="itemCountChange" :range="countRange" 
+        :textWidth="250" :maxSliderWidth="320" :width="570" :text="t('settingPage.advance.maxSearchCount')"/>
     
     <!--管理搜索引擎-->
     <setting-item horizontal>
       <template #lable>
-        <span>{{ t("search.engine") }}</span>
+        <span class="text">{{ t("search.engine") }}</span>
       </template>
 
       <el-select v-model = "currentEngine" style="width: 90px">
@@ -20,7 +21,7 @@
     <!--管理接口-->
     <setting-item horizontal>
       <template #lable>
-        <span>{{ t("search.suggestApi") }}</span>
+        <span class="text">{{ t("search.suggestApi") }}</span>
       </template>
 
       <el-select v-model = "searchSetting.suggestion" style="width: 100px" placement="bottom">
@@ -39,15 +40,15 @@
 <!--      />-->
 <!--    </setting-item>-->
 
-    <setting-item :lable="t('search.newTabOpen')" horizontal>
+    <setting-item :lable="t('search.newTabOpen')" class="text" horizontal>
       <el-switch v-model = "isOpenPageByBlank" />
     </setting-item>
 
-    <setting-item :lable="t('search.showEngineIcon')" horizontal>
+    <setting-item :lable="t('search.showEngineIcon')" class="text" horizontal>
       <el-switch v-model = "searchSetting.showEngineIcon" />
     </setting-item>
 
-    <setting-item :lable="t('search.showEngineSelet')" horizontal>
+    <setting-item :lable="t('search.showEngineSelet')" class="text" horizontal>
       <el-switch v-model = "searchSetting.showEngineSelect" />
     </setting-item>
     </div>
@@ -66,7 +67,6 @@ import { SettingsMutationTypes } from '@/store/settings'
 import { useI18n } from "vue-i18n"
 
   const store = useStore();
-  const { state: stateX } = useStore();
   const { t } = useI18n();
 
   function updateSearchSetting(data: Option<SearchSetting>) {
@@ -76,7 +76,7 @@ import { useI18n } from "vue-i18n"
   /**
    * 响应式对象（reactive,computed）
    */
-  const searchSetting = computed(() => stateX.setting.search)
+  const searchSetting = computed(() => store.state.setting.search)
   const searchEngines = computed<SearchEngineData>(() => store.getters[SearchGetters.getUseSearchEngines])
   const currentEngine = computed({
     get: () => searchSetting.value.currentEngine,
@@ -98,12 +98,8 @@ import { useI18n } from "vue-i18n"
     set: searchItemNumber => itemCountChange(searchItemNumber)
   });
 
-  const blankSeparatorColorStyle = {
-                backgroundColor:{
-                    hex:"#000000",
-                    alpha:1
-                }
-            }
+  const blankSeparatorColorStyle = computed(()=>store.state.settings.pageColorStyle.buttonColor.hex)
+  const fontColor = computed(()=>store.state.settings.pageColorStyle.fontColor)
 
   const countRange = {
                 start: 0,
@@ -128,5 +124,9 @@ import { useI18n } from "vue-i18n"
     min-height: 600px;
     width: 600px;
     overflow: hidden;
+}
+
+.text{
+  color: v-bind("fontColor");
 }
 </style>

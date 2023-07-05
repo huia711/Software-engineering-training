@@ -6,10 +6,11 @@
   /**
    * 导入（import）
    */
-  import {computed, provide, watchEffect, defineProps, withDefaults, watch} from "vue"
+  import {computed, watchEffect, watch} from "vue"
   import {useStore} from "@/store"
   import { SettingMutations } from "@/store/setting"
   // 导入外部定义
+  import basicSettings from "@/views/settingPage/basicSettings.vue";
   import {LanguageType, ThemeMode} from "@/enum-interface"
   import { usePreferredDark } from "@/utils/use"
   // 外部
@@ -88,7 +89,6 @@
   })
 
   watch(() => isDark.value, (newValue, oldValue) => {
-    // console.log(newValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value)
     if (oldValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value) {
       store.commit(SettingMutations.updateThemeMode, newValue ? ThemeMode.Dark : ThemeMode.Light)
     }

@@ -1,6 +1,3 @@
-import { Option } from "@/enum-interface"
-import { computed, reactive } from "vue"
-
 /**
  * 前缀匹配
  */
@@ -45,16 +42,6 @@ export function isEmpty(obj: any): boolean {
  * @param target
  * @returns boolean
  */
-// export function equalsIgnoreCase(source?: string, target?: string) {
-//   if (source && target) {
-//     const sourceLow = source.toLowerCase(),
-//       targetLow = target.toLowerCase()
-//
-//     return sourceLow === targetLow
-//   } else {
-//     return false
-//   }
-// }
 
 /**
  * 存在任意字符

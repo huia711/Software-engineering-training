@@ -1,15 +1,15 @@
 <template>
     <div class="base" v-loading="uploading" element-loading-background="rgba(0,0,0,0.6)">
         <div class="container">
-            <p>修改昵称：<inputBox :visibleButton="false" :clearAllButton="true" :widthExpand="100" @dataChanged="getNewName" :defaultContent="userName"/></p>
-            <modernButton :customButtonStyle="buttonStyle" buttonText="确认修改" @buttonClicked="uploadName" element-loading-background="rgba(0,0,0,0.6)" />
-            <modernButton :customButtonStyle="buttonStyle" buttonText="取消" @buttonClicked="cancle" />
+            <p class="text">{{ t('userPage.editName.edit') }}<inputBox :visibleButton="false" :clearAllButton="true" :widthExpand="100" @dataChanged="getNewName" :defaultContent="userName"/></p>
+            <modernButton :customButtonStyle="buttonStyle" :buttonText="t('userPage.editName.confirm')" @buttonClicked="uploadName" element-loading-background="rgba(0,0,0,0.6)" />
+            <modernButton :customButtonStyle="buttonStyle" buttonText="t('userPage.editName.cancle')" @buttonClicked="cancle" />
         </div>
         <el-dialog :title="messageTitle" v-model="messageVisible" width="30%">
         <span>{{ message }}</span>
             <template #footer>
             <span class="dialog-footer">
-                <el-button type="primary" @click="messageVisible = false">确认</el-button>
+                <el-button type="primary" @click="messageVisible = false">{{ t('elDialog.buttons.confirm') }}</el-button>
             </span>
             </template>
         </el-dialog>
@@ -22,15 +22,18 @@ import inputBox from './inputBox.vue';
 import axios from 'axios';
 import cal from '@/utils/calculation';
 import { useStore } from '@/store';
+import { useI18n } from 'vue-i18n';
 import { computed } from '@vue/reactivity';
 import { mapMutations } from 'vuex';
 export default{
     setup(){
-        const store = useStore()
+        const store = useStore();
+        const {t} = useI18n();
         return{
             userId: computed(()=>store.state.settings.userId),
             userName: computed(()=>store.state.settings.userName),
             pageColorStyle: computed(()=>store.state.settings.pageColorStyle),
+            t
         }
     },
     data(){
@@ -43,6 +46,7 @@ export default{
             backgroundColor: computed(()=>cal.rgbaTextSpawn(cal.hexToRgb(this.pageColorStyle.backgroundColor.hex), this.pageColorStyle.backgroundColor.alpha)),
             buttonStyle: {
                 backgroundColor: this.pageColorStyle.buttonColor.hex,
+                fontColor: this.pageColorStyle.fontColor,
                 width:"250px",
                 height:"35px",
                 borderColor:"transparent",
@@ -57,6 +61,9 @@ export default{
     watch:{
         pageColorStyle(newVal, oldVal){
             this.buttonStyle.backgroundColor = newVal.buttonColor.hex
+        },
+        'pageColorStyle.fontColor'(newVal){
+            this.buttonStyle.fontColor = newVal
         }
     },
     methods:{
@@ -69,14 +76,14 @@ export default{
         },
         uploadName(){
             if(this.curName === ""){
-                this.message = "昵称不能为空!"
-                this.messageTitle = "错误"
+                this.message = this.t('elDialog.errorMessages.errorTypes.blankName')
+                this.messageTitle = this.t('elDialog.errorMessages.title')
                 this.messageVisible = true
                 return;
             }
             if(this.curName === this.userName){
-                this.message = "昵称不能与原名相同!"
-                this.messageTitle = "警告"
+                this.message = this.t('elDialog.errorMessages.errorTypes.repeatName')
+                this.messageTitle = this.t('elDialog.errorMessages.title')
                 this.messageVisible = true
                 return;
             }
@@ -92,14 +99,14 @@ export default{
                     this.setUserName(this.curName)
                 } else {
                     // 修改失败
-                    this.message = "ERROR: Reply code " + response.data.code
-                    this.messageTitle = "错误"
+                    this.message = this.t('elDialog.errorMessages.errorTypes.uploadFailure') + "Reply code " + response.data.code
+                    this.messageTitle = this.t('elDialog.errorMessages.title')
                     this.messageVisible = true
                 }
                 this.uploading = false
             }, error=>{
-                this.message = "ERROR:" + error.message
-                this.messageTitle = "错误"
+                this.message = this.t('elDialog.errorMessages.errorTypes.uploadFailure') + error.message
+                this.messageTitle = this.t('elDialog.errorMessages.title')
                 this.uploading = false
                 this.messageVisible = true
             })
@@ -121,7 +128,11 @@ export default{
   margin: auto;
   align-items: center;
   justify-content: center;
-  font-family: SmileySans,serif;
+  font-family: serif;
+}
+
+.text{
+    color: v-bind("buttonStyle.fontColor");
 }
 
 .container{

@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading" element-loading-background="rgba(0,0,0,0.6)" class="base">
     <div class="clipContainer">
-      <p>上传截图</p>
+      <p class="text">{{ t('userPage.imageClip.clipWindow') }}</p>
       <div class="viewer">
         <!-- 图片 -->
         <div 
@@ -18,13 +18,13 @@
         <div style="height: 330px; width: 1px;" :style="'backgroundColor:' + buttonColor"></div>
         <!-- 确认按钮 -->
         <div class="selectionContainer">
-          <p>预览图</p>
+          <p class="text">{{ t('userPage.imageClip.preview') }}</p>
           <div style="width: 160px; height: 160px;">
             <img v-show="previewImg" :src="previewImg" alt="NaN" style="width: 100%; height: 100%;"/>
           </div>
-          <modernButton buttonText="上传" :customButtonStyle="buttonStyle" 
+          <modernButton :buttonText="t('userPage.imageClip.upload')" :customButtonStyle="buttonStyle" 
           @buttonClicked="clip"/>
-          <modernButton buttonText="关闭" :customButtonStyle="buttonStyle" 
+          <modernButton :buttonText="t('userPage.imageClip.close')" :customButtonStyle="buttonStyle" 
           @buttonClicked="cancle"/>
         </div>
       </div>
@@ -33,7 +33,7 @@
       <span>{{ message }}</span>
       <template #footer>
       <span class="dialog-footer">
-          <el-button type="primary" @click="messageVisible = false">确认</el-button>
+          <el-button type="primary" @click="messageVisible = false">{{ t('elDialog.buttons.confirm') }}</el-button>
       </span>
       </template>
     </el-dialog>
@@ -45,16 +45,19 @@ import cal from '@/utils/calculation'
 import modernButton from './modernButton.vue';
 import axios from 'axios';
 import { useStore } from '@/store';
+import { useI18n } from 'vue-i18n'
 import { computed } from '@vue/reactivity';
 import { mapMutations } from 'vuex';
 export default {
   setup(){
     const store = useStore();
+    const {t} = useI18n();
     return{
       userId: computed(()=>store.state.settings.userId),
       pageColorStyle: computed(()=>store.state.settings.pageColorStyle),
       buttonAlpha: computed(()=>store.state.settings.pageColorStyle.buttonColor.alpha),
-      buttonColor: computed(()=>store.state.settings.pageColorStyle.buttonColor.hex)
+      buttonColor: computed(()=>store.state.settings.pageColorStyle.buttonColor.hex),
+      t
     }
   },
   data() {
@@ -68,6 +71,7 @@ export default {
       buttonStyle:{
         backgroundColor: this.pageColorStyle.buttonColor.hex,
         borderColor: "transparent",
+        fontColor: this.pageColorStyle.fontColor,
         borderRadius: "5px",
         cursor: "pointer",
         height: "35px",
@@ -132,7 +136,9 @@ export default {
         this.canvas.height = 1024;
 
         if(!this.canvas){
-          console.log("ERROR: Cannot create canvas!")
+          this.messageTitle = this.t('elDialog.errorMessages.title')
+          this.message = this.t('elDialog.errorMessages.errorTypes.noCanvas')
+          this.messageVisible = true
           return;
         }
 
@@ -155,8 +161,8 @@ export default {
     clip() {
 
       if(this.selectHeight*this.selectWidth === 0){
-        this.message = "请选择截图区域！"
-        this.messageTitle = "错误"
+        this.message = this.t('elDialog.errorMessages.errorTypes.noImageClipped')
+        this.messageTitle = this.t('elDialog.errorMessages.title')
         this.messageVisible = true
         return;
       }
@@ -179,8 +185,8 @@ export default {
         this.canvas.height = 1024;
 
         if(!this.canvas){
-          this.messageTitle = "错误"
-          this.message = "ERROR:Cannot create canvas!"
+          this.messageTitle = this.t('elDialog.errorMessages.title')
+          this.message = this.t('elDialog.errorMessages.errorTypes.noCanvas')
           this.messageVisible = true
           return;
         }
@@ -203,21 +209,22 @@ export default {
         // 获取图片数据并发送至后端
         let data = {
           "Id": this.userId,
-          "Avatar": clippedData  //base64编码的图片数据
+          "ImageData": clippedData,  //base64编码的图片数据
+          "description": "Customized avatar"
         }
         this.loading = true
         axios.post('http://localhost:2020/user/uploadAvatar',data).then(response =>{
           if(response.data.code !== 200){
             // 发送失败
-            this.messageTitle = "错误"
-            this.message = "上传失败！ERROR: Reply code " + response.data.code
+            this.messageTitle = this.t('elDialog.errorMessages.title')
+            this.message = this.t('elDialog.errorMessages.errorTypes.uploadFailure') + " Reply code " + response.data.code
             this.messageVisible = true
           }
           this.loading = false
         }, error=>{
           this.loading = false
-          this.messageTitle = "错误"
-          this.message = "上传失败！ERROR:" + error.message
+          this.messageTitle = this.t('elDialog.errorMessages.title')
+          this.message = this.t('elDialog.errorMessages.errorTypes.uploadFailure') + error.message
           this.messageVisible = true
         })
       }
@@ -234,8 +241,10 @@ export default {
   },
   watch:{
     pageColorStyle(newVal, oldVal){
-      this.confirmButtonStyle.backgroundColor = cal.rgbaTextSpawn(cal.hexToRgb(newVal.buttonColor.hex), newVal.buttonColor.alpha);
-      this.cancleButtonStyle.backgroundColor = cal.rgbaTextSpawn(cal.hexToRgb(newVal.buttonColor.hex), newVal.buttonColor.alpha);
+      this.buttonStyle.backgroundColor = cal.rgbaTextSpawn(cal.hexToRgb(newVal.buttonColor.hex), newVal.buttonColor.alpha);
+    },
+    'pageColorStyle.fontColor'(newVal){
+      this.buttonStyle.fontColor = newVal
     }
   },
   components:{
@@ -253,7 +262,7 @@ export default {
   margin: auto;
   align-items: center;
   justify-content: center;
-  font-family: SmileySans,serif;
+  font-family: serif;
 }
 
 .clipContainer{
@@ -292,6 +301,10 @@ export default {
   height: 100%;
   max-width: 300px;
   max-height: 300px;
+}
+
+.text{
+  color: v-bind("pageColorStyle.fontColor");
 }
 
 .wrapper{

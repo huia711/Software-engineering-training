@@ -69,8 +69,6 @@ export default {
     cancel: "取消",
     textIcon: "文字圖示",
     iconURL:"圖示URL",
-
-    updateSuccess:"儲存成功"
   },
   other: {
     setting: "其他設置",
@@ -92,5 +90,87 @@ export default {
   popup: {
     bookmark: "首頁導航",
     searchHistory: "搜索歷史"
+  },
+  elDialog: {
+    messages:{
+      warningTitle: "警告",
+      deleteSuccess: "刪除成功",
+      deleteWarning: "確認刪除賬號？（賬號將永久消失！）",
+    },
+    errorMessages:{
+      title: "錯誤",
+      errorTypes:{
+        uploadFailure: "上傳失敗:",
+        fetchFailure: "獲取失敗:",
+        deleteFailure: "刪除失敗:",
+        notLogined: "賬號未登錄！",
+        noImageClipped: "請選擇截圖區域！",
+        noCanvas: "無法處理圖片！",
+        blankName: "新暱稱不能為空！",
+        repeatName: "新暱稱不能與原名相同！",
+        blankOldPassword: "原密碼不能為空！",
+        blankNewPassword: "新密碼不不能為空！",
+        wrongPassword: "原密碼錯誤！",
+        passwordNotEqual: "兩次輸入的密碼不一致！"
+      }
+    },
+    buttons:{
+      confirm: "確定",
+      cancle: "取消"
+    }
+  },
+  loginPage: {
+    login:"登錄",
+    register: "註冊",
+    account: "賬號：",
+    password: "密碼：",
+    username: "暱稱：",
+    confirmPassword: "確認密碼：",
+    warnings:{
+      loginNotComplete: "賬號或密碼不能為空",
+      registerNotComplete: "用戶暱稱與密碼不能為空",
+      serverUnreachable: "無法連接服務器",
+      passwordNotEqual: "兩次輸入的密碼不一致"
+    }
+  },
+  settingPage: {
+    common: {
+      title: "通用",
+      settings: {
+        theme:{
+          title: "主題顏色",
+          customizedBackgroundColor: "自定義背景顏色",
+          customizedButtonColor: "自定義按鈕顏色",
+          fontColor: "字體顏色",
+          presetColor: "預設背景顏色",
+          preview: "預覽",
+          dayMode: "白天模式",
+          nightMode: "夜間模式"
+        },
+        lang: {
+          title: "語言設置"
+        }
+      }
+    },
+    wallpaper: {
+      title: "壁紙",
+      reload: "重新加載",
+      webImages: "網絡圖片",
+      uploadImages: {
+        title: "上傳圖片",
+        tips: "點擊選擇本地圖片文件",
+        links: "您也可在此輸入圖片鏈接"
+      },
+      confirm: "確認上傳"
+    },
+    advance: {
+      title: "搜索",
+      maxSearchCount: "最大搜索結果數量",
+    },
+    about: {
+      title: "關於",
+      author: "軟件中級實訓製作組",
+      rights: "2023 版權所有",
+    }
   }
 };

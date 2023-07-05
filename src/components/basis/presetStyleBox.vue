@@ -1,18 +1,20 @@
 <template>
     <div class="basic">
         <div class="presetStyle" @mouseenter="mouseOn(true)" @mouseleave="mouseOn(false)" @click="selected">
-            <p>预览</p>
-            <modernButton buttonText="预览" :customButtonStyle="btnStyle"/>
+            <p class="text">{{ t('settingPage.common.settings.theme.preview') }}</p>
+            <modernButton :buttonText="t('settingPage.common.settings.theme.preview')" :customButtonStyle="btnStyle"/>
         </div>
-        <p>{{ textUnderBox }}</p>
+        <p :style="'color:' + fontColor">{{ textUnderBox }}</p>
     </div>
 </template>
 
 <script>
 import modernButton from './modernButton.vue';
 import cal from '@/utils/calculation'
+import { useI18n } from 'vue-i18n';
 export default{
     data(){
+        const {t} = useI18n();
         return{
             bkgColorStyle: cal.hexToRgb(this.presetStyle.backgroundColor.hex),
             btnAlpha: this.presetStyle.buttonColor.alpha,
@@ -22,13 +24,15 @@ export default{
                 height: "35px",
                 borderColor:"transparent",
                 borderRadius:"6px",
+                fontColor: this.presetStyle.fontColor,
                 cursor:"pointer",
                 outlineColor:"transparent",
                 wordSpacing:"50px",
                 divHeight:"4rem"
             },
             outlineStyle: this.isSelected === true ? "2px solid purple" : "0px",
-            isMouseOn: false
+            isMouseOn: false,
+            t
         }
     },
     methods:{
@@ -65,6 +69,10 @@ export default{
         textUnderBox:{
             type:String,
             required:true
+        },
+        fontColor:{
+            type: String,
+            default: "black"
         }
     },
     components:{
@@ -83,6 +91,10 @@ export default{
     padding: 0px;
     height: 110px;
     width: 110px;
+}
+
+.text{
+    color: v-bind("presetStyle.fontColor");
 }
 
 .presetStyle{
