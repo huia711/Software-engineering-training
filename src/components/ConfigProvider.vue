@@ -91,6 +91,7 @@
   watch(() => isDark.value, (newValue, oldValue) => {
     if (oldValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value) {
       store.commit(SettingMutations.updateThemeMode, newValue ? ThemeMode.Dark : ThemeMode.Light)
+      // 加上
     }
   }, {
     deep: true,      // 深度监听属性的变化
