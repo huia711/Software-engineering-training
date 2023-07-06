@@ -111,12 +111,12 @@ import userPage from '@/views/userPage/userPage.vue'
 import { TabMutations } from "@/store/tab"
 // 外部导入
 import $ from 'jquery';
-import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
 import {Check, Close, Document, Menu as IconMenu, Setting, User} from '@element-plus/icons-vue'
 import axios from "@/plugins/axios";
 import { BookMarkMutations } from "@/store/bookmark";
 import { SearchSuggestion,OpenPageTarget, LanguageType } from "@/enum-interface"
+import { loginMethod } from "@/utils/loginMethod"
 
 export default {
   data(){
@@ -327,11 +327,19 @@ export default {
       } else {
         $("#wallpaper").removeClass("backgroundImg");
       }
+      window.addEventListener('scroll', handleScroll)
+      // 组件挂载后自动读取本地数据并尝试登录
+      let account = localStorage.getItem("userId")
+      let password = localStorage.getItem("userPassword")
+      if(account && password){
+        // 存在数据，尝试登录
+        loginMethod({
+          "Id": account,
+          "passwd": password
+        })
+    }
     })
 
-    onMounted(() => {
-      window.addEventListener('scroll', handleScroll)
-    })
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', handleScroll)
     })

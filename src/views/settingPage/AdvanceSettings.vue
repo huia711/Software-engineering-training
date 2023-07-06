@@ -2,7 +2,7 @@
     <div class="basis">
         <p class="text">{{ t('settingPage.advance.title') }}</p>
         <blankSeparator :blankColorStyle="blankSeparatorColorStyle" height="0px 0px 20px 0px"/>
-        <slider :fontColor="fontColor" :valueCallback="itemCountChange" :range="countRange" 
+        <slider :fontColor="fontColor" @valueCallback="itemCountChange" :range="countRange" 
         :textWidth="250" :maxSliderWidth="320" :width="570" :text="t('settingPage.advance.maxSearchCount')"/>
     
     <!--管理搜索引擎-->

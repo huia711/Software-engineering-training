@@ -147,6 +147,9 @@ export default{
                 this.setUserName("Guest")
                 this.setUserId("")
                 this.setUserPassword("")
+                // 删除本地记录
+                localStorage.removeItem("userId")
+                localStorage.removeItem("userPassword")
                 this.$emit("pageHide")
             }
             else
