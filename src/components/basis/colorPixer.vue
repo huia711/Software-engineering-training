@@ -10,16 +10,15 @@
             <inputBox :visibleButton="false" :widthExpand="-203" :defaultContent="String(currentColorStyle.alpha)" @dataChanged="alphaChange"/>
         </div>
         <div>
-            <slider text="R" :range="rangeR" :valueCallback="rChange" :fontColor="fontColor"/>
-            <slider text="G" :range="rangeG" :valueCallback="gChange" :fontColor="fontColor"/>
-            <slider text="B" :borderBottomStyle="borderBottom" :range="rangeB" :valueCallback="bChange" :fontColor="fontColor"/>
-            <slider text="Alpha" :range="rangeAlpha" :valueCallback="alphaChange" :fontColor="fontColor"/>
+            <slider text="R" :range="rangeR" @valueCallback="rChange" :fontColor="fontColor"/>
+            <slider text="G" :range="rangeG" @valueCallback="gChange" :fontColor="fontColor"/>
+            <slider text="B" :borderBottomStyle="borderBottom" :range="rangeB" @valueCallback="bChange" :fontColor="fontColor"/>
+            <slider text="Alpha" :range="rangeAlpha" @valueCallback="alphaChange" :fontColor="fontColor"/>
         </div>
     </div>
 </template>
 
 <script>
-import { ref } from 'vue';
 import slider from './SliderComponent.vue';
 import inputBox from './inputBox.vue';
 import cal from '@/utils/calculation'
@@ -67,44 +66,44 @@ export default{
     },
     methods:{
         rChange(newVal){
-            let validNum = cal.max(cal.min(newVal,255),0)
+            var validNum = cal.max(cal.min(newVal,255),0)
             this.currentColorStyle.R = validNum
             this.rangeR = Object({
                 start: 0,
                 end: 255,
                 baseNum: validNum
             })
-            this.colorChangeCallback(cal.rgbaToObj(this.currentColorStyle))
+            this.$emit("colorChangeCallback",cal.rgbaToObj(this.currentColorStyle))
         },
         gChange(newVal){
-            let validNum = cal.max(cal.min(newVal,255),0)
+            var validNum = cal.max(cal.min(newVal,255),0)
             this.currentColorStyle.G = validNum
             this.rangeG = Object({
                 start: 0,
                 end: 255,
                 baseNum: validNum
             })
-            this.colorChangeCallback(cal.rgbaToObj(this.currentColorStyle))
+            this.$emit("colorChangeCallback",cal.rgbaToObj(this.currentColorStyle))
         },
         bChange(newVal){
-            let validNum = cal.max(cal.min(newVal,255),0)
+            var validNum = cal.max(cal.min(newVal,255),0)
             this.currentColorStyle.B = validNum
             this.rangeB = Object({
                 start: 0,
                 end: 255,
                 baseNum: validNum
             })
-            this.colorChangeCallback(cal.rgbaToObj(this.currentColorStyle))
+            this.$emit("colorChangeCallback",cal.rgbaToObj(this.currentColorStyle))
         },
         alphaChange(newVal){
-            let validNum = cal.max(cal.min(newVal,100),0)
+            var validNum = cal.max(cal.min(newVal,100),0)
             this.currentColorStyle.alpha = validNum
             this.rangeAlpha = Object({
                 start: 0,
                 end: 100,
                 baseNum: validNum
             })
-            this.colorChangeCallback(cal.rgbaToObj(this.currentColorStyle))
+            this.$emit("colorChangeCallback",cal.rgbaToObj(this.currentColorStyle))
         }
     },
     props:{
@@ -116,10 +115,6 @@ export default{
               alpha: 1
             }
           }
-        },
-        colorChangeCallback:{
-            type:Function,
-            required:true
         },
         fontColor:{
             type: String,

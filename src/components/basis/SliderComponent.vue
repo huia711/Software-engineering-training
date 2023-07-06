@@ -1,26 +1,18 @@
 <template>
-    <div class="main" @mousemove="updateInfo" @mouseleave="stopUpdate"  @mouseup="stopUpdate">
+    <div class="main">
         <p class="text">{{ text }}</p>
         <div class="base">
             <p class="text" style="justify-content: flex-end;">{{ curValue }}</p>
             <div class="slider" ref="Slider">
-                <!-- Left side -->
-                <!-- Width based on the current value -->
-                <div class="slider__left" :style="{width: curPercentage + '%'}"></div>
-
-                <!-- Circle -->
-                <div class="slider__circle" @mousedown="initInfo"></div>
-
-                <!-- Right side -->
-                <div class="slider__right"></div>
+                <el-slider v-model="curValue"
+                :min="range.start" :max="range.end">
+                </el-slider>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import GetMousePos from '@/utils/Mouse'
-import cal from '@/utils/calculation'
 
 export default{
     created(){
@@ -31,49 +23,15 @@ export default{
     },
     data(){
         return{
-            mouse : GetMousePos(),
-            curPercentage: (this.range.baseNum - this.range.start)*100/(this.range.end - this.range.start),
-            startx: 0,
-            endx: 0,
-            relX: 0,
-            listenMouse: false,
             curValue: this.range.baseNum
-        }
-    },
-    methods:{
-        initInfo(){
-            // 鼠标按下，初始化参数
-            this.listenMouse = true
-            let target = this.$refs.Slider.getBoundingClientRect()
-            this.startx = target.x
-            this.endx = target.right
-            let mousePos = this.mouse
-            // 左侧div右边界x坐标位置在(startx + (endx - startx)*percentage/100)px
-            // 获取鼠标点击位置相对左侧div右边界x坐标relX
-            this.relX = mousePos.x - (this.startx + (this.endx - this.startx)*this.curPercentage/100)
-        },
-        updateInfo(){
-            // 鼠标拖动，更新curPercentage
-            if(this.listenMouse === true){
-                let mousePos = this.mouse
-                // 限制左侧div右边界x坐标范围
-                // 实际上左侧div滑动比例范围为0 ~ maxRatio,maxRatio = (endx - startx - roundRadiu*2)/(endx - startx)
-                // 则有实际返回数值realPercentage = curPercentage / maxRatio
-                let curX = cal.min(cal.max(mousePos.x - this.relX,this.startx),this.endx - this.roundRadius*2)
-                let maxRatio = (this.endx - this.startx - this.roundRadius*2)/(this.endx - this.startx)
-                this.curPercentage = Math.round((curX - this.startx)*100/(this.endx - this.startx))
-                this.curValue = Math.round((this.curPercentage/100/maxRatio).toFixed(2)*(this.range.end - this.range.start) + this.range.start)
-                this.valueCallback(this.curValue)
-            }
-        },
-        stopUpdate(){
-            this.listenMouse = false
         }
     },
     watch:{
         range(newValue,oldValue){
             this.curValue = newValue.baseNum
-            this.curPercentage = (this.curValue - newValue.start)/(newValue.end - newValue.start)*100
+        },
+        curValue(newVal, oldVal){
+            this.$emit("valueCallback",Number(newVal))
         }
     },
     props:{
@@ -99,10 +57,6 @@ export default{
         borderBottomStyle:{
             type:String,
             default:""
-        },
-        valueCallback:{
-            type:Function,
-            required:true
         },
         width:{
             type:Number,
