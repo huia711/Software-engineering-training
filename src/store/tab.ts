@@ -2,9 +2,10 @@
  * 导入（import）
  */
 import { TabItem, Tabs } from "@/enum-interface"
-import { createStoreModule } from "@/store/index";
+import { createStoreModule } from "@/store/index"
 import { copy } from "@/utils/common";
-import { debounce } from "@/utils/async";
+import { debounce } from "@/utils/async"
+import {House, Document,SwitchButton,Collection} from '@element-plus/icons-vue'
 
 /**
  * 自定义类型（type）的定义
@@ -43,24 +44,35 @@ export default createStoreModule<TabState>({
             // 创建一个数组保存网站
             Tabs: [
             {
-                title: 'Tab 1',
+                title: '首页',
                 num: 1,
-                content: 'Tab 1 content',
+                icon: SwitchButton,
             },
             {
-                title: 'Tab 2',
+                title: '主页面',
                 num: 2,
-                content: 'Tab 2 content',
-            }],
+                icon: House,
+            },
+            {
+                title: '资讯',
+                num: 3,
+                icon: Document,
+            },
+            {
+                title: '学习',
+                num: 4,
+                icon: Collection,
+            }
+            ],
             TabsAdd: [],
-            tabIndex: 2,
+            tabIndex: 4,
             lastUpdateTime: undefined
         }
 
-        // 从本地存储中读取
-        const TabsData = JSON.parse(localStorage[TAB_STORAGE] ?? "[]")
-        // 将本地存储中读取到的合并到默认状态中
-        copy(TabsData, defaultState, true)
+        // // 从本地存储中读取
+        // const TabsData = JSON.parse(localStorage[TAB_STORAGE] ?? "[]")
+        // // 将本地存储中读取到的合并到默认状态中
+        // copy(TabsData, defaultState, true)
 
         return defaultState
     },

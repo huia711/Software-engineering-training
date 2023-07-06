@@ -4,7 +4,7 @@
 
     <!-- 如果配置项中要求，显示搜索引擎图标 -->
     <div class="search-logo"  v-if="searchSetting.showEngineIcon ">
-      <!-- <img :src="searchEngines[currentEngine].icon" class="logo" alt="logo" draggable="false" /> -->
+       <img :src="searchEngines[currentEngine].icon" class="logo" alt="logo" draggable="false" />
     </div>
 
     <!-- 输入框容器 -->
