@@ -143,6 +143,7 @@ export default{
   flex-direction: row;
   background-color: v-bind("colorStyle");
   border-radius: 10px;
+  border: v-bind("'1px solid ' + pageColorStyle.buttonColor.hex");
   width: auto;
   height: auto;
   background-attachment: scroll;

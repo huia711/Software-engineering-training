@@ -62,7 +62,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setBackgroundImage']),
+    ...mapMutations(['setBackgroundImage','setBackgroundURL']),
     openFileBrowser() {
       // 手动触发点击事件，打开文件选择框
       this.$refs.fileInput.click();
@@ -114,6 +114,8 @@ export default {
           if(response.data.code!==200){
             this.$emit("error",this.t('elDialog.errorMessages.title'),
             this.t('elDialog.errorMessages.errorTypes.uploadFailure')+response.data.msg)
+          } else {
+            this.setBackgroundURL(response.data.data.URL)
           }
         }, error=>{
           this.$emit("error",this.t('elDialog.errorMessages.title'),

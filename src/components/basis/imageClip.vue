@@ -278,6 +278,7 @@ export default {
   justify-content: flex-start;
   flex-direction: column;
   background-color: v-bind("backgroundColor");
+  border: v-bind("'1px solid ' + pageColorStyle.buttonColor.hex");
 }
 
 .viewer{
