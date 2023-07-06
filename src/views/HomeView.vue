@@ -287,11 +287,11 @@ export default {
     }
 
     const scroll = (sec) => {
-      console.log("success")
+      // console.log("success")
       const element = document.getElementById('sec'+sec)
       element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
       pageNow.value = sec
-      console.log("page"+pageNow.value)
+      // console.log("page"+pageNow.value)
     }
 
     const addTab = (targetName) => {

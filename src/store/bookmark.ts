@@ -19,6 +19,7 @@ export interface BookMarkState {
   bookMarks: BookMarks
   lastUpdateTime?: number
   pageNow: number
+  pageCount: number[]
 }
 
 //
@@ -65,16 +66,27 @@ export default createStoreModule<BookMarkState>({
   state() {
     // 设置默认状态值
     const defaultState: BookMarkState = {
-
       // 创建一个数组保存网站
       bookMarks: [],
       lastUpdateTime: undefined,
-      pageNow: 1
+      pageNow: 1,
+      pageCount: []
     }
 
     // 从本地存储中读取
     const topSitesData = JSON.parse(localStorage[BOOK_MARK_STORAGE] ?? "[]")
+    // console.log(topSitesData)
     copy(topSitesData, defaultState, true)
+    //初始化pageNow
+    defaultState.pageNow = 1
+    //初始化pageCount
+    for(let i=1; i < defaultState.pageCount.length; i++) {
+      defaultState.pageCount[i-1] = defaultState.bookMarks.reduce((acc, curr) => {
+        return curr.page === i ? acc + 1 : acc;
+      }, 0);
+    }
+    console.log(defaultState.pageCount)
+
     return defaultState
   },
 
@@ -90,10 +102,7 @@ export default createStoreModule<BookMarkState>({
       // 从根状态中获取topSite配置对象
       const bookMarkSetting = rootState.setting.bookMark
       // 根据配置筛选出前topSiteSetting.col * topSiteSetting.row项网站数据
-      return bookMarks
-          .filter((_item, index) => index < bookMarkSetting.col * bookMarkSetting.row)
-          .filter((item, _index) => item.page === rootState.bookMark.pageNow)
-
+      return bookMarks.filter((item, _index) => item.page === rootState.bookMark.pageNow)
     }
   },
   mutations: {
@@ -104,8 +113,11 @@ export default createStoreModule<BookMarkState>({
      */
     [BookMarkMutations.addBookMark]: (state, payload: { data: BookMarkItem, userId: string }) => {
       const { data, userId } = payload
+      if (state.pageCount[0] < 12 && state.pageCount[state.pageNow] < 18)
       state.bookMarks.push(data)
+      state.pageCount[state.pageNow]++
       console.log(data)
+      console.log(state.pageCount)
       saveBookMarkState(state, userId)
     },
     /**
@@ -126,6 +138,7 @@ export default createStoreModule<BookMarkState>({
     [BookMarkMutations.deleteBookMark]: (state, payload: { index: number, userId: string }) => {
       const { index, userId } = payload
       state.bookMarks.splice(index, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
+      state.pageCount[state.pageNow]--
       saveBookMarkState(state, userId)
     },
 
@@ -161,6 +174,13 @@ export default createStoreModule<BookMarkState>({
       // save
       const settingJson = JSON.stringify(state)
       localStorage.setItem(BOOK_MARK_STORAGE, settingJson)
+      //初始化pageCount
+      for(let i=1; i < state.pageCount.length; i++) {
+        state.pageCount[i-1] = state.bookMarks.reduce((acc, curr) => {
+          return curr.page === i ? acc + 1 : acc;
+        }, 0);
+      }
+      console.log(state.pageCount)
     },
 
     /**
