@@ -12,21 +12,7 @@
       <div class="search-input" ref="searchInput">
         <!--自动完成搜索建议-->
         <!-- 搜索输入框，按下回车键或点击搜索按钮时触发搜索事件 -->
-        <el-autocomplete :placeholder="t('home.search')"
-                         v-model="inputSearch"
-                         type="text"
-                         class="input-with-select"
-                         clearable
-                         autofocus
-                         highlight-first-item
-                         fit-input-width
-                         @keyup.enter="onSearch(inputSearch)"
-                         @keydown="onSwitchEngines"
-
-                         :fetch-suggestions="querySearch"
-                         popper-class="my-autocomplete"
-                         @clear="commit(SearchMutations.cleanHistory)"
-        >
+        <el-autocomplete :placeholder="t('home.search')">
           <!-- 搜索引擎选项卡 -->
           <template #prepend v-if="searchSetting.showEngineSelect">
             <el-select v-model = "currentEngine">
