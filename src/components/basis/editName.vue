@@ -3,7 +3,7 @@
         <div class="container">
             <p class="text">{{ t('userPage.editName.edit') }}<inputBox :visibleButton="false" :clearAllButton="true" :widthExpand="100" @dataChanged="getNewName" :defaultContent="userName"/></p>
             <modernButton :customButtonStyle="buttonStyle" :buttonText="t('userPage.editName.confirm')" @buttonClicked="uploadName" element-loading-background="rgba(0,0,0,0.6)" />
-            <modernButton :customButtonStyle="buttonStyle" buttonText="t('userPage.editName.cancle')" @buttonClicked="cancle" />
+            <modernButton :customButtonStyle="buttonStyle" :buttonText="t('userPage.editName.cancle')" @buttonClicked="cancle" />
         </div>
         <el-dialog :title="messageTitle" v-model="messageVisible" width="30%">
         <span>{{ message }}</span>

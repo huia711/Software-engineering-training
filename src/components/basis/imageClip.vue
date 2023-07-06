@@ -214,13 +214,16 @@ export default {
         }
         this.loading = true
         axios.post('http://localhost:2020/user/uploadAvatar',data).then(response =>{
+          this.loading = false
           if(response.data.code !== 200){
             // 发送失败
             this.messageTitle = this.t('elDialog.errorMessages.title')
             this.message = this.t('elDialog.errorMessages.errorTypes.uploadFailure') + " Reply code " + response.data.code
             this.messageVisible = true
           }
-          this.loading = false
+          else{
+            this.$emit("pageHide")
+          }
         }, error=>{
           this.loading = false
           this.messageTitle = this.t('elDialog.errorMessages.title')
@@ -230,7 +233,7 @@ export default {
       }
     },
     cancle(){
-      this.$emit("clipCancle");
+      this.$emit("pageHide");
     }
   },
   props:{

@@ -1,6 +1,6 @@
 <template>
     <div class="imgBasis" @click="setBackgroundImg">
-      <img class="imgStyle" :src="imageUrl" :alt="imageAlt"/>
+      <img class="imgStyle" :src="localUrl" :alt="imageAlt"/>
       <div class="imgDescription">
         <p style="font-size: 30px; word-spacing: 15px;">{{ imageDescription }}</p>
       </div>
@@ -9,6 +9,7 @@
   
 <script>
 import { useStore } from '@/store';
+import axios from 'axios';
 import { mapMutations } from 'vuex';
 export default {
 data(){
@@ -17,13 +18,15 @@ data(){
   }
 },
 methods: {
-  ...mapMutations(['setBackgroundImage']),
+  ...mapMutations(['setBackgroundImage','setBackgroundURL']),
   setBackgroundImg(){
-    this.setBackgroundImage(this.imageUrl)
+    this.setBackgroundImage(this.localUrl)
+    this.setBackgroundURL(this.webUrl)
   }
 },
 props: {
-  imageUrl: String,
+  localUrl: String,
+  webUrl: String,
   imageAlt: String,
   imageDescription: String
 }

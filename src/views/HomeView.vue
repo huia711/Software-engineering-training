@@ -189,12 +189,13 @@ export default {
         }
         let data = {
           "Id": this.store.state.settings.userId,
+          "backgroundURL": this.store.state.settings.backgroundURL,
           "backgroundColor": this.store.state.settings.pageColorStyle.backgroundColor.hex,
           "backgroundAlpha": this.store.state.settings.pageColorStyle.backgroundColor.alpha,
           "buttonColor": this.store.state.settings.pageColorStyle.buttonColor.hex,
           "buttonAlpha": this.store.state.settings.pageColorStyle.buttonColor.alpha,
-          "customBackgroungColor": this.store.state.settings.pageColorStyle.customBackgroundColor,
-          "customButtonColor": this.store.state.settings.pageColorStyle.customButtonColor,
+          "customBackgroungColor": this.store.state.settings.pageColorStyle.customBackgroundColor ? '1' : '0',
+          "customButtonColor": this.store.state.settings.pageColorStyle.customButtonColor ? '1' : '0',
           "presetColor": this.store.state.settings.pageColorStyle.presetColor,
           "fontColor": this.store.state.settings.pageColorStyle.fontColor,
           "language": langStr,
@@ -209,6 +210,7 @@ export default {
           if(response.data.code === 400){
             // 同步失败
             this.settingUploadSuccess = -1
+            console.log(response.data)
             setTimeout(()=>{
               this.settingUploadSuccess = 0
             },5000)
@@ -238,6 +240,13 @@ export default {
         $("#setting-page").removeClass("slide_out").addClass("slide_in");
       } else {
         $("#setting-page").removeClass("slide_in").addClass("slide_out");
+      }
+    },
+    userVisible(newVal, oldVal){
+      if (newVal) {
+        $("#user-page").removeClass("slide_out").addClass("slide_in");
+      } else {
+        $("#user-page").removeClass("slide_in").addClass("slide_out");
       }
     },
     backgroungImage(newVal, oldVal){
@@ -370,7 +379,7 @@ export default {
 
   #wallpaper{
     display: flex;
-    //position: fixed;
+    /* position: fixed; */
     width: 100%;
     height: 100%;
     top: 0;

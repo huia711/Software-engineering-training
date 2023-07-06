@@ -17,7 +17,7 @@
         <!-- 从本地读取图片，仅供测试使用 -->
         <!-- <input type="file" style="width: 600px; height: 100px;" ref="testInput" multiple @change="testFunc"> -->
         <div v-for="(image, index) in state.images" :key="index">
-          <imageViewer :image-url="image.url" :imageDescription="image.description" />
+          <imageViewer :local-url="image.localUrl" :web-url="image.webUrl" :imageDescription="image.description" />
         </div>
       </div>
       </el-scrollbar>
@@ -62,7 +62,8 @@ watch(locale,(newLocale)=>{
 
 // 定义图片数据类型
 interface ImageInfo {
-  url: string,
+  localUrl: string,
+  webUrl: string,
   description: string
 }
 
@@ -88,6 +89,7 @@ async function loadWebPicture(){
       for(i = 0; i < imageURLs.length - 1; i++){
         // 根据URL数组从服务器获取图片数据
         let description = imageDescriptions[i]??''
+        let url = imageURLs[i]
         axios.get(imageURLs[i]).then(response=>{
           let imageStr = window.atob(response.data.data.image);
           const imageDat = new Uint8Array(imageStr.length)
@@ -95,7 +97,8 @@ async function loadWebPicture(){
             imageDat[j] = imageStr.charCodeAt(j)
           const imageBlob = new Blob([imageDat], { type: 'image/jpeg' });
           state.images.push({
-            url: URL.createObjectURL(imageBlob),
+            localUrl: URL.createObjectURL(imageBlob),
+            webUrl: url,
             description: description
           })
         },error=>{
