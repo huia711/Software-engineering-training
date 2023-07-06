@@ -122,7 +122,7 @@ export default{
         }
     },
     methods:{
-        ...mapMutations(['setAvatar','setUserId','setUserName','setUserPassword']),
+        ...mapMutations(['setAvatar','setUserId','setUserName','setUserPassword','setBackgroundImage']),
         openFileBrowser() {
             // 手动触发点击事件，打开文件选择框
             this.$refs.fileInput.click();
@@ -130,8 +130,10 @@ export default{
         handleFileChange(event) {
             // 获取文件路径并设置到 data 中
             const file = event.target.files[0];
-            this.avatarSrc = URL.createObjectURL(file);
-            this.avatarClipPageVisible(true)
+            if(file){
+                this.avatarSrc = URL.createObjectURL(file);
+                this.avatarClipPageVisible(true)
+            }
         },
         deleteAccountButtonState(state){
             if(state === true){
@@ -147,6 +149,7 @@ export default{
                 this.setUserName("Guest")
                 this.setUserId("")
                 this.setUserPassword("")
+                this.setBackgroundImage("")
                 // 删除本地记录
                 localStorage.removeItem("userId")
                 localStorage.removeItem("userPassword")
@@ -272,6 +275,7 @@ export default{
     flex-direction: column;
     align-items: center;
     border-radius: 10px;
+    border: v-bind("'1px solid ' + pageColorStyle.buttonColor.hex");
     background-color: v-bind("backgroundColor");
 }
 

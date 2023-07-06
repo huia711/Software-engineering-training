@@ -461,6 +461,7 @@ export default {
   height: 500px;
   width: 400px;
   background-color: rgba(v-bind("colorStyle.r"), v-bind("colorStyle.g"), v-bind("colorStyle.b"), v-bind("pageColorStyle.backgroundColor.alpha"));
+  border: v-bind("'1px solid ' + pageColorStyle.buttonColor.hex");
   border-radius: 15px;
 }
 

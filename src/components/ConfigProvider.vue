@@ -92,6 +92,41 @@
     if (oldValue ? ThemeMode.Dark : ThemeMode.Light === currentTheme.value) {
       store.commit(SettingMutations.updateThemeMode, newValue ? ThemeMode.Dark : ThemeMode.Light)
       // 加上
+      if(newValue){
+        // 黑夜模式
+        const tempPageColorStyle = Object({
+            backgroundColor:{
+              hex:"#000000",
+              alpha:1
+            },
+            buttonColor: {
+              hex:"#ffffff",
+              alpha:0.3
+            },
+            fontColor:"white",
+            customBackgroundColor: store.state.settings.pageColorStyle.customBackgroundColor,
+            customButtonColor: store.state.settings.pageColorStyle.customButtonColor,
+            presetColor: 1
+          })
+        store.commit("setPageColorStyle",tempPageColorStyle)
+      } else {
+        // 白天模式
+        const tempPageColorStyle = Object({
+            backgroundColor:{
+              hex:"#ffffff",
+              alpha:1
+            },
+            buttonColor: {
+              hex:"#000000",
+              alpha:0.3
+            },
+            fontColor:"black",
+            customBackgroundColor: store.state.settings.pageColorStyle.customBackgroundColor,
+            customButtonColor: store.state.settings.pageColorStyle.customButtonColor,
+            presetColor: 0
+          })
+        store.commit("setPageColorStyle",tempPageColorStyle)
+      }
     }
   }, {
     deep: true,      // 深度监听属性的变化

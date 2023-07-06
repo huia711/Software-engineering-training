@@ -71,7 +71,7 @@ export default{
             this.rangeR = Object({
                 start: 0,
                 end: 255,
-                baseNum: validNum
+                baseNum: Number(validNum)
             })
             this.$emit("colorChangeCallback",cal.rgbaToObj(this.currentColorStyle))
         },
@@ -81,7 +81,7 @@ export default{
             this.rangeG = Object({
                 start: 0,
                 end: 255,
-                baseNum: validNum
+                baseNum: Number(validNum)
             })
             this.$emit("colorChangeCallback",cal.rgbaToObj(this.currentColorStyle))
         },
@@ -91,7 +91,7 @@ export default{
             this.rangeB = Object({
                 start: 0,
                 end: 255,
-                baseNum: validNum
+                baseNum: Number(validNum)
             })
             this.$emit("colorChangeCallback",cal.rgbaToObj(this.currentColorStyle))
         },
@@ -101,7 +101,7 @@ export default{
             this.rangeAlpha = Object({
                 start: 0,
                 end: 100,
-                baseNum: validNum
+                baseNum: Number(validNum)
             })
             this.$emit("colorChangeCallback",cal.rgbaToObj(this.currentColorStyle))
         }
