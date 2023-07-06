@@ -14,6 +14,7 @@ export interface SettingsState {
     userName: string
     userPassword: string
     avatar: string
+    backgroundURL: string
 }
 
 export enum SettingsMutationTypes {
@@ -50,8 +51,8 @@ export default createStoreModule<SettingsState>({
             userId: "",
             userName: "Guest",
             userPassword: "",
-            avatar: "img/userHead.png"
-
+            avatar: "img/userHead.png",
+            backgroundURL: "",
         }
 
         return defaultState
@@ -75,6 +76,9 @@ export default createStoreModule<SettingsState>({
         initSettings(state, payload: any) {
             state.pageColorStyle = payload.pageColorStyle;
             state.searchItemCount = payload.searchItemCount;
+        },
+        setBackgroundURL(state, payload:string) {
+            state.backgroundURL = payload;
         },
         setAvatar(state, payload:string) {
             state.avatar = payload;

@@ -95,7 +95,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setUserName', 'setUserId', 'setAvatar', 'initSettings', 'setBackgroundImage', 'updateBookMarks', 'updateHistory','setUserPassword']),
+    ...mapMutations(['setUserName', 'setUserId', 'setAvatar', 'initSettings', 'setBackgroundImage', 'setBackgroundURL', 'updateBookMarks', 'updateHistory', 'setUserPassword']),
     loginButtonClicked() {
       if (this.registerMode === false) {
         if (this.account === "" || this.passwd === "")
@@ -153,8 +153,8 @@ export default {
                 this.initSettings({
                   pageColorStyle: {
                     fontColor: response.data.data.fontColor,
-                    customBackgroundColor: response.data.data.customBackgroundColor,
-                    customButtonColor: response.data.data.customButtonColor,
+                    customBackgroundColor: response.data.data.customBackgroundColor === '1' ? true : false,
+                    customButtonColor: response.data.data.customButtonColor === '1' ? true : false,
                     presetColor: response.data.data.presetColor,
                     backgroundColor: {
                       hex: response.data.data.backgroundColor,
@@ -229,6 +229,7 @@ export default {
                     this.setAvatar(URL.createObjectURL(avatarBlob));
                   })
                 // 获取用户背景图片，格式同上方头像
+                this.setBackgroundURL(response.data.data.backgroundURL)
                 if (response.data.data.backgroundURL !== "null")
                   axios.get(response.data.data.backgroundURL).then(response => {
                     if (response.data.code === 200) {

@@ -266,5 +266,6 @@ export default{
 .boxs{
     display: flex;
     flex-direction: row;
+    padding: 10px 0px 0px 0px;
 }
 </style>

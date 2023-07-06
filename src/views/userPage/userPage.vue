@@ -29,7 +29,7 @@
         </div>
         <!-- 截图页面 -->
         <imageClip v-if="avatarProcessWindowVisible" 
-        :imageUrl="avatarSrc" @clipCancle="avatarClipPageVisible(false)" v-click-outside="handleClickOutsideClipPage"
+        :imageUrl="avatarSrc" @pageHide="avatarClipPageVisible(false)" v-click-outside="handleClickOutsideClipPage"
         style="display: flex; z-index: 200; position: fixed;"/>
         <input ref="fileInput" type="file" style="display:none;" accept="image/*" @change="handleFileChange" 
         />
@@ -42,7 +42,7 @@
         @hidePage="editPasswordPageVisible(false)"
         style="display: flex; z-index: 200; position: fixed;"/>
         <!-- 提示框 -->
-        <el-dialog :title="t('userPage.messages.warningTitle')" v-model="dialogVisible" width="30%">
+        <el-dialog :title="t('elDialog.messages.warningTitle')" v-model="dialogVisible" width="30%">
             <span>{{ t('elDialog.messages.deleteWarning') }}</span>
             <template #footer>
             <span class="dialog-footer">
