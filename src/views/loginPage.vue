@@ -153,8 +153,8 @@ export default {
                 this.initSettings({
                   pageColorStyle: {
                     fontColor: response.data.data.fontColor,
-                    customBackgroundColor: response.data.data.customBackgroundColor === '1' ? true : false,
-                    customButtonColor: response.data.data.customButtonColor === '1' ? true : false,
+                    customBackgroundColor: response.data.data.customBackgroundColor,
+                    customButtonColor: response.data.data.customButtonColor,
                     presetColor: response.data.data.presetColor,
                     backgroundColor: {
                       hex: response.data.data.backgroundColor,

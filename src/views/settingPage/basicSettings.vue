@@ -8,14 +8,14 @@
                 :initialstate="curCustomBackgroundColorState" :font-color="pageColorStyle.fontColor"
                 @stateChange="customBackgroundColorStateChange"/>
                 <colorPixer v-if="curCustomBackgroundColorState" 
-                :colorChangeCallback="backgroundColorChange" :colorStyle="backgroundColorStyle" :fontColor="pageColorStyle.fontColor"/>
+                @colorChangeCallback="backgroundColorChange" :colorStyle="backgroundColorStyle" :fontColor="pageColorStyle.fontColor"/>
             </div>
             <div>
                 <switcher :texts="t('settingPage.common.settings.theme.customizedButtonColor')" 
                 :initialstate="curCustomButtonColorState" :font-color="pageColorStyle.fontColor"
                 @stateChange="customButtonColorStateChange"/>
                 <colorPixer v-if="curCustomButtonColorState" 
-                :colorChangeCallback="buttonColorChange" :colorStyle="buttonColorStyle" :fontColor="pageColorStyle.fontColor"/>
+                @colorChangeCallback="buttonColorChange" :colorStyle="buttonColorStyle" :fontColor="pageColorStyle.fontColor"/>
             </div>
             <div>
                 <switcher :texts="t('settingPage.common.settings.theme.fontColor') + pageColorStyle.fontColor" 
