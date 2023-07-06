@@ -146,6 +146,7 @@ export default{
   justify-content: center;
   flex-direction: column;
   background-color: v-bind("backgroundColor");
+  border: v-bind("'1px solid ' + pageColorStyle.buttonColor.hex");
 }
 
 </style>
