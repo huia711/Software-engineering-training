@@ -19,7 +19,7 @@
           shadow="hover"
           :body-style="{ padding: '0px' }"
       >
-        <TableItem type="weibo"/>
+        <TableItem type="wbHot"/>
       </el-card>
       <el-card
           v-if="pageNow === 3"
@@ -27,7 +27,7 @@
           shadow="hover"
           :body-style="{ padding: '0px' }"
       >
-        <TableItem :type="zhihu"/>
+        <TableItem type="bili"/>
       </el-card>
       </li>
     </transition-group>
@@ -462,7 +462,7 @@
 
     //
     .widget {
-      width: calc((@col * @item-size-max + (@col - 1) * @gap)/2 -40);
+      width: calc((@col * @item-size-max + (@col - 1) * @gap)/2 - 40);
       height: 320px;
       padding: 0;
       cursor: pointer;
