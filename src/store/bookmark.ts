@@ -64,28 +64,38 @@ export default createStoreModule<BookMarkState>({
    * state
    */
   state() {
+    const calendar: BookMarkItem = {
+      title: "calendar",
+      url: "",
+      icon: "",
+      textIcon: false,
+      custom: false,
+      page: 2
+    }
     // 设置默认状态值
     const defaultState: BookMarkState = {
       // 创建一个数组保存网站
-      bookMarks: [],
+      bookMarks: [calendar],
       lastUpdateTime: undefined,
       pageNow: 1,
       pageCount: []
     }
 
     // 从本地存储中读取
-    const topSitesData = JSON.parse(localStorage[BOOK_MARK_STORAGE] ?? "[]")
-    // console.log(topSitesData)
-    copy(topSitesData, defaultState, true)
+    const bookMarkData = JSON.parse(localStorage[BOOK_MARK_STORAGE] ?? "[]")
+    copy(bookMarkData, defaultState, true)
     //初始化pageNow
     defaultState.pageNow = 1
     //初始化pageCount
+    defaultState.pageCount = new Array(100).fill(0)
     for(let i=1; i < defaultState.pageCount.length; i++) {
-      defaultState.pageCount[i-1] = defaultState.bookMarks.reduce((acc, curr) => {
+      defaultState.pageCount[i] = defaultState.bookMarks.reduce((acc, curr) => {
         return curr.page === i ? acc + 1 : acc;
       }, 0);
     }
+
     console.log(defaultState.pageCount)
+    console.log(defaultState.bookMarks)
 
     return defaultState
   },

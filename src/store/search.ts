@@ -99,6 +99,7 @@ export default createStoreModule<SearchState>({
     // 从本地存储中读取历史搜索记录
     const history = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
     Object.assign(defaultState.history, history)
+    console.log(defaultState.history)
 
     return defaultState
   },
@@ -131,8 +132,10 @@ export default createStoreModule<SearchState>({
      */
     [SearchMutations.putHistory]: (state,  payload: { newHistory: HistoryItem, userID: string }) => {
       const { newHistory, userID } = payload
-      // console.log("1"+newHistory.searchText)
-      let history: Array<HistoryItem> = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] || "[]") as Array<HistoryItem>
+
+      let history:any[] =  []
+      const his = JSON.parse(localStorage[SEARCH_HISTORY_STORAGE] ?? "[]")
+      Object.assign(history, his)
       console.log(history)
       // 去重并在头添加
       history = history.filter(item => item?.searchText !== newHistory?.searchText)

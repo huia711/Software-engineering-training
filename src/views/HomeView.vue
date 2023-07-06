@@ -21,11 +21,20 @@
         <!-- 书签 -->
         <BookMark/>
       </section>
+      <section class="sec" id="sec3">
+        <div class="nouse"></div>
+        <!-- 书签 -->
+        <BookMark/>
+      </section>
+      <section class="sec" id="sec4">
+        <div class="nouse"></div>
+        <!-- 书签 -->
+        <BookMark/>
+      </section>
 
       <!-- 设置标签页 -->
       <el-tabs
-          v-model=pageNow
-          type="card"
+          v-model='pagenow'
           class="el-tabs"
           tab-position="left"
           @tab-remove="removeTab"
@@ -39,7 +48,7 @@
         >
           <template #label>
             <span class="custom-tabs-label" @click="scroll(item.num)" :id="item.num">
-              <el-icon><IconMenu /></el-icon>
+              <el-icon><component :is="item.icon" /></el-icon>
               <span>{{ item.title }}</span>
             </span>
           </template>
@@ -108,15 +117,18 @@ import settingPage from '@/views/settingPage/settingPage.vue'
 import BookMark from '@/views/home/BookMark.vue'
 import userPage from '@/views/userPage/userPage.vue'
 
+
 import { TabMutations } from "@/store/tab"
 // 外部导入
 import $ from 'jquery';
 import { mapMutations } from "vuex";
 import { useI18n } from 'vue-i18n'
-import {Check, Close, Document, Menu as IconMenu, Setting, User} from '@element-plus/icons-vue'
+import {Check, Close, Menu as IconMenu, Setting, User} from '@element-plus/icons-vue'
 import axios from "@/plugins/axios";
 import { BookMarkMutations } from "@/store/bookmark";
 import { SearchSuggestion,OpenPageTarget, LanguageType } from "@/enum-interface"
+import {House, Document, SwitchButton, Collection} from '@element-plus/icons-vue'
+
 
 export default {
   data(){
@@ -268,6 +280,7 @@ export default {
     const { t } = useI18n()
 
     const menu1 = ref(t('home.MainTab'))
+    let pagenow = ref('1')
 
     const pageNow = computed({
       get: () => store.state.bookMark.pageNow,
@@ -278,11 +291,11 @@ export default {
     let tabIndex = computed(() => store.state.tab.tabIndex)
 
     const handleScroll = () => {
-      if (document.getElementById('main').scrollTop === 0) {
-        document.getElementById('1').click()
-      }
-      if (document.getElementById('main').scrollTop === document.getElementById('main').clientHeight) {
-        document.getElementById('2').click()
+      for (let i=0; i<tabIndex.value; i++) {
+        if (document.getElementById('main').scrollTop === (document.getElementById('main').clientHeight)*i) {
+          pagenow.value = '2'
+          console.log("page"+pagenow.value)
+        }
       }
     }
 
@@ -291,7 +304,7 @@ export default {
       const element = document.getElementById('sec'+sec)
       element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
       pageNow.value = sec
-      // console.log("page"+pageNow.value)
+      console.log("page"+pageNow.value)
     }
 
     const addTab = (targetName) => {
@@ -343,6 +356,8 @@ export default {
       addTab,
       tabs,
       tabsAdd,
+      pageNow: computed(() => pageNow).value,
+      pagenow,
 
       fixedSearch: computed(() => route.path !== "/"), // 是否固定搜索框
       searchText: computed(() => route.params.text), // 搜索框默认文本 // params 是 Vue Router 提供的一种路由参数获取方式，用于在路由中传递参数

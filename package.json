@@ -16,6 +16,7 @@
     "@vueuse/core": "^10.1.2",
     "ant-design-vue": "^3.2.20",
     "axios": "^1.4.0",
+    "babel-plugin-import": "^1.13.6",
     "core-js": "^3.8.3",
     "element-plus": "^2.3.6",
     "jquery": "^3.7.0",

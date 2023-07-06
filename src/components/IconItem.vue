@@ -1,4 +1,5 @@
 <template>
+  <div class="item-wrap">
       <!-- 如果需要使用文本图标或者没有传入图片地址，则渲染文本图标 -->
       <p
         v-if="textIcon || !src"
@@ -12,7 +13,7 @@
 
       <!-- 如果传入了图片地址，则渲染图片 -->
       <img v-else class="img-icon" :src="src" alt="logo" draggable="false" />
-
+  </div>
 </template>
 
 <script lang="ts" setup type="module">
@@ -46,11 +47,19 @@ function getFontIcon() {
 </script>
 
 <style>
+.item-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* 添加这一行 */
+
+  width: 65px;
+  height: 65px;
 
     /* 文本图标样式 */
     .text-icon {
-      width: 66px;
-      height: 66px;
+      width: 65px;
+      height: 65px;
       font-size: 38px;
       margin: 0;
       line-height: 0.9;
@@ -64,12 +73,13 @@ function getFontIcon() {
 
     /* 图片样式 */
     .img-icon {
-      height: 100%;
-      width: 100%;
+      height: 75%;
+      width: 75%;
       text-align: center;
       display: flex;
       justify-content: center;
       align-items: center;
     }
+}
 
 </style>

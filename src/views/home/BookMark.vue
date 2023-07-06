@@ -1,11 +1,40 @@
 <template>
   <!-- 顶部网站导航组件 -->
   <div class="bookmark-warp">
+    <transition-group class="widget-grid">
+      <li class='widget-item'>
+      <!-- 小组件：日历 -->
+      <el-card
+          v-if="pageNow === 2"
+          class="widget"
+          shadow="hover"
+          :body-style="{ padding: '0px' }"
+      >
+        <CalendarItem/>
+      </el-card>
+      <!-- 小组件:热搜 -->
+      <el-card
+          v-if="pageNow === 3"
+          class="widget"
+          shadow="hover"
+          :body-style="{ padding: '0px' }"
+      >
+        <TableItem type="weibo"/>
+      </el-card>
+      <el-card
+          v-if="pageNow === 3"
+          class="widget"
+          shadow="hover"
+          :body-style="{ padding: '0px' }"
+      >
+        <TableItem :type="zhihu"/>
+      </el-card>
+      </li>
+    </transition-group>
     <!-- 过渡动画组件，实现顶部网站拖拽排序的动画效果 -->
     <!--tag="ul":将<transition-group>组件中的所有子元素渲染为HTML中的无序列表元素（ul)-->
     <transition-group class="bookmark-grid" name="flip-list" tag="ul">
       <!-- 循环渲染顶部网站列表中的每一项 -->
-      <!--{hide: data.currentDrag === index}: 当data.currentDrag与当前index相等时，元素会绑定“hide”这个CSS类，从而实现“隐藏”这个效果。-->
       <li
           v-for="(item, index) of bookMarks"
           :key="item.url"
@@ -132,14 +161,17 @@
   import { useStore } from "@/store"
   import {BookMarkActions, BookMarkGetters, BookMarkMutations} from "@/store/bookmark"
 
+  import { getFavicon } from "@/plugins/getIcon"
+
   // 外部导入
   import { DragType, OpenPageTarget, SortData, BookMarkItem, BookMarks } from "@/enum-interface"
   import { useI18n } from "vue-i18n"
-  import { Plus } from "@element-plus/icons-vue";
+  import { Plus} from "@element-plus/icons-vue"
   import type { FormInstance } from 'element-plus'
-  import Icon from "@/components/IconItem.vue";
+  import Icon from "@/components/IconItem.vue"
+  import CalendarItem from "@/components/CalendarItem.vue";
+  import TableItem from "@/components/TableItem.vue";
 
-  import { getFavicon } from "@/plugins/getIcon"
 
   /**
    * 常/变量（const/let）的定义
@@ -288,6 +320,7 @@
       return pageCount.value[pageNow.value] < 10
     }
     else {
+      console.log(pageCount.value[pageNow.value])
       return pageCount.value[pageNow.value] < 18
     }
   }
@@ -323,8 +356,10 @@
 
   // 定义样式规则
   .bookmark-warp {
-    // 计算整个顶部网站导航栏的高度和宽度
     width: calc(@col * @item-size-max + (@col - 1) * @gap);
+
+    display: grid;
+    grid-row-gap: 42px;
 
     // 定义图标网格布局
     .bookmark-grid {
@@ -409,6 +444,29 @@
         user-select: none; // 用户无法选中元素中的文本
       }
     }
+
+    // 定义图标网格布局
+    .widget-grid {
+      display: grid;
+      gap: @gap;
+      padding: 0;
+    }
+
+    .widget-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      column-gap: 8px;
+    }
+
+    //
+    .widget {
+      width: calc((@col * @item-size-max + (@col - 1) * @gap)/2 -40);
+      height: 320px;
+      padding: 0;
+      cursor: pointer;
+    }
   }
 
   @keyframes shake {
@@ -438,3 +496,5 @@
   //  }
   //}
 </style>
+
+

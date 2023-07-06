@@ -15,6 +15,8 @@ app.use(router)
 app.use(i18n)
 app.use(ElementPlus)
 
+
+
 //注册全局指令click-outside
 app.directive('clickOutside', {
     mounted(el, binding, vnode, prevVnode) {

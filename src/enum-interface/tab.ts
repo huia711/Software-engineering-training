@@ -1,7 +1,9 @@
+import {Component} from "vue";
+
 export interface TabItem {
     title: string
     num: number
-    content?: string
+    icon?: Component
 }
 
 export type Tabs = Array<TabItem>
