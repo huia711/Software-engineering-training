@@ -78,7 +78,7 @@ export default{
         return{
             curCustomBackgroundColorState: this.pageColorStyle.customBackgroundColor,
             curCustomButtonColorState: this.pageColorStyle.customButtonColor,
-            curPresetColorState: this.pageColorStyle.presetColor > -1,
+            curPresetColorState: !(this.pageColorStyle.customBackgroundColor || this.pageColorStyle.customButtonColor),
             curSelectedPresetColorStyle: this.pageColorStyle.presetColor,
             backgroundColorStyle: this.pageColorStyle.backgroundColor,
             buttonColorStyle: this.pageColorStyle.buttonColor,
@@ -236,6 +236,9 @@ export default{
         isVisible(newVal, oldVal){
             if(newVal === false)
                 this.setPageColorStyle(this.tempPageColorStyle)
+        },
+        pageColorStyle(newVal, oldVal){
+            this.tempPageColorStyle = newVal
         }
     }
 }

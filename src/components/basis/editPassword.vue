@@ -119,6 +119,7 @@ export default{
                 if(response.data.code === 200){
                     // 修改成功
                     this.setUserPassword(this.newPasswd)
+                    localStorage.setItem("userPassword",this.newPasswd)
                     this.$emit("hidePage")
                 } else {
                     // 修改失败
