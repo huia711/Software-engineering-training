@@ -11,6 +11,9 @@
   >
     <el-table-column prop="rank" label="排行" width="80" />
     <el-table-column prop="name" label="标题" width="400" />
+    <template #header>
+      <span>{{ title }}</span>
+    </template>
   </el-table>
 </template>
 
@@ -35,6 +38,12 @@ interface ContentIndex {
 
   const content = ref<ContentIndex[]>([])
 
+  let title = ''
+  if (props.type === 'wbHot')  title = "微博热搜"
+  if (props.type === 'wbHot')  title = "微博热搜"
+  if (props.type === 'wbHot')  title = "微博热搜"
+  if (props.type === 'wbHot')  title = "微博热搜"
+
   async function getContent() {
     if ((props.type) === undefined) {
       return []
@@ -43,7 +52,7 @@ interface ContentIndex {
         await axios.get('http://localhost:2020/user/getMoreInfo?type=' + props.type).then(response => {
           if (response.data.code === 200 && response.data.data !== null) {
 
-            content.value = content.value.concat(response.data.data.data);
+            content.value = response.data.data.data;
             console.log(content.value)
             return response.data.data.data
           }
@@ -80,8 +89,6 @@ interface ContentIndex {
       return 'success-row'
     }
   }
-
-  onBeforeMount(getContent)
 </script>
 
 <style>

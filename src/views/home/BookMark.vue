@@ -12,6 +12,7 @@
       >
         <CalendarItem/>
       </el-card>
+
       <!-- 小组件:热搜 -->
       <el-card
           v-if="pageNow === 3"
@@ -28,6 +29,24 @@
           :body-style="{ padding: '0px' }"
       >
         <TableItem type="bili"/>
+      </el-card>
+
+      <!-- 小组件:热搜 -->
+      <el-card
+          v-if="pageNow === 4"
+          class="widget"
+          shadow="hover"
+          :body-style="{ padding: '0px' }"
+      >
+        <TableItem type="zhihuHot"/>
+      </el-card>
+      <el-card
+          v-if="pageNow === 4"
+          class="widget"
+          shadow="hover"
+          :body-style="{ padding: '0px' }"
+      >
+        <TableItem type="itInfo"/>
       </el-card>
       </li>
     </transition-group>
