@@ -188,6 +188,8 @@ export default {
              * 
              *          bookMarks:...           <= 标签页，无则返回"null"
              *          record:...              <= 搜索历史，无则返回"null"
+             *
+             *          log:...
              *          ...                     <= 后期可能增加的其它用户数据
              *      }
              *  ...
@@ -196,6 +198,8 @@ export default {
             this.setUserName(response.data.data.userName)
             this.setUserPassword(this.passwd)
             this.setUserId(this.account)
+
+            console.log(this.account)
             // 初始化用户设置
             this.initSettings({
               pageColorStyle: {
@@ -346,6 +350,28 @@ export default {
               }
               this.updateHistory(historys)
             }
+            // /**
+            //  * 返回格式：
+            //  * {
+            //  *  code:...
+            //  *  data:...  <= 历史记录数据
+            //  * }
+            //  */
+            // if (response.data.data.log !== "null") {
+            //   const log = response.data.data.log
+            //   const date = response.data.data.date
+            //   const contents = []
+            //   // 遍历5个数组，初始化bookmark
+            //   for (let i = 0; i < log.length - 1; i++) {
+            //     const content = {
+            //       date: date[i],
+            //       text: log[i]
+            //     }
+            //     contents.push(content)
+            //   }
+            //   this.updateHistory(contents)
+            // }
+
             this.spinnerVisible = false
             this.closePage()
           } else {

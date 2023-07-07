@@ -10,10 +10,7 @@
       @header-click="refresh"
   >
     <el-table-column prop="rank" label="排行" width="80" />
-    <el-table-column prop="name" label="标题" width="400" />
-    <template #header>
-      <span>{{ title }}</span>
-    </template>
+    <el-table-column prop="name" :label="title" width="400" />
   </el-table>
 </template>
 
@@ -37,12 +34,13 @@ interface ContentIndex {
   });
 
   const content = ref<ContentIndex[]>([])
+  let isCreatedCalled = false
 
   let title = ''
   if (props.type === 'wbHot')  title = "微博热搜"
-  if (props.type === 'wbHot')  title = "微博热搜"
-  if (props.type === 'wbHot')  title = "微博热搜"
-  if (props.type === 'wbHot')  title = "微博热搜"
+  if (props.type === 'bili')  title = "B站热搜"
+  if (props.type === 'zhihuHot')  title = "知乎热搜"
+  if (props.type === 'itInfo')  title = "IT之家资讯"
 
   async function getContent() {
     if ((props.type) === undefined) {
@@ -89,6 +87,9 @@ interface ContentIndex {
       return 'success-row'
     }
   }
+
+  onBeforeMount(getContent)
+
 </script>
 
 <style>

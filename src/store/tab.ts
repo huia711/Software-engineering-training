@@ -45,22 +45,22 @@ export default createStoreModule<TabState>({
             Tabs: [
             {
                 title: '首页',
-                num: 1,
+                name: '1',
                 icon: SwitchButton,
             },
             {
                 title: '主页面',
-                num: 2,
+                name: '2',
                 icon: House,
             },
             {
                 title: '资讯',
-                num: 3,
+                name: '3',
                 icon: Document,
             },
             {
                 title: '学习',
-                num: 4,
+                name: '4',
                 icon: Collection,
             }
             ],

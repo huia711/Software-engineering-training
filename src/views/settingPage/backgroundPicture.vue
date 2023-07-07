@@ -106,6 +106,11 @@ async function loadWebPicture(){
           state.pictureLoaded = false
         })
       }
+      state.images.push({
+        localUrl: "",
+        webUrl: "",
+        description: "✖"
+      })
     }, error=>{
       console.log(error);
       state.pictureLoaded = false

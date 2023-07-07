@@ -34,20 +34,20 @@
 
       <!-- 设置标签页 -->
       <el-tabs
-          v-model='pagenow'
+          v-model="pagenow"
           class="el-tabs"
           tab-position="left"
           @tab-remove="removeTab"
       >
         <el-tab-pane
             v-for="item in tabs"
-            :key="item.num"
+            :key="item.name"
             :label="item.title"
-            :name="item.title"
-            :closable = "false"
+            :name="item.name"
+            :closable="false"
         >
           <template #label>
-            <span class="custom-tabs-label" @click="scroll(item.num)" :id="item.num">
+            <span class="custom-tabs-label" @click="scroll(item.name)" :id="item.name">
               <el-icon><component :is="item.icon" /></el-icon>
               <span>{{ item.title }}</span>
             </span>
@@ -55,13 +55,13 @@
         </el-tab-pane>
         <el-tab-pane
             v-for="item in tabsAdd"
-            :key="item.num"
+            :key="item.name"
             :label="item.title"
             :name="item.title"
             closable
         >
           <template #label>
-            <span class="custom-tabs-label" @click="scroll(item.num)" :id="item.num">
+            <span class="custom-tabs-label" @click="scroll(item.name)" :id="item.name">
               <el-icon><IconMenu /></el-icon>
               <span>{{ item.title }}</span>
             </span>
@@ -107,7 +107,7 @@
 /**
  * 导入（import）
  */
-import {computed, onBeforeUnmount, onMounted, ref} from "vue"
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue"
 import Vue from 'vue'
 import { useStore } from "@/store"
 import { useRoute } from "vue-router"
@@ -116,6 +116,7 @@ import Search from "@/views/home/IndexSearch.vue"
 import settingPage from '@/views/settingPage/settingPage.vue'
 import BookMark from '@/views/home/BookMark.vue'
 import userPage from '@/views/userPage/userPage.vue'
+import { SettingsMutationTypes } from '@/store/settings'
 
 
 import { TabMutations } from "@/store/tab"
@@ -128,6 +129,7 @@ import { BookMarkMutations } from "@/store/bookmark";
 import { SearchSuggestion,OpenPageTarget, LanguageType } from "@/enum-interface"
 import { loginMethod } from "@/utils/loginMethod"
 import {House, Document, SwitchButton, Collection} from '@element-plus/icons-vue'
+const editableTabsValue = ref(2)
 
 
 export default {
@@ -286,6 +288,7 @@ export default {
       get: () => store.state.bookMark.pageNow,
       set: pageNow => store.commit(BookMarkMutations.updatePageNow, pageNow)
     })
+
     const tabs =  computed(() => store.state.tab.Tabs)
     const tabsAdd = computed(() => store.state.tab.TabsAdd)
     let tabIndex = computed(() => store.state.tab.tabIndex)
@@ -293,8 +296,9 @@ export default {
     const handleScroll = () => {
       for (let i=0; i<tabIndex.value; i++) {
         if (document.getElementById('main').scrollTop === (document.getElementById('main').clientHeight)*i) {
-          pagenow.value = '2'
-          console.log("page"+pagenow.value)
+          pagenow.value = (i+1).toString()
+          pageNow.value = i+1
+          console.log("page"+pageNow.value)
         }
       }
     }
@@ -302,9 +306,10 @@ export default {
     const scroll = (sec) => {
       // console.log("success")
       const element = document.getElementById('sec'+sec)
-      element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
+      pagenow.value = sec.toString()
       pageNow.value = sec
       console.log("page"+pageNow.value)
+      element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
     }
 
     const addTab = (targetName) => {
@@ -342,8 +347,9 @@ export default {
       }
       window.addEventListener('scroll', handleScroll)
       // 组件挂载后自动读取本地数据并尝试登录
-      let account = localStorage.getItem("userId")
-      let password = localStorage.getItem("userPassword")
+      const account = localStorage.getItem("userId")
+      commit(SettingsMutationTypes.setUserId, account)
+      const password = localStorage.getItem("userPassword")
       if(account && password){
         // 存在数据，尝试登录
         loginMethod({

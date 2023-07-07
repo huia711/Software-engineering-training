@@ -6,7 +6,7 @@
       <!-- 小组件：日历 -->
       <el-card
           v-if="pageNow === 2"
-          class="widget"
+          class="widget-calendar"
           shadow="hover"
           :body-style="{ padding: '0px' }"
       >
@@ -178,14 +178,14 @@
    */
   import { computed, onBeforeMount, reactive, ref } from "vue"
   import { useStore } from "@/store"
-  import {BookMarkActions, BookMarkGetters, BookMarkMutations} from "@/store/bookmark"
+  import { BookMarkActions, BookMarkGetters, BookMarkMutations } from "@/store/bookmark"
 
   import { getFavicon } from "@/plugins/getIcon"
 
   // 外部导入
   import { DragType, OpenPageTarget, SortData, BookMarkItem, BookMarks } from "@/enum-interface"
   import { useI18n } from "vue-i18n"
-  import { Plus} from "@element-plus/icons-vue"
+  import { Plus } from "@element-plus/icons-vue"
   import type { FormInstance } from 'element-plus'
   import Icon from "@/components/IconItem.vue"
   import CalendarItem from "@/components/CalendarItem.vue";
@@ -242,6 +242,8 @@
 
   // 删除
   function deleteBookMark(index: number) {
+    console.log(index)
+    console.log(bookMarks)
     commit(BookMarkMutations.deleteBookMark, { index: index, userId: userID })
   }
 
@@ -336,7 +338,10 @@
   //
   function checkPage() {
     if (pageNow.value === 1) {
-      return pageCount.value[pageNow.value] < 10
+      return pageCount.value[pageNow.value] < 12
+    }
+    if (pageNow.value === 2) {
+      return false
     }
     else {
       console.log(pageCount.value[pageNow.value])
@@ -477,12 +482,35 @@
       align-items: center;
       justify-content: center;
       column-gap: 8px;
+
+      // 定义图标的进入和离开动画样式
+      &.flip-list-enter-from,
+      &.flip-list-leave-to {
+        opacity: 0;
+        transform: translateY(@board-size);
+      }
+
+      &.flip-list-enter-active,
+      &.flip-list-leave-active,
+      &.flip-list-move {
+        transition: all 0.3s ease;
+      }
+
+      &.flip-list-enter-active {
+        transition-delay: 0.3s;
+      }
     }
 
     //
     .widget {
       width: calc((@col * @item-size-max + (@col - 1) * @gap)/2 - 40);
       height: 320px;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .widget-calendar {
+      width: calc((@col * @item-size-max + (@col - 1) * @gap)/2 - 40);
       padding: 0;
       cursor: pointer;
     }

@@ -56,7 +56,7 @@
   import { useStore } from "@/store"
   import {SearchActions, SearchGetters, SearchMutations} from "@/store/search" // 引入搜索业务模块中的 Actions 和 Getters
   import { SettingMutations } from "@/store/setting" // 引入设置业务模块中的 Mutations
-  import { ref, computed } from "vue"
+  import {ref, computed, watch} from "vue"
   // 导入外部定义
   import {HistoryItem, Option, SearchSetting, SearchSuggestion} from "@/enum-interface" // 引入一些用于标记类型的枚举或接口类型
   import {isEmpty, matchPrefix} from "@/utils/common" // 引入一个工具函数用于判断一个值是否为空
@@ -94,6 +94,7 @@
   const searchEngines = computed(() => getters[SearchGetters.getUseSearchEngines])
   const searchSetting = computed(() => stateX.setting.search)
   const userID = computed(() => stateX.settings.userId).value
+  const MaxSearch = computed(() => stateX.settings.searchItemCount)
 
   // 当前搜索引擎
   const currentEngine = computed({
@@ -160,6 +161,7 @@
       }
 
       const suggestionObject = []
+
       Result.forEach(str => {
         const obj = {
           title: "",

@@ -21,6 +21,8 @@ export function loginMethod(userInfo : UserInfo){
       try {
         axios.post('http://localhost:2020/user/login', data).then(response => {
           if (response.data.code === 200) {
+            store.commit("setuserId", userInfo.Id)
+            store.commit("setuserPassword", userInfo.passwd)
             // 登陆成功
             /**
              * 返回消息内容格式：

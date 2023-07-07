@@ -19,6 +19,7 @@ export interface SettingsState {
 
 export enum SettingsMutationTypes {
     setSearchItemCount = "SET_SEARCH_ITEM_COUNT",
+    setUserId = "SET_USERID"
 }
 
 export default createStoreModule<SettingsState>({
@@ -71,6 +72,9 @@ export default createStoreModule<SettingsState>({
         */
         [SettingsMutationTypes.setSearchItemCount]: (state, payload:number) => {
             state.searchItemCount = payload;
+        },
+        [SettingsMutationTypes.setUserId]: (state, payload:string) => {
+            state.userId = payload;
         },
 
         initSettings(state, payload: any) {

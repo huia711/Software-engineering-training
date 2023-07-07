@@ -64,18 +64,10 @@ export default createStoreModule<BookMarkState>({
    * state
    */
   state() {
-    const calendar: BookMarkItem = {
-      title: "calendar",
-      url: "",
-      icon: "",
-      textIcon: false,
-      custom: false,
-      page: 2
-    }
     // 设置默认状态值
     const defaultState: BookMarkState = {
       // 创建一个数组保存网站
-      bookMarks: [calendar],
+      bookMarks: [],
       lastUpdateTime: undefined,
       pageNow: 1,
       pageCount: []
@@ -147,7 +139,7 @@ export default createStoreModule<BookMarkState>({
      */
     [BookMarkMutations.deleteBookMark]: (state, payload: { index: number, userId: string }) => {
       const { index, userId } = payload
-      state.bookMarks.splice(index, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
+      state.bookMarks.splice(index+1, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
       state.pageCount[state.pageNow]--
       saveBookMarkState(state, userId)
     },
@@ -207,8 +199,8 @@ export default createStoreModule<BookMarkState>({
     /**
      * 更新页面
      */
-    [BookMarkMutations.updatePageNow]: (state, pageNow: number) => {
-      state.pageNow = pageNow
+    [BookMarkMutations.updatePageNow]: (state, pageNow: string) => {
+      state.pageNow = parseInt(pageNow)
     }
   },
   actions: {
@@ -242,10 +234,11 @@ const saveBookMarkState = debounce((data: BookMarkState, userId: string) => {
    * 上传新标签页到服务器
    */
   try {
+    console.log(userId)
     axios.post('http://localhost:2020/user/newURL/'+userId, postData).then(response=> {
       if (response.data.code === 200) {
         ElMessage({
-          message: "history.updateSuccess",
+          message: "已连接服务器",
           type: "success",
         })
       }

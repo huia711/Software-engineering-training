@@ -1,92 +1,146 @@
+<!--suppress TypeScriptValidateTypes -->
 <template>
   <div class="calendar">
-    <el-calendar v-model="value" :fullscreen="false" >
-      <template #dateCellRender="{ current }">
-        <ul class="events">
-          <li v-for="item in getListData(current)" :key="item.content">
-            <a-badge :status="item.type" :text="item.content" />
-          </li>
-        </ul>
+    <el-calendar >
+      <template #header="{ date }">
+        <span>日程</span>
+        <span>{{ date }}</span>
       </template>
-      <template #monthCellRender="{ current }">
-        <div v-if="getMonthData(current)" class="notes-month">
-          <section>{{ getMonthData(current) }}</section>
-          <span>Backlog number</span>
-        </div>
+
+      <template #date-cell="{ data }">
+        <p :class="data.isSelected ? 'is-selected' : ''">
+          {{ data.day.split('-').slice(1).join('-') }}
+          {{ data.isSelected ? '✔️' : '' }}
+        </p>
+        <p>
+          {{ getMessage(data.day) }}
+        </p>
+        <el-dialog v-model="data.isSelected">
+          <el-form-item label="日程" prop="title">
+            <el-input v-model="log" placeholder="今天要……" />
+          </el-form-item>
+          <template #footer>
+          <span class="dialog-footer">
+            <el-button type="primary" @click=Save(data.day)>
+              确定
+            </el-button>
+          </span>
+          </template>
+        </el-dialog>
       </template>
     </el-calendar>
   </div>
 </template>
+
 <script lang="ts" setup>
-  import { defineComponent, ref } from 'vue'
-  import { Dayjs } from 'dayjs'
+  import { ref } from "@vue/reactivity"
+  import axios from "@/plugins/axios";
+  import { ElMessage } from "element-plus";
+  import {computed, onBeforeMount} from "vue";
+  import { useStore } from "@/store"
+  import { debounce } from "@/utils/async";
 
+  interface post {
+    id: string
+    date: string
+    log: string
+  }
 
-  const value = ref<Dayjs>();
+  const { state } = useStore()
 
+  let logs: post[] = []
+  const userID = computed(() => state.settings.userId ).value
 
-  const getListData = (value: Dayjs) => {
-    let listData;
-    switch (value.date()) {
-      case 8:
-        listData = [
-          { type: 'warning', content: 'This is warning event.' },
-          { type: 'success', content: 'This is usual event.' },
-        ];
-        break;
-      case 10:
-        listData = [
-          { type: 'warning', content: 'This is warning event.' },
-          { type: 'success', content: 'This is usual event.' },
-          { type: 'error', content: 'This is error event.' },
-        ];
-        break;
-      case 15:
-        listData = [
-          { type: 'warning', content: 'This is warning event' },
-          { type: 'success', content: 'This is very long usual event。。....' },
-          { type: 'error', content: 'This is error event 1.' },
-          { type: 'error', content: 'This is error event 2.' },
-          { type: 'error', content: 'This is error event 3.' },
-          { type: 'error', content: 'This is error event 4.' },
-        ];
-        break;
-      default:
+  let log = ref('')
+
+  function getMessage (date: Date) {
+    console.log(":"+logs.length)
+    for (let i in logs) {
+      if (date === logs[i].date) {
+        return logs[i].log
+      }
     }
-    return listData || [];
-  };
+  }
 
-  const getMonthData = (value: Dayjs) => {
-    if (value.month() === 8) {
-      return 1394;
+
+  function Save(date: Date) {
+    const post = {
+      id: userID,
+      date: date,
+      log: log.value
     }
-  };
+    logs.push(post)
+    Postlog(post, userID)
+
+  }
+
+  const Postlog = debounce((data: post) => {
+    /**
+     * 上传新标签页到服务器
+     */
+    try {
+      console.log(data)
+      axios.post('http://localhost:2020/user/log', data).then(response=> {
+        if (response.data.code === 200) {
+          ElMessage({
+            message: "已连接服务器",
+            type: "success",
+          })
+        }
+      },(error)=>{
+        ElMessage({
+          message: "无法连接服务器",
+          type: 'warning',
+        })
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }, 250)
+
+  async function getContent() {
+    try {
+      await axios.get('http://localhost:2020/user/myLog/' + userID).then(response => {
+        if (response.data.code === 200 && response.data.data !== null) {
+          const date = response.data.data.Date
+          const log = response.data.data.log
+          console.log(date)
+          console.log(log)
+          logs=[]
+          for (let i = 0; i < log.length - 1; i++) {
+            const Log = {
+              date: date[i],
+              log: log[i]
+            }
+            logs.push(Log)
+            console.log(logs)
+          }
+          return response.data.data.data
+        }
+      }, (error) => {
+        ElMessage({
+          message: "无法连接服务器",
+          type: 'warning',
+        })
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  onBeforeMount(getContent)
 
 </script>
 
-<style lang="less" scoped>
-  .events {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .events .ant-badge-status {
-    overflow: hidden;
-    white-space: nowrap;
-    width: 100%;
-    text-overflow: ellipsis;
-    font-size: 12px;
-  }
-  .notes-month {
-    text-align: center;
-    font-size: 28px;
-  }
-  .notes-month section {
-    font-size: 28px;
+<style>
+  .is-selected {
+    color: #1989fa;
   }
 
   .calendar {
-    width: 100%;
-    height: 100%;
+    width: 970px;
+
+    align-items: center;
+    justify-content: center;
   }
 </style>

@@ -10,7 +10,6 @@
   import {useStore} from "@/store"
   import { SettingMutations } from "@/store/setting"
   // 导入外部定义
-  import basicSettings from "@/views/settingPage/basicSettings.vue";
   import {LanguageType, ThemeMode} from "@/enum-interface"
   import { usePreferredDark } from "@/utils/use"
   // 外部
@@ -127,7 +126,6 @@
     }
 
     if (oldValue === undefined) {
-      console.log(oldValue)
       if(newValue){
         // 黑夜模式
         const tempPageColorStyle = Object({

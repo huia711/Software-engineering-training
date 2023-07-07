@@ -2,7 +2,7 @@ import {Component} from "vue";
 
 export interface TabItem {
     title: string
-    num: number
+    name: string
     icon?: Component
 }
 

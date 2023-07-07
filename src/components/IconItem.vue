@@ -14,6 +14,7 @@
       <!-- 如果传入了图片地址，则渲染图片 -->
       <img v-else class="img-icon" :src="src" alt="logo" draggable="false" />
   </div>
+
 </template>
 
 <script lang="ts" setup type="module">
