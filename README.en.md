@@ -1,36 +1,6 @@
 # 软件工程实训-中级
 
-#### Description
-{**When you're done, you can delete the content in this README and update the file with details for others getting started with your repository**}
-
-#### Software Architecture
-Software architecture description
-
-#### Installation
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Instructions
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Contribution
-
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
+### Description
+With the increasing user demand for interface personalization, products that support customization are becoming more and more popular. Those products that do not support user customization are always mocked by users for their "poison spots" in the layout; At the same time, we also noticed that the old TAB page of the browser has only the most basic functions in terms of the content that the user really needs, and can not fully meet the daily use needs of the majority of users; At the same time, it adds many additional functions that users do not need, which cannot provide users with a better experience. Therefore, we decided to develop a new browser TAB plug-in that supports user customization, replacing the old browser TAB.
 
 
-#### Gitee Feature
-
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
