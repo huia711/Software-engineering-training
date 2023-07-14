@@ -54,12 +54,12 @@ export default createStoreModule<TabState>({
                 icon: House,
             },
             {
-                title: '资讯',
+                title: '热榜',
                 name: '3',
                 icon: Document,
             },
             {
-                title: '学习',
+                title: '资讯',
                 name: '4',
                 icon: Collection,
             }

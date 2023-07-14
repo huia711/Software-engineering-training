@@ -87,9 +87,6 @@ interface ContentIndex {
       return 'success-row'
     }
   }
-
-  onBeforeMount(getContent)
-
 </script>
 
 <style>

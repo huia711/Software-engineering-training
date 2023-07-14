@@ -139,7 +139,7 @@ export default createStoreModule<BookMarkState>({
      */
     [BookMarkMutations.deleteBookMark]: (state, payload: { index: number, userId: string }) => {
       const { index, userId } = payload
-      state.bookMarks.splice(index+1, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
+      state.bookMarks.splice(index, 1) // splice(index, 1) 的意思是从 index 开始删除一个元素，并返回被删除的元素（如果存在）的数组
       state.pageCount[state.pageNow]--
       saveBookMarkState(state, userId)
     },

@@ -104,7 +104,7 @@ import { useI18n } from "vue-i18n"
   const countRange = {
                 start: 0,
                 end: 8,
-                baseNum:store.state.settings.searchItemCount
+                baseNum: searchItemNumber
             }
   
   function itemCountChange(newVal:number){

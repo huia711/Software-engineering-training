@@ -36,7 +36,7 @@
   import { ref } from "@vue/reactivity"
   import axios from "@/plugins/axios";
   import { ElMessage } from "element-plus";
-  import {computed, onBeforeMount} from "vue";
+  import {computed, onBeforeMount, watch} from "vue";
   import { useStore } from "@/store"
   import { debounce } from "@/utils/async";
 
@@ -52,6 +52,11 @@
   const userID = computed(() => state.settings.userId ).value
 
   let log = ref('')
+
+  watch(() => logs.length, (newValue, oldValue) => {
+    logs = newValue
+    console.log(":"+logs.length)
+  })
 
   function getMessage (date: Date) {
     console.log(":"+logs.length)
