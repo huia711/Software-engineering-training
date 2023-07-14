@@ -13,12 +13,25 @@ func UserRouterInit(r *gin.RouterGroup) {
 	{
 		userManager.POST("/register", control.RegisterHandler)
 		userManager.POST("/login", control.LoginHandler)
-		userManager.POST("/:id", control.OnlineHandler)
-		//userManager.GET("/refresh_token", control.RefreshTokenHandler)
+		userManager.POST("/settings", control.Settings)
+		userManager.POST("/deleteAccount", control.DeleteAccount)
+		userManager.POST("/uploadBackground", control.UploadBackground)
+		userManager.POST("/uploadAvatar", control.UploadAvatar)
+		userManager.POST("/changePassword", control.ChangePasswd)
+		userManager.POST("/changeUserName", control.ChangeUserName)
+		userManager.POST("/newURL/:userId", control.PostNewURL)
+		userManager.POST("/record/:userId", control.PostRecord)
+		userManager.POST("/log", control.AddLog)
+		userManager.GET("/myURL/:userId", control.GetMyURL)
+		userManager.GET("/image/:imageIndex", control.OnImagesGet)
+		userManager.GET("/web-images", control.WebImages)
+		userManager.GET("/baiduSuggestion", control.GetBaiduSuggestion)
+		userManager.GET("/bingSuggestion", control.GetBingSuggestion)
+		userManager.GET("/googleSuggestion", control.GetGoogleSuggestion)
+		userManager.GET("/getMoreInfo", control.GetMoreInfo)
+		userManager.GET("/myLog/:userId", control.GetLog)
+
 		userManager.Use(logic.AuthMiddleware())
-		//{
-		//	userManager.GET("/userinfo", control.UserInfoHandler)
-		//}
 	}
 }
 

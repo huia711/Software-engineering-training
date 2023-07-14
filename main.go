@@ -49,12 +49,12 @@ func Execute() error {
 			return err
 		}
 
-		mysql.DB.AutoMigrate(&models.User{}) // 将数据库的表自动映射为User
+		mysql.DB.AutoMigrate(&models.User{}, &models.PresetBackground{}) // 将数据库的表自动映射为User
 
 		defer mysql.DB.Close() // 最后别忘了把连接关了
 
 		r := router.SetupRouter() // 初始化路由
-		err = r.Run(":2000")
+		err = r.Run(":2020")
 		if err != nil {
 			return err
 		}
